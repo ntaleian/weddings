@@ -1,0 +1,9 @@
+# Prevent directory listing
+Options -Indexes
+
+# Allow access to document files
+<FilesMatch "\.(pdf|jpg|jpeg|png|doc|docx)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+

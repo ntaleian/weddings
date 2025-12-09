@@ -1,0 +1,68 @@
+<?= $this->extend('layouts/main') ?>
+
+<?= $this->section('title') ?>Flash Messages Demo<?= $this->endSection() ?>
+
+<?= $this->section('main_content') ?>
+<div class="container" style="margin-top: 100px; padding: 40px 0;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1 class="display-4 mb-3" style="color: var(--primary-color);">Flash Messages Demo</h1>
+                <p class="lead text-muted">Test the new flash message design system</p>
+            </div>
+
+            <!-- Demo Flash Messages -->
+            <div class="alert alert-success alert-dismissible fade show flash-alert" role="alert">
+                <div class="alert-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="alert-content">
+                    <strong>Success!</strong> Your wedding application has been submitted successfully. We'll review it shortly.
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div class="alert alert-danger alert-dismissible fade show flash-alert" role="alert">
+                <div class="alert-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="alert-content">
+                    <strong>Error!</strong> Please correct the following errors:
+                    <ul class="mb-0 mt-2">
+                        <li>Wedding date is required</li>
+                        <li>Campus selection is mandatory</li>
+                        <li>Bride's full name must be provided</li>
+                    </ul>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div class="alert alert-warning alert-dismissible fade show flash-alert" role="alert">
+                <div class="alert-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="alert-content">
+                    <strong>Warning!</strong> Your selected date is very popular. Consider booking an alternative date to avoid scheduling conflicts.
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div class="alert alert-info alert-dismissible fade show flash-alert" role="alert">
+                <div class="alert-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="alert-content">
+                    <strong>Info:</strong> Pre-marital counseling sessions are available every Saturday from 9 AM to 12 PM. Please register in advance.
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div class="text-center mt-5">
+                <a href="<?= base_url('/') ?>" class="btn btn-primary btn-lg">
+                    <i class="fas fa-home"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<?= $this->endSection() ?>

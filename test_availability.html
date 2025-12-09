@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Time Slot Availability</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .time-slot {
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .time-slot.available {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+        }
+        .time-slot.unavailable {
+            border-color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .availability {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .availability.available {
+            background: #28a745;
+            color: white;
+        }
+        .availability.unavailable {
+            background: #dc3545;
+            color: white;
+        }
+        .test-controls {
+            margin: 20px 0;
+        }
+        .test-controls select, .test-controls input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wedding Time Slot Availability Test</h1>
+    
+    <div class="test-section">
+        <h3>Test API Endpoint</h3>
+        <div class="test-controls">
+            <label>Campus ID:</label>
+            <select id="campusId">
+                <option value="1">Campus 1</option>
+                <option value="2">Campus 2</option>
+                <option value="3">Campus 3</option>
+            </select>
+            
+            <label>Date:</label>
+            <input type="date" id="testDate" value="2025-08-15">
+            
+            <button onclick="checkAvailability()">Check Availability</button>
+        </div>
+        
+        <div id="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Sample Time Slots</h3>
+        <div id="timeSlots">
+            <div class="time-slot available" data-time="11:00">
+                <div>
+                    <strong>11:00 AM - 1:00 PM</strong>
+                    <br>
+                    <small>Morning ceremony time</small>
+                </div>
+                <span class="availability available">Available</span>
+            </div>
+            
+            <div class="time-slot available" data-time="13:00">
+                <div>
+                    <strong>1:00 PM - 3:00 PM</strong>
+                    <br>
+                    <small>Afternoon ceremony time</small>
+                </div>
+                <span class="availability available">Available</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkAvailability() {
+            const campusId = document.getElementById('campusId').value;
+            const date = document.getElementById('testDate').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!campusId || !date) {
+                resultDiv.innerHTML = '<div class="error">Please select both campus and date</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div>Checking availability...</div>';
+            
+            // Make API call
+            fetch(`/wedding/api/campuses/${campusId}/availability/${date}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('API Response:', data);
+                
+                if (data.status === 'success') {
+                    let html = '<div class="success"><strong>Success!</strong><br>';
+                    html += `Date: ${data.date}<br>`;
+                    html += `Campus ID: ${data.campus_id}<br>`;
+                    html += `Cost: $${data.cost || 'N/A'}<br><br>`;
+                    html += '<strong>Time Slots:</strong><br>';
+                    
+                    data.time_slots.forEach(slot => {
+                        html += `• ${slot.display}: ${slot.available ? 'Available' : 'Unavailable'}`;
+                        if (!slot.available && slot.booking_status) {
+                            html += ` (${slot.booking_status})`;
+                        }
+                        html += '<br>';
+                    });
+                    html += '</div>';
+                    
+                    resultDiv.innerHTML = html;
+                    
+                    // Update visual time slots
+                    updateTimeSlots(data.time_slots);
+                } else {
+                    resultDiv.innerHTML = `<div class="error"><strong>Error:</strong> ${data.message}</div>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `<div class="error"><strong>Error:</strong> ${error.message}</div>`;
+            });
+        }
+        
+        function updateTimeSlots(slots) {
+            slots.forEach(slotData => {
+                const timeSlot = document.querySelector(`[data-time="${slotData.time}"]`);
+                if (timeSlot) {
+                    const availability = timeSlot.querySelector('.availability');
+                    
+                    if (slotData.available) {
+                        timeSlot.className = 'time-slot available';
+                        availability.className = 'availability available';
+                        availability.textContent = 'Available';
+                    } else {
+                        timeSlot.className = 'time-slot unavailable';
+                        availability.className = 'availability unavailable';
+                        availability.textContent = slotData.booking_status === 'pending' ? 'Pending' : 'Booked';
+                    }
+                }
+            });
+        }
+        
+        // Set default date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('testDate').value = tomorrow.toISOString().split('T')[0];
+    </script>
+</body>
+</html>

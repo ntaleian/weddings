@@ -1,0 +1,338 @@
+/* Math CAPTCHA Styling */
+.math-captcha-group {
+    margin: 20px 0;
+}
+
+.captcha-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.captcha-question {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #6f017f;
+    font-weight: 600;
+    color: #495057;
+    font-size: 1.1rem;
+    position: relative;
+}
+
+.captcha-question i {
+    color: #6f017f;
+    font-size: 1.2rem;
+}
+
+.captcha-refresh {
+    background: #6f017f;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: auto;
+    font-size: 0.9rem;
+}
+
+.captcha-refresh:hover {
+    background: #8e0199;
+    transform: rotate(180deg);
+}
+
+.captcha-refresh:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.math-captcha-group input[type="number"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    background: #fff;
+}
+
+.math-captcha-group input[type="number"]:focus {
+    outline: none;
+    border-color: #6f017f;
+    box-shadow: 0 0 0 3px rgba(111, 1, 127, 0.1);
+}
+
+.math-captcha-group .form-error {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: none;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .captcha-question {
+        font-size: 1rem;
+        padding: 12px;
+    }
+    
+    .captcha-question i {
+        font-size: 1.1rem;
+    }
+}
+
+/* Email Verification Page Styling */
+.verification-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin: 20px 0;
+    text-align: center;
+    border: 1px solid #e1e8ed;
+}
+
+.verification-icon {
+    margin-bottom: 20px;
+}
+
+.verification-icon i {
+    font-size: 3rem;
+    color: #6f017f;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 20px;
+    border-radius: 50%;
+    border: 2px solid #6f017f;
+}
+
+.otp-input {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.5rem;
+    padding: 15px 20px;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 200px;
+    margin: 0 auto;
+    transition: border-color 0.3s ease;
+}
+
+.otp-input:focus {
+    outline: none;
+    border-color: #6f017f;
+    box-shadow: 0 0 0 3px rgba(111, 1, 127, 0.1);
+}
+
+.verification-footer {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #e1e8ed;
+}
+
+.code-timer {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.code-timer i {
+    margin-right: 5px;
+    color: #ffc107;
+}
+
+.resend-section p {
+    margin: 0 0 10px 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: #6f017f;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0;
+    transition: color 0.3s ease;
+}
+
+.btn-link:hover {
+    color: #8e0199;
+    text-decoration: none;
+}
+
+.btn-link i {
+    margin-right: 5px;
+}
+
+/* Mobile responsiveness for verification card */
+@media (max-width: 768px) {
+    .verification-card {
+        padding: 20px;
+        margin: 15px 0;
+    }
+    
+    .verification-icon i {
+        font-size: 2.5rem;
+        padding: 15px;
+    }
+    
+    .otp-input {
+        font-size: 1.3rem;
+        padding: 12px 15px;
+        max-width: 180px;
+    }
+}
+
+/* OTP Input Group Styling */
+.otp-input-group {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.otp-digit {
+    width: 35px;
+    height: 40px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border: 2px solid #e1e8ed;
+    border-radius: 6px;
+    background: #fff;
+    transition: all 0.3s ease;
+    outline: none;
+    padding: 0 !important;
+    margin: 0;
+    line-height: 36px;
+}
+
+.otp-digit:focus {
+    border-color: #6f017f;
+    box-shadow: 0 0 0 3px rgba(111, 1, 127, 0.1);
+    transform: scale(1.05);
+}
+
+.otp-digit:not(:placeholder-shown) {
+    border-color: #6f017f;
+    background: #f8f9ff;
+}
+
+/* Enhanced Footer Styling */
+.footer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    text-align: center;
+}
+
+.timer-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #6c757d;
+    font-size: 0.85rem;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    padding: 6px 12px;
+    border-radius: 16px;
+    border: 1px solid #ffc107;
+}
+
+.timer-info i {
+    color: #ffc107;
+    font-size: 0.9rem;
+}
+
+.timer-info strong {
+    color: #856404;
+}
+
+.divider {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e1e8ed, transparent);
+    margin: 0 auto;
+}
+
+.resend-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.resend-info span {
+    color: #6c757d;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.resend-btn {
+    background: linear-gradient(135deg, #6f017f 0%, #8e0199 100%);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(111, 1, 127, 0.2);
+}
+
+.resend-btn:hover {
+    background: linear-gradient(135deg, #8e0199 0%, #6f017f 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(111, 1, 127, 0.4);
+}
+
+.resend-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(111, 1, 127, 0.2);
+}
+
+.resend-btn i {
+    font-size: 0.75rem;
+}
+
+/* Mobile responsiveness for new footer */
+@media (max-width: 768px) {
+    .otp-input-group {
+        gap: 4px;
+    }
+    
+    .otp-digit {
+        width: 30px;
+        height: 36px;
+        font-size: 1.1rem;
+    }
+    
+    .timer-info {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+    
+    .resend-btn {
+        padding: 6px 12px;
+        font-size: 0.75rem;
+    }
+}

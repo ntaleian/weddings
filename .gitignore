@@ -1,0 +1,71 @@
+# CodeIgniter 4
+/writable/cache/*
+!/writable/cache/index.html
+!/writable/cache/.gitkeep
+/writable/logs/*
+!/writable/logs/index.html
+!/writable/logs/.gitkeep
+/writable/session/*
+!/writable/session/index.html
+!/writable/session/.gitkeep
+/writable/uploads/*
+!/writable/uploads/index.html
+!/writable/uploads/.gitkeep
+/writable/debugbar/*
+!/writable/debugbar/index.html
+
+# Environment
+.env
+.env.*.local
+
+# Composer
+/vendor/
+composer.phar
+composer.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Testing
+/phpunit.xml
+phpunit.xml
+.phpunit.result.cache
+
+# Database files (move to database/ directory)
+*.sql
+!database_schema.sql.example
+
+# Temporary files
+*.log
+*.tmp
+*.bak
+*.backup
+
+# Node modules (if using npm)
+node_modules/
+package-lock.json
+
+# Build files
+/builds/
+
+# Sensitive files
+*.pem
+*.key
+*.crt
+config.php
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+

@@ -1,0 +1,2995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Dashboard - Watoto Church Wedding Booking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="<?= base_url('css/style.css') ?>" rel="stylesheet">
+    <link href="<?= base_url('css/dashboard.css') ?>" rel="stylesheet">
+    <style>
+        /* Enhanced Dashboard Styles */
+        :root {
+            --primary-color: #64017f;
+            --secondary-color: #8e44ad;
+            --accent-color: #f39c12;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --warning-color: #f1c40f;
+            --info-color: #3498db;
+            --white: #ffffff;
+            --light-gray: #ecf0f1;
+            --gray: #95a5a6;
+            --text-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navigation */
+        .dashboard-nav {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+
+        .dashboard-nav .container {
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-brand a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        .logo {
+            height: 40px;
+        }
+
+        .brand-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        .user-email {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .dropdown-toggle {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .dropdown-menu a:hover {
+            background: var(--light-gray);
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            display: flex;
+            /* margin-top: 70px; */
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .dashboard-sidebar {
+            width: 280px;
+            background: var(--white);
+            border-right: 1px solid var(--light-gray);
+            padding: 30px 0;
+            position: fixed;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 30px 30px;
+            border-bottom: 1px solid var(--light-gray);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-header h3 {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin: 0;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .sidebar-nav {
+            padding: 0 15px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: var(--light-gray);
+            color: var(--primary-color);
+        }
+
+        .nav-item.active {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .nav-badge {
+            background: var(--accent-color);
+            color: var(--white);
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+
+        /* Main Content */
+        .dashboard-main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--gray);
+            color: var(--white);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: var(--white);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar dashboard-nav">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="index.html">
+                    <img src="<?= base_url() ?>images/watoto_logo.png" alt="Watoto Church" class="logo">
+                    <!-- <span class="brand-text">Wedding Booking</span> -->
+                </a>
+            </div>
+            <div class="nav-menu">
+                <div class="user-menu">
+                    <div class="user-avatar">
+                        <img src="<?= base_url() ?>images/user.png" alt="User Avatar">
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">John & Sarah</span>
+                        <span class="user-email">john.sarah@email.com</span>
+                    </div>
+                    <div class="user-dropdown">
+                        <button class="dropdown-toggle" onclick="toggleDropdown()">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="userDropdown">
+                            <a href="#profile"><i class="fas fa-user"></i> Profile</a>
+                            <a href="#settings"><i class="fas fa-cog"></i> Settings</a>
+                            <a href="#help"><i class="fas fa-question-circle"></i> Help</a>
+                            <hr>
+                            <a href="index.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Main Content -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <h3>Your Wedding Journey</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#overview" class="nav-item active" onclick="showSection('overview')">
+                    <i class="fas fa-home"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="#application" class="nav-item" onclick="showSection('application')">
+                    <i class="fas fa-file-contract"></i>
+                    <span>Application</span>
+                    <span class="nav-badge">In Progress</span>
+                </a>
+                <a href="#documents" class="nav-item" onclick="showSection('documents')">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Documents</span>
+                </a>
+                <a href="#messages" class="nav-item" onclick="showSection('messages')">
+                    <i class="fas fa-comments"></i>
+                    <span>Messages</span>
+                    <span class="nav-badge">3</span>
+                </a>
+                <a href="#timeline" class="nav-item" onclick="showSection('timeline')">
+                    <i class="fas fa-tasks"></i>
+                    <span>Timeline</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="dashboard-main">
+            <!-- Overview Section -->
+            <section id="overview" class="content-section active">
+                <style>
+                    /* Welcome Section */
+                    .welcome-section {
+                        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                        color: var(--white);
+                        padding: 40px;
+                        border-radius: 16px;
+                        margin-bottom: 30px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+
+                    .welcome-content h1 {
+                        font-size: 2rem;
+                        margin-bottom: 10px;
+                        font-family: 'Playfair Display', serif;
+                    }
+
+                    .welcome-content p {
+                        font-size: 1.1rem;
+                        opacity: 0.9;
+                    }
+
+                    .welcome-actions {
+                        display: flex;
+                        gap: 15px;
+                    }
+
+                    /* Progress Overview */
+                    .progress-overview {
+                        background: var(--white);
+                        border-radius: 16px;
+                        padding: 30px;
+                        margin-bottom: 30px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    }
+
+                    .section-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 30px;
+                    }
+
+                    .progress-percentage {
+                        background: var(--success-color);
+                        color: var(--white);
+                        padding: 8px 16px;
+                        border-radius: 20px;
+                        font-weight: 600;
+                    }
+
+                    .progress-steps {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                        gap: 20px;
+                        margin-bottom: 20px;
+                    }
+
+                    .progress-step {
+                        display: flex;
+                        align-items: center;
+                        gap: 15px;
+                        padding: 20px;
+                        border-radius: 12px;
+                        border: 2px solid var(--light-gray);
+                        transition: all 0.3s ease;
+                    }
+
+                    .progress-step.completed {
+                        border-color: var(--success-color);
+                        background: rgba(46, 204, 113, 0.1);
+                    }
+
+                    .progress-step.current {
+                        border-color: var(--primary-color);
+                        background: rgba(100, 1, 127, 0.1);
+                    }
+
+                    .step-icon {
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: 600;
+                        background: var(--light-gray);
+                        color: var(--text-color);
+                    }
+
+                    .progress-step.completed .step-icon {
+                        background: var(--success-color);
+                        color: var(--white);
+                    }
+
+                    .progress-step.current .step-icon {
+                        background: var(--primary-color);
+                        color: var(--white);
+                    }
+
+                    .step-content h4 {
+                        margin: 0 0 5px 0;
+                        color: var(--text-color);
+                    }
+
+                    .step-content p {
+                        margin: 0;
+                        color: var(--gray);
+                        font-size: 0.9rem;
+                    }
+
+                    .progress-bar {
+                        height: 8px;
+                        background: var(--light-gray);
+                        border-radius: 4px;
+                        overflow: hidden;
+                    }
+
+                    .progress-fill {
+                        height: 100%;
+                        background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+                        transition: width 0.3s ease;
+                    }
+
+                    /* Quick Actions */
+                    .quick-actions {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                        gap: 20px;
+                        margin-bottom: 30px;
+                    }
+
+                    .action-card {
+                        background: var(--white);
+                        border-radius: 16px;
+                        padding: 30px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                        transition: transform 0.3s ease;
+                    }
+
+                    .action-card:hover {
+                        transform: translateY(-5px);
+                    }
+
+                    .card-icon {
+                        width: 60px;
+                        height: 60px;
+                        border-radius: 12px;
+                        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-bottom: 20px;
+                    }
+
+                    .card-icon i {
+                        font-size: 1.5rem;
+                        color: var(--white);
+                    }
+
+                    .card-content h3 {
+                        margin: 0 0 10px 0;
+                        color: var(--text-color);
+                    }
+
+                    .card-content p {
+                        margin: 0 0 20px 0;
+                        color: var(--gray);
+                    }
+                </style>
+                <!-- Welcome Section -->
+                <div class="welcome-section">
+                    <div class="welcome-content">
+                        <h1 style="color:#f8f8d3">Welcome Back, John & Sarah!</h1>
+                        <p>Complete your wedding venue application to secure your special day.</p>
+                    </div>
+                    <div class="welcome-actions">
+                        <button class="btn btn-primary" onclick="showSection('application')">
+                            <i class="fas fa-play"></i>
+                            Continue Application
+                        </button>
+                        <a href="<?= site_url('dashboard/download-checklist') ?>" class="btn btn-secondary">
+                            <i class="fas fa-download"></i>
+                            Download Checklist
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Application Progress -->
+                <div class="progress-overview">
+                    <div class="section-header">
+                        <h2>Application Progress</h2>
+                        <span class="progress-percentage">0% Complete</span>
+                    </div>
+                    <div class="progress-steps">
+                        <div class="progress-step current">
+                            <div class="step-icon">1</div>
+                            <div class="step-content">
+                                <h4>Venue & Date</h4>
+                                <p>Select campus and wedding date</p>
+                            </div>
+                        </div>
+                        <div class="progress-step">
+                            <div class="step-icon">2</div>
+                            <div class="step-content">
+                                <h4>Personal Details</h4>
+                                <p>Bride & Groom information</p>
+                            </div>
+                        </div>
+                        <div class="progress-step">
+                            <div class="step-icon">3</div>
+                            <div class="step-content">
+                                <h4>Additional Information</h4>
+                                <p>Family & witness details</p>
+                            </div>
+                        </div>
+                        <div class="progress-step">
+                            <div class="step-icon">4</div>
+                            <div class="step-content">
+                                <h4>Review & Submit</h4>
+                                <p>Final review and submission</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <div class="action-card">
+                        <div class="card-icon">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Upload Documents</h3>
+                            <p>Submit required identification documents</p>
+                            <button class="btn btn-outline">Upload Now</button>
+                        </div>
+                    </div>
+                    <div class="action-card">
+                        <div class="card-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Schedule Counseling</h3>
+                            <p>Book your pre-marital counseling session</p>
+                            <button class="btn btn-outline">Schedule</button>
+                        </div>
+                    </div>
+                    <div class="action-card">
+                        <div class="card-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Contact Coordinator</h3>
+                            <p>Get help with your application</p>
+                            <button class="btn btn-outline">Message</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Application Section -->
+            <section id="application" class="content-section">
+                <style>
+                    /* Application Form Styles */
+                    .application-header {
+                        background: var(--white);
+                        padding: 30px;
+                        border-radius: 16px;
+                        margin-bottom: 30px;
+                        text-align: center;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    }
+
+                    .application-header h1 {
+                        color: var(--primary-color);
+                        margin-bottom: 10px;
+                        font-family: 'Playfair Display', serif;
+                    }
+
+                    .app-progress-indicator {
+                        background: var(--white);
+                        padding: 30px;
+                        border-radius: 16px;
+                        margin-bottom: 30px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    }
+
+                    .step-indicator {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        position: relative;
+                    }
+
+                    .step-indicator::before {
+                        content: '';
+                        position: absolute;
+                        top: 20px;
+                        left: 10%;
+                        right: 10%;
+                        height: 2px;
+                        background: var(--light-gray);
+                        z-index: 1;
+                    }
+
+                    .step {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        position: relative;
+                        z-index: 2;
+                        background: #f8f9fa;
+                        padding: 10px;
+                        border-radius: 8px;
+                        min-width: 120px;
+                    }
+
+                    .step-circle {
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        background: var(--light-gray);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: 600;
+                        margin-bottom: 10px;
+                        transition: all 0.3s ease;
+                    }
+
+                    .step.completed .step-circle {
+                        background: var(--success-color);
+                        color: var(--white);
+                    }
+
+                    .step.active .step-circle {
+                        background: var(--primary-color);
+                        color: var(--white);
+                    }
+
+                    .step-label {
+                        font-size: 0.8rem;
+                        text-align: center;
+                        color: var(--gray);
+                        font-weight: 500;
+                    }
+
+                    /* Application Form Container */
+                    .application-form-container {
+                        background: var(--white);
+                        border-radius: 16px;
+                        padding: 40px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                        margin-bottom: 30px;
+                    }
+
+                    .form-section-header {
+                        text-align: center;
+                        margin-bottom: 40px;
+                        padding-bottom: 20px;
+                        border-bottom: 2px solid var(--light-gray);
+                    }
+
+                    .form-section-header h2 {
+                        color: var(--primary-color);
+                        margin-bottom: 10px;
+                        font-family: 'Playfair Display', serif;
+                    }
+
+                    /* Form Grid Layout */
+                    .form-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                        gap: 20px;
+                        margin-bottom: 30px;
+                    }
+
+                    .form-group {
+                        display: flex;
+                        flex-direction: column;
+                    }
+
+                    .form-group.full-width {
+                        grid-column: 1 / -1;
+                    }
+
+                    .form-group label {
+                        font-weight: 600;
+                        color: var(--text-color);
+                        margin-bottom: 8px;
+                        font-size: 0.9rem;
+                    }
+
+                    .form-group input,
+                    .form-group select {
+                        padding: 12px 16px;
+                        border: 2px solid var(--light-gray);
+                        border-radius: 8px;
+                        font-size: 1rem;
+                        transition: all 0.3s ease;
+                        background: var(--white);
+                    }
+
+                    .form-group input:focus,
+                    .form-group select:focus {
+                        outline: none;
+                        border-color: var(--primary-color);
+                        box-shadow: 0 0 0 3px rgba(100, 1, 127, 0.1);
+                    }
+
+                    /* Radio Options */
+                    .radio-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                        gap: 10px;
+                        margin-top: 10px;
+                    }
+
+                    .radio-option {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        cursor: pointer;
+                        padding: 8px 12px;
+                        border: 1px solid var(--light-gray);
+                        border-radius: 6px;
+                        transition: all 0.3s ease;
+                    }
+
+                    .radio-option:hover {
+                        border-color: var(--primary-color);
+                        background: rgba(100, 1, 127, 0.05);
+                    }
+
+                    .radio-option input[type="radio"] {
+                        margin: 0;
+                        width: auto;
+                        height: auto;
+                    }
+
+                    .person-section {
+                        margin-bottom: 40px;
+                        padding: 30px;
+                        border: 2px solid var(--light-gray);
+                        border-radius: 12px;
+                        background: #fafbfc;
+                    }
+
+                    .section-title {
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        color: var(--primary-color);
+                        margin-bottom: 25px;
+                        font-size: 1.2rem;
+                        font-family: 'Playfair Display', serif;
+                    }
+
+                    .form-navigation {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-top: 40px;
+                        padding-top: 20px;
+                        border-top: 2px solid var(--light-gray);
+                    }
+
+                    .save-status {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        color: var(--success-color);
+                        font-size: 0.9rem;
+                    }
+                </style>
+                <div class="application-header">
+                    <h1>Wedding Venue Application</h1>
+                    <p>Complete all sections to submit your application. Your progress is automatically saved.</p>
+                </div>
+
+                <!-- Application Progress Indicator -->
+                <div class="app-progress-indicator">
+                    <div class="step-indicator">
+                        <div class="step active" data-step="1">
+                            <div class="step-circle">1</div>
+                            <span class="step-label">Venue & Date</span>
+                        </div>
+                        <div class="step" data-step="2">
+                            <div class="step-circle">2</div>
+                            <span class="step-label">Personal Details</span>
+                        </div>
+                        <div class="step" data-step="3">
+                            <div class="step-circle">3</div>
+                            <span class="step-label">Additional Info</span>
+                        </div>
+                        <div class="step" data-step="4">
+                            <div class="step-circle">4</div>
+                            <span class="step-label">Review & Submit</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Application Form Container -->
+                <div class="application-form-container">
+                    <form id="weddingApplicationForm" class="wedding-application-form">
+                        
+                        <!-- Step 1: Venue & Date Selection (Currently Active) -->
+                        <div class="form-section" data-step="1">
+                            <div class="form-section-header">
+                                <h2>Venue & Date Selection</h2>
+                                <p>Choose your preferred campus and wedding date</p>
+                            </div>
+                            
+                            <!-- Campus Selection -->
+                            <div class="campus-selection">
+                                <h3 class="section-title">
+                                    <i class="fas fa-church"></i>
+                                    Select Campus
+                                </h3>
+                                
+                                <div class="campus-grid">
+                                    <div class="campus-card" data-campus="downtown" onclick="selectCampus('downtown')">
+                                        <div class="campus-image">
+                                            <img src="assets/images/location_downtown.jpg" alt="Downtown Campus">
+                                        </div>
+                                        <div class="campus-info">
+                                            <h4>Downtown Campus</h4>
+                                            <p><i class="fas fa-map-marker-alt"></i> Kampala Road, Kampala</p>
+                                            <p><i class="fas fa-users"></i> Capacity: 500 guests</p>
+                                            <p><i class="fas fa-clock"></i> Available: 10:00 AM - 4:00 PM</p>
+                                        </div>
+                                        <div class="campus-select-indicator">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="campus-card" data-campus="ntinda" onclick="selectCampus('ntinda')">
+                                        <div class="campus-image">
+                                            <img src="assets/images/location_ntinda.jpg" alt="Ntinda Campus">
+                                        </div>
+                                        <div class="campus-info">
+                                            <h4>Ntinda Campus</h4>
+                                            <p><i class="fas fa-map-marker-alt"></i> Ntinda Road, Kampala</p>
+                                            <p><i class="fas fa-users"></i> Capacity: 300 guests</p>
+                                            <p><i class="fas fa-clock"></i> Available: 10:00 AM - 4:00 PM</p>
+                                        </div>
+                                        <div class="campus-select-indicator">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="campus-card" data-campus="bweyogerere" onclick="selectCampus('bweyogerere')">
+                                        <div class="campus-image">
+                                            <img src="assets/images/location_bweyogerere.jpg" alt="Bweyogerere Campus">
+                                        </div>
+                                        <div class="campus-info">
+                                            <h4>Bweyogerere Campus</h4>
+                                            <p><i class="fas fa-map-marker-alt"></i> Bweyogerere, Wakiso</p>
+                                            <p><i class="fas fa-users"></i> Capacity: 400 guests</p>
+                                            <p><i class="fas fa-clock"></i> Available: 10:00 AM - 4:00 PM</p>
+                                        </div>
+                                        <div class="campus-select-indicator">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <input type="hidden" id="selectedCampus" name="selectedCampus" required>
+                            </div>
+                            
+                            <!-- Date & Time Selection -->
+                            <div class="datetime-selection" id="datetimeSection" style="display: none;">
+                                <h3 class="section-title">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Select Date & Time
+                                </h3>
+                                
+                                <div class="calendar-container">
+                                    <div class="calendar-header">
+                                        <button type="button" class="nav-btn" id="prevMonth" onclick="changeMonth(-1)">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <h4 id="currentMonth">December 2025</h4>
+                                        <button type="button" class="nav-btn" id="nextMonth" onclick="changeMonth(1)">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="calendar-grid" id="calendarGrid">
+                                        <div class="day-header">Sun</div>
+                                        <div class="day-header">Mon</div>
+                                        <div class="day-header">Tue</div>
+                                        <div class="day-header">Wed</div>
+                                        <div class="day-header">Thu</div>
+                                        <div class="day-header">Fri</div>
+                                        <div class="day-header">Sat</div>
+                                        
+                                        <!-- Calendar days will be generated by JavaScript -->
+                                    </div>
+                                </div>
+                                
+                                <div class="time-selection" id="timeSelection" style="display: none;">
+                                    <h4>Select Time Slot</h4>
+                                    <div class="time-slots">
+                                        <div class="time-slot" data-time="10:00" onclick="selectTime('10:00')">
+                                            <i class="fas fa-clock"></i>
+                                            <span>10:00 AM - 12:00 PM</span>
+                                            <span class="availability available">Available</span>
+                                        </div>
+                                        <div class="time-slot" data-time="14:00" onclick="selectTime('14:00')">
+                                            <i class="fas fa-clock"></i>
+                                            <span>2:00 PM - 4:00 PM</span>
+                                            <span class="availability available">Available</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <input type="hidden" id="selectedDate" name="selectedDate" required>
+                                <input type="hidden" id="selectedTime" name="selectedTime" required>
+                            </div>
+                            
+                            <!-- Selection Summary -->
+                            <div class="selection-summary" id="selectionSummary" style="display: none;">
+                                <h3 class="section-title">
+                                    <i class="fas fa-check-circle"></i>
+                                    Your Selection
+                                </h3>
+                                
+                                <div class="summary-card">
+                                    <div class="summary-item">
+                                        <strong>Campus:</strong>
+                                        <span id="summaryaCampus">-</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <strong>Date:</strong>
+                                        <span id="summaryDate">-</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <strong>Time:</strong>
+                                        <span id="summaryTime">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Personal Details -->
+                        <div class="form-section" data-step="2" style="display: none;">
+                            <div class="form-section-header">
+                                <h2>Personal Details</h2>
+                                <p>Provide information about the bride and groom</p>
+                            </div>
+                            
+                            <!-- Bride Information -->
+                            <div class="person-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-female"></i>
+                                    Bride Information
+                                </h3>
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="brideName">Full Name *</label>
+                                        <input type="text" id="brideName" name="brideName" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="brideAge">Age *</label>
+                                        <input type="number" id="brideAge" name="brideAge" min="18" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="brideEmail">Email Address *</label>
+                                        <input type="email" id="brideEmail" name="brideEmail" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="bridePhone">Phone Number *</label>
+                                        <input type="tel" id="bridePhone" name="bridePhone" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="brideOccupation">Occupation</label>
+                                        <input type="text" id="brideOccupation" name="brideOccupation">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="brideNationality">Nationality</label>
+                                        <input type="text" id="brideNationality" name="brideNationality">
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="brideAddress">Address</label>
+                                        <input type="text" id="brideAddress" name="brideAddress">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Groom Information -->
+                            <div class="person-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-male"></i>
+                                    Groom Information
+                                </h3>
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="groomName">Full Name *</label>
+                                        <input type="text" id="groomName" name="groomName" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="groomAge">Age *</label>
+                                        <input type="number" id="groomAge" name="groomAge" min="18" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="groomEmail">Email Address *</label>
+                                        <input type="email" id="groomEmail" name="groomEmail" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="groomPhone">Phone Number *</label>
+                                        <input type="tel" id="groomPhone" name="groomPhone" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="groomOccupation">Occupation</label>
+                                        <input type="text" id="groomOccupation" name="groomOccupation">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="groomNationality">Nationality</label>
+                                        <input type="text" id="groomNationality" name="groomNationality">
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="groomAddress">Address</label>
+                                        <input type="text" id="groomAddress" name="groomAddress">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Relationship Information -->
+                            <div class="person-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-heart"></i>
+                                    Relationship Information
+                                </h3>
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="relationshipDuration">How long have you been together?</label>
+                                        <select id="relationshipDuration" name="relationshipDuration">
+                                            <option value="">Select duration</option>
+                                            <option value="less-than-1">Less than 1 year</option>
+                                            <option value="1-2">1-2 years</option>
+                                            <option value="2-3">2-3 years</option>
+                                            <option value="3-5">3-5 years</option>
+                                            <option value="more-than-5">More than 5 years</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="previousMarriage">Previous marriage(s)?</label>
+                                        <div class="radio-grid">
+                                            <div class="radio-option">
+                                                <input type="radio" id="prevMarriageNo" name="previousMarriage" value="no">
+                                                <label for="prevMarriageNo">No</label>
+                                            </div>
+                                            <div class="radio-option">
+                                                <input type="radio" id="prevMarriageYes" name="previousMarriage" value="yes">
+                                                <label for="prevMarriageYes">Yes</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Additional Information -->
+                        <div class="form-section" data-step="3" style="display: none;">
+                            <div class="form-section-header">
+                                <h2>Additional Information</h2>
+                                <p>Wedding details and family information</p>
+                            </div>
+                            
+                            <!-- Wedding Details -->
+                            <div class="person-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-calendar-day"></i>
+                                    Wedding Details
+                                </h3>
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="guestCount">Expected Number of Guests *</label>
+                                        <input type="number" id="guestCount" name="guestCount" min="1" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="receptionVenue">Reception Venue</label>
+                                        <input type="text" id="receptionVenue" name="receptionVenue" placeholder="Leave blank if same as ceremony">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="specialRequests">Special Requirements</label>
+                                        <select id="specialRequests" name="specialRequests">
+                                            <option value="">None</option>
+                                            <option value="wheelchair-access">Wheelchair accessibility</option>
+                                            <option value="sound-system">Additional sound system</option>
+                                            <option value="photography">Photography services</option>
+                                            <option value="decorations">Special decorations</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="musicPreference">Music Preference</label>
+                                        <select id="musicPreference" name="musicPreference">
+                                            <option value="">Select preference</option>
+                                            <option value="choir">Church choir only</option>
+                                            <option value="live-band">Live band</option>
+                                            <option value="recorded">Recorded music</option>
+                                            <option value="mixed">Mixed (choir + recorded)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Family Information -->
+                            <div class="person-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-users"></i>
+                                    Family Information
+                                </h3>
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="brideFather">Bride's Father Name</label>
+                                        <input type="text" id="brideFather" name="brideFather">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="brideMother">Bride's Mother Name</label>
+                                        <input type="text" id="brideMother" name="brideMother">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="groomFather">Groom's Father Name</label>
+                                        <input type="text" id="groomFather" name="groomFather">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="groomMother">Groom's Mother Name</label>
+                                        <input type="text" id="groomMother" name="groomMother">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Witnesses -->
+                            <div class="person-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-user-friends"></i>
+                                    Witnesses
+                                </h3>
+                                
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="witness1Name">Best Man - Full Name</label>
+                                        <input type="text" id="witness1Name" name="witness1Name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="witness1Phone">Best Man - Phone</label>
+                                        <input type="tel" id="witness1Phone" name="witness1Phone">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="witness2Name">Matron - Full Name</label>
+                                        <input type="text" id="witness2Name" name="witness2Name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="witness2Phone">Matron - Phone</label>
+                                        <input type="tel" id="witness2Phone" name="witness2Phone">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Review & Submit -->
+                        <div class="form-section" data-step="4" style="display: none;">
+                            <div class="form-section-header">
+                                <h2>Review & Submit</h2>
+                                <p>Please review your information before submitting</p>
+                            </div>
+                            
+                            <!-- Review Summary -->
+                            <div class="review-summary">
+                                <div class="review-section">
+                                    <h3 class="section-title">
+                                        <i class="fas fa-church"></i>
+                                        Venue & Date Selection
+                                    </h3>
+                                    <div class="review-grid">
+                                        <div class="review-item">
+                                            <strong>Campus:</strong>
+                                            <span id="reviewCampus">-</span>
+                                        </div>
+                                        <div class="review-item">
+                                            <strong>Date:</strong>
+                                            <span id="reviewDate">-</span>
+                                        </div>
+                                        <div class="review-item">
+                                            <strong>Time:</strong>
+                                            <span id="reviewTime">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="review-section">
+                                    <h3 class="section-title">
+                                        <i class="fas fa-users"></i>
+                                        Personal Details
+                                    </h3>
+                                    <div class="review-grid">
+                                        <div class="review-item">
+                                            <strong>Bride:</strong>
+                                            <span id="reviewBrideName">-</span>
+                                        </div>
+                                        <div class="review-item">
+                                            <strong>Groom:</strong>
+                                            <span id="reviewGroomName">-</span>
+                                        </div>
+                                        <div class="review-item">
+                                            <strong>Contact Email:</strong>
+                                            <span id="reviewEmail">-</span>
+                                        </div>
+                                        <div class="review-item">
+                                            <strong>Contact Phone:</strong>
+                                            <span id="reviewPhone">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="review-section">
+                                    <h3 class="section-title">
+                                        <i class="fas fa-calendar-day"></i>
+                                        Wedding Details
+                                    </h3>
+                                    <div class="review-grid">
+                                        <div class="review-item">
+                                            <strong>Expected Guests:</strong>
+                                            <span id="reviewGuests">-</span>
+                                        </div>
+                                        <div class="review-item">
+                                            <strong>Music Preference:</strong>
+                                            <span id="reviewMusic">-</span>
+                                        </div>
+                                        <div class="review-item">
+                                            <strong>Special Requirements:</strong>
+                                            <span id="reviewSpecialReq">None</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Terms and Conditions -->
+                            <div class="terms-section">
+                                <h3 class="section-title">
+                                    <i class="fas fa-file-contract"></i>
+                                    Terms and Conditions
+                                </h3>
+                                <div class="terms-content">
+                                    <p>By submitting this application, you agree to the following:</p>
+                                    <ul>
+                                        <li>All information provided is accurate and complete</li>
+                                        <li>You will attend mandatory pre-marital counseling sessions</li>
+                                        <li>Wedding ceremony must follow Watoto Church guidelines</li>
+                                        <li>Full payment must be completed before the wedding date</li>
+                                        <li>Cancellation must be made at least 30 days in advance</li>
+                                    </ul>
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="acceptTerms" name="acceptTerms" required>
+                                        <label for="acceptTerms">I accept the terms and conditions *</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional CSS for new form sections -->
+                        <style>
+                            /* Review Summary Styles */
+                            .review-summary {
+                                margin-bottom: 30px;
+                            }
+
+                            .review-section {
+                                background: #f8f9fa;
+                                border-radius: 12px;
+                                padding: 25px;
+                                margin-bottom: 20px;
+                                border: 1px solid var(--light-gray);
+                            }
+
+                            .review-grid {
+                                display: grid;
+                                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                                gap: 15px;
+                                margin-top: 15px;
+                            }
+
+                            .review-item {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 5px;
+                            }
+
+                            .review-item strong {
+                                color: var(--primary-color);
+                                font-size: 0.9rem;
+                            }
+
+                            .review-item span {
+                                color: var(--text-color);
+                                font-weight: 500;
+                            }
+
+                            /* Terms Section */
+                            .terms-section {
+                                background: rgba(100, 1, 127, 0.05);
+                                border: 2px solid var(--primary-color);
+                                border-radius: 12px;
+                                padding: 25px;
+                            }
+
+                            .terms-content ul {
+                                margin: 15px 0;
+                                padding-left: 20px;
+                            }
+
+                            .terms-content li {
+                                margin-bottom: 8px;
+                                color: var(--text-color);
+                            }
+
+                            .checkbox-group {
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                                margin-top: 20px;
+                                padding: 15px;
+                                background: var(--white);
+                                border-radius: 8px;
+                                border: 2px solid var(--light-gray);
+                            }
+
+                            .checkbox-group input[type="checkbox"] {
+                                width: 18px;
+                                height: 18px;
+                                margin: 0;
+                            }
+
+                            .checkbox-group label {
+                                margin: 0;
+                                color: var(--text-color);
+                                font-weight: 600;
+                            }
+
+                            /* Form validation styles */
+                            .form-group input:invalid,
+                            .form-group select:invalid {
+                                border-color: var(--error-color);
+                            }
+
+                            .form-group input:valid,
+                            .form-group select:valid {
+                                border-color: var(--success-color);
+                            }
+
+                            /* Responsive adjustments */
+                            @media (max-width: 768px) {
+                                .form-grid {
+                                    grid-template-columns: 1fr;
+                                }
+                                
+                                .campus-grid {
+                                    grid-template-columns: 1fr;
+                                }
+                                
+                                .time-slots {
+                                    grid-template-columns: 1fr;
+                                }
+                                
+                                .review-grid {
+                                    grid-template-columns: 1fr;
+                                }
+                            }
+                        </style>
+
+                        <!-- Additional CSS for new components -->
+                        <style>
+                            /* Campus Selection Styles */
+                            .campus-grid {
+                                display: grid;
+                                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                                gap: 20px;
+                                margin-bottom: 30px;
+                            }
+
+                            .campus-card {
+                                border: 2px solid var(--light-gray);
+                                border-radius: 12px;
+                                overflow: hidden;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                position: relative;
+                                background: var(--white);
+                            }
+
+                            .campus-card:hover {
+                                border-color: var(--primary-color);
+                                transform: translateY(-5px);
+                                box-shadow: 0 10px 30px rgba(100, 1, 127, 0.1);
+                            }
+
+                            .campus-card.selected {
+                                border-color: var(--primary-color);
+                                background: rgba(100, 1, 127, 0.05);
+                            }
+
+                            .campus-card.selected .campus-select-indicator {
+                                opacity: 1;
+                                transform: scale(1);
+                            }
+
+                            .campus-image {
+                                height: 180px;
+                                overflow: hidden;
+                            }
+
+                            .campus-image img {
+                                width: 100%;
+                                height: 100%;
+                                object-fit: cover;
+                                transition: transform 0.3s ease;
+                            }
+
+                            .campus-card:hover .campus-image img {
+                                transform: scale(1.05);
+                            }
+
+                            .campus-info {
+                                padding: 20px;
+                            }
+
+                            .campus-info h4 {
+                                margin: 0 0 10px 0;
+                                color: var(--primary-color);
+                                font-size: 1.2rem;
+                            }
+
+                            .campus-info p {
+                                margin: 5px 0;
+                                color: var(--gray);
+                                font-size: 0.9rem;
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                            }
+
+                            .campus-select-indicator {
+                                position: absolute;
+                                top: 15px;
+                                right: 15px;
+                                width: 30px;
+                                height: 30px;
+                                background: var(--primary-color);
+                                color: var(--white);
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                opacity: 0;
+                                transform: scale(0.8);
+                                transition: all 0.3s ease;
+                            }
+
+                            /* Calendar Styles */
+                            .calendar-container {
+                                max-width: 400px;
+                                margin: 0 auto 30px;
+                                background: var(--white);
+                                border: 2px solid var(--light-gray);
+                                border-radius: 12px;
+                                overflow: hidden;
+                            }
+
+                            .calendar-header {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                padding: 20px;
+                                background: var(--primary-color);
+                                color: var(--white);
+                            }
+
+                            .calendar-header h4 {
+                                margin: 0;
+                                font-size: 1.1rem;
+                            }
+
+                            .nav-btn {
+                                background: none;
+                                border: none;
+                                color: var(--white);
+                                cursor: pointer;
+                                padding: 8px;
+                                border-radius: 4px;
+                                transition: background 0.3s ease;
+                            }
+
+                            .nav-btn:hover {
+                                background: rgba(255, 255, 255, 0.1);
+                            }
+
+                            .calendar-grid {
+                                display: grid;
+                                grid-template-columns: repeat(7, 1fr);
+                                gap: 1px;
+                                background: var(--light-gray);
+                            }
+
+                            .day-header {
+                                padding: 15px 10px;
+                                text-align: center;
+                                font-weight: 600;
+                                color: var(--gray);
+                                background: #f8f9fa;
+                                font-size: 0.9rem;
+                            }
+
+                            .calendar-day {
+                                padding: 15px 10px;
+                                text-align: center;
+                                background: var(--white);
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                border: 2px solid transparent;
+                                position: relative;
+                            }
+
+                            .calendar-day:hover {
+                                background: rgba(100, 1, 127, 0.1);
+                            }
+
+                            .calendar-day.available {
+                                color: var(--text-color);
+                            }
+
+                            .calendar-day.unavailable {
+                                color: var(--gray);
+                                background: #f8f9fa;
+                                cursor: not-allowed;
+                            }
+
+                            .calendar-day.selected {
+                                background: var(--primary-color);
+                                color: var(--white);
+                                border-color: var(--primary-color);
+                            }
+
+                            .calendar-day.other-month {
+                                color: var(--light-gray);
+                                background: #f8f9fa;
+                            }
+
+                            /* Time Selection Styles */
+                            .time-slots {
+                                display: grid;
+                                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                                gap: 15px;
+                                margin-top: 20px;
+                            }
+
+                            .time-slot {
+                                padding: 20px;
+                                border: 2px solid var(--light-gray);
+                                border-radius: 8px;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                display: flex;
+                                align-items: center;
+                                gap: 15px;
+                                background: var(--white);
+                            }
+
+                            .time-slot:hover {
+                                border-color: var(--primary-color);
+                                background: rgba(100, 1, 127, 0.05);
+                            }
+
+                            .time-slot.selected {
+                                border-color: var(--primary-color);
+                                background: rgba(100, 1, 127, 0.1);
+                            }
+
+                            .time-slot i {
+                                color: var(--primary-color);
+                                font-size: 1.2rem;
+                            }
+
+                            .time-slot span {
+                                flex: 1;
+                            }
+
+                            .availability {
+                                font-size: 0.8rem;
+                                padding: 4px 8px;
+                                border-radius: 4px;
+                                font-weight: 600;
+                            }
+
+                            .availability.available {
+                                background: rgba(46, 204, 113, 0.1);
+                                color: var(--success-color);
+                            }
+
+                            .availability.unavailable {
+                                background: rgba(231, 76, 60, 0.1);
+                                color: var(--error-color);
+                            }
+
+                            /* Selection Summary Styles */
+                            .summary-card {
+                                background: rgba(100, 1, 127, 0.05);
+                                border: 2px solid var(--primary-color);
+                                border-radius: 12px;
+                                padding: 25px;
+                            }
+
+                            .summary-item {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                margin-bottom: 10px;
+                                padding: 10px 0;
+                                border-bottom: 1px solid var(--light-gray);
+                            }
+
+                            .summary-item:last-child {
+                                border-bottom: none;
+                                margin-bottom: 0;
+                            }
+
+                            .summary-item strong {
+                                color: var(--primary-color);
+                            }
+                        </style>
+
+                        <!-- Form Navigation -->
+                        <div class="form-navigation">
+                            <button type="button" class="btn btn-secondary" onclick="previousStep()" style="display: none;" id="prevButton">
+                                <i class="fas fa-arrow-left"></i>
+                                Previous
+                            </button>
+                            
+                            <div class="save-status">
+                                <i class="fas fa-check-circle"></i>
+                                Changes saved automatically
+                            </div>
+                            
+                            <button type="button" class="btn btn-primary" onclick="nextStep()" id="nextButton" disabled>
+                                Next
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Documents Section -->
+            <section id="documents" class="content-section">
+                <style>
+                    .documents-container {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                        gap: 20px;
+                        margin-bottom: 30px;
+                    }
+
+                    .document-card {
+                        background: var(--white);
+                        border-radius: 16px;
+                        padding: 25px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                        border: 2px solid var(--light-gray);
+                        transition: all 0.3s ease;
+                    }
+
+                    .document-card:hover {
+                        transform: translateY(-5px);
+                        border-color: var(--primary-color);
+                    }
+
+                    .document-header {
+                        display: flex;
+                        align-items: center;
+                        gap: 15px;
+                        margin-bottom: 15px;
+                    }
+
+                    .document-icon {
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 12px;
+                        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: var(--white);
+                        font-size: 1.2rem;
+                    }
+
+                    .document-info h3 {
+                        margin: 0 0 5px 0;
+                        color: var(--text-color);
+                    }
+
+                    .document-status {
+                        padding: 4px 12px;
+                        border-radius: 20px;
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                    }
+
+                    .status-required {
+                        background: rgba(231, 76, 60, 0.1);
+                        color: var(--error-color);
+                    }
+
+                    .status-uploaded {
+                        background: rgba(46, 204, 113, 0.1);
+                        color: var(--success-color);
+                    }
+
+                    .status-pending {
+                        background: rgba(255, 193, 7, 0.1);
+                        color: #f39c12;
+                    }
+
+                    .upload-area {
+                        border: 2px dashed var(--light-gray);
+                        border-radius: 8px;
+                        padding: 20px;
+                        text-align: center;
+                        margin-top: 15px;
+                        transition: all 0.3s ease;
+                        cursor: pointer;
+                    }
+
+                    .upload-area:hover {
+                        border-color: var(--primary-color);
+                        background: rgba(100, 1, 127, 0.05);
+                    }
+
+                    .upload-area.dragover {
+                        border-color: var(--primary-color);
+                        background: rgba(100, 1, 127, 0.1);
+                    }
+
+                    .document-list {
+                        margin-top: 15px;
+                    }
+
+                    .document-item {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 10px;
+                        border: 1px solid var(--light-gray);
+                        border-radius: 6px;
+                        margin-bottom: 10px;
+                    }
+
+                    .document-item:last-child {
+                        margin-bottom: 0;
+                    }
+                </style>
+                
+                <div class="section-header">
+                    <h1>Documents</h1>
+                    <p>Upload and manage your wedding application documents</p>
+                </div>
+                
+                <div class="documents-container">
+                    <div class="document-card">
+                        <div class="document-header">
+                            <div class="document-icon">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <div class="document-info">
+                                <h3>Identity Documents</h3>
+                                <span class="document-status status-required">Required</span>
+                            </div>
+                        </div>
+                        <p>Upload copies of national IDs or passports for both bride and groom.</p>
+                        <div class="upload-area" onclick="triggerFileUpload('identity')">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Click to upload or drag files here</p>
+                            <small>PDF, JPG, PNG (max 5MB each)</small>
+                        </div>
+                        <input type="file" id="identity-upload" multiple accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                    </div>
+                    
+                    <div class="document-card">
+                        <div class="document-header">
+                            <div class="document-icon">
+                                <i class="fas fa-certificate"></i>
+                            </div>
+                            <div class="document-info">
+                                <h3>Birth Certificates</h3>
+                                <span class="document-status status-required">Required</span>
+                            </div>
+                        </div>
+                        <p>Official birth certificates for both parties.</p>
+                        <div class="upload-area" onclick="triggerFileUpload('birth')">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Click to upload or drag files here</p>
+                            <small>PDF, JPG, PNG (max 5MB each)</small>
+                        </div>
+                        <input type="file" id="birth-upload" multiple accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                    </div>
+                    
+                    <div class="document-card">
+                        <div class="document-header">
+                            <div class="document-icon">
+                                <i class="fas fa-file-medical"></i>
+                            </div>
+                            <div class="document-info">
+                                <h3>Medical Reports</h3>
+                                <span class="document-status status-pending">Optional</span>
+                            </div>
+                        </div>
+                        <p>Recent medical certificates (if required by church policy).</p>
+                        <div class="upload-area" onclick="triggerFileUpload('medical')">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Click to upload or drag files here</p>
+                            <small>PDF, JPG, PNG (max 5MB each)</small>
+                        </div>
+                        <input type="file" id="medical-upload" multiple accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                    </div>
+                    
+                    <div class="document-card">
+                        <div class="document-header">
+                            <div class="document-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="document-info">
+                                <h3>Additional Documents</h3>
+                                <span class="document-status status-pending">Optional</span>
+                            </div>
+                        </div>
+                        <p>Any other supporting documents.</p>
+                        <div class="upload-area" onclick="triggerFileUpload('additional')">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Click to upload or drag files here</p>
+                            <small>PDF, JPG, PNG (max 5MB each)</small>
+                        </div>
+                        <input type="file" id="additional-upload" multiple accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Messages Section -->
+            <section id="messages" class="content-section">
+                <style>
+                    .messages-layout {
+                        display: grid;
+                        grid-template-columns: 1fr 300px;
+                        gap: 20px;
+                        height: 600px;
+                    }
+
+                    .messages-main {
+                        background: var(--white);
+                        border-radius: 16px;
+                        padding: 0;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                        display: flex;
+                        flex-direction: column;
+                    }
+
+                    .messages-header {
+                        padding: 20px;
+                        border-bottom: 2px solid var(--light-gray);
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+
+                    .messages-body {
+                        flex: 1;
+                        padding: 20px;
+                        overflow-y: auto;
+                    }
+
+                    .message {
+                        margin-bottom: 20px;
+                        display: flex;
+                        gap: 15px;
+                    }
+
+                    .message.sent {
+                        flex-direction: row-reverse;
+                    }
+
+                    .message-avatar {
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        background: var(--primary-color);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: var(--white);
+                        font-weight: 600;
+                        flex-shrink: 0;
+                    }
+
+                    .message-content {
+                        max-width: 70%;
+                    }
+
+                    .message-bubble {
+                        background: #f1f3f4;
+                        padding: 12px 16px;
+                        border-radius: 16px;
+                        margin-bottom: 5px;
+                    }
+
+                    .message.sent .message-bubble {
+                        background: var(--primary-color);
+                        color: var(--white);
+                    }
+
+                    .message-time {
+                        font-size: 0.8rem;
+                        color: var(--gray);
+                        text-align: right;
+                    }
+
+                    .message.sent .message-time {
+                        text-align: left;
+                    }
+
+                    .message-input {
+                        padding: 20px;
+                        border-top: 2px solid var(--light-gray);
+                    }
+
+                    .input-group {
+                        display: flex;
+                        gap: 10px;
+                    }
+
+                    .input-group input {
+                        flex: 1;
+                        padding: 12px 16px;
+                        border: 2px solid var(--light-gray);
+                        border-radius: 25px;
+                        outline: none;
+                    }
+
+                    .input-group input:focus {
+                        border-color: var(--primary-color);
+                    }
+
+                    .send-btn {
+                        width: 50px;
+                        height: 50px;
+                        border: none;
+                        background: var(--primary-color);
+                        color: var(--white);
+                        border-radius: 50%;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: background 0.3s ease;
+                    }
+
+                    .send-btn:hover {
+                        background: var(--secondary-color);
+                    }
+
+                    .messages-sidebar {
+                        background: var(--white);
+                        border-radius: 16px;
+                        padding: 20px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    }
+
+                    .coordinator-info {
+                        text-align: center;
+                        padding-bottom: 20px;
+                        border-bottom: 2px solid var(--light-gray);
+                        margin-bottom: 20px;
+                    }
+
+                    .coordinator-avatar {
+                        width: 80px;
+                        height: 80px;
+                        border-radius: 50%;
+                        background: var(--primary-color);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: var(--white);
+                        font-size: 2rem;
+                        margin: 0 auto 15px;
+                    }
+
+                    .quick-actions {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 10px;
+                    }
+
+                    .quick-action-btn {
+                        padding: 10px;
+                        border: 2px solid var(--light-gray);
+                        background: var(--white);
+                        border-radius: 8px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        text-align: left;
+                    }
+
+                    .quick-action-btn:hover {
+                        border-color: var(--primary-color);
+                        background: rgba(100, 1, 127, 0.05);
+                    }
+
+                    @media (max-width: 768px) {
+                        .messages-layout {
+                            grid-template-columns: 1fr;
+                            grid-template-rows: 1fr auto;
+                        }
+                        
+                        .messages-sidebar {
+                            order: -1;
+                            height: auto;
+                        }
+                    }
+                </style>
+                
+                <div class="section-header">
+                    <h1>Messages</h1>
+                    <p>Communication with your wedding coordinator</p>
+                </div>
+                
+                <div class="messages-layout">
+                    <div class="messages-main">
+                        <div class="messages-header">
+                            <h3>Chat with Pastor Sarah Nakamya</h3>
+                            <span class="status-indicator">
+                                <i class="fas fa-circle" style="color: #2ecc71; font-size: 0.8rem;"></i>
+                                Online
+                            </span>
+                        </div>
+                        
+                        <div class="messages-body" id="messagesBody">
+                            <div class="message">
+                                <div class="message-avatar">SN</div>
+                                <div class="message-content">
+                                    <div class="message-bubble">
+                                        Welcome to Watoto Church! I'm Pastor Sarah, your wedding coordinator. I'm here to help you through the entire process. Have you started filling out your application?
+                                    </div>
+                                    <div class="message-time">Today, 10:30 AM</div>
+                                </div>
+                            </div>
+                            
+                            <div class="message sent">
+                                <div class="message-avatar">JS</div>
+                                <div class="message-content">
+                                    <div class="message-bubble">
+                                        Hi Pastor Sarah! Thank you so much. Yes, we've just started the application process. We're very excited!
+                                    </div>
+                                    <div class="message-time">Today, 10:45 AM</div>
+                                </div>
+                            </div>
+                            
+                            <div class="message">
+                                <div class="message-avatar">SN</div>
+                                <div class="message-content">
+                                    <div class="message-bubble">
+                                        That's wonderful! Please don't hesitate to reach out if you have any questions. Also, remember to schedule your pre-marital counseling sessions once your application is submitted.
+                                    </div>
+                                    <div class="message-time">Today, 11:00 AM</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="message-input">
+                            <div class="input-group">
+                                <input type="text" placeholder="Type your message..." id="messageInput">
+                                <button class="send-btn" onclick="sendMessage()">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="messages-sidebar">
+                        <div class="coordinator-info">
+                            <div class="coordinator-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h4>Pastor Sarah Nakamya</h4>
+                            <p>Wedding Coordinator</p>
+                            <small>Usually responds within 2 hours</small>
+                        </div>
+                        
+                        <div class="quick-actions">
+                            <h5>Quick Actions</h5>
+                            <button class="quick-action-btn" onclick="sendQuickMessage('schedule')">
+                                <i class="fas fa-calendar"></i>
+                                Schedule Counseling
+                            </button>
+                            <button class="quick-action-btn" onclick="sendQuickMessage('documents')">
+                                <i class="fas fa-file-alt"></i>
+                                Ask about Documents
+                            </button>
+                            <button class="quick-action-btn" onclick="sendQuickMessage('venue')">
+                                <i class="fas fa-church"></i>
+                                Venue Questions
+                            </button>
+                            <button class="quick-action-btn" onclick="sendQuickMessage('payment')">
+                                <i class="fas fa-credit-card"></i>
+                                Payment Information
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Timeline Section -->
+            <section id="timeline" class="content-section">
+                <style>
+                    .timeline-container {
+                        max-width: 800px;
+                        margin: 0 auto;
+                    }
+
+                    .timeline {
+                        position: relative;
+                        padding: 20px 0;
+                    }
+
+                    .timeline::before {
+                        content: '';
+                        position: absolute;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        width: 4px;
+                        height: 100%;
+                        background: var(--light-gray);
+                        border-radius: 2px;
+                    }
+
+                    .timeline-item {
+                        position: relative;
+                        margin-bottom: 40px;
+                        width: 100%;
+                    }
+
+                    .timeline-item:nth-child(odd) .timeline-content {
+                        margin-left: 0;
+                        margin-right: 50%;
+                        padding-right: 30px;
+                        text-align: right;
+                    }
+
+                    .timeline-item:nth-child(even) .timeline-content {
+                        margin-left: 50%;
+                        margin-right: 0;
+                        padding-left: 30px;
+                        text-align: left;
+                    }
+
+                    .timeline-marker {
+                        position: absolute;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        width: 60px;
+                        height: 60px;
+                        border-radius: 50%;
+                        border: 4px solid var(--white);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.2rem;
+                        color: var(--white);
+                        z-index: 10;
+                    }
+
+                    .timeline-marker.completed {
+                        background: var(--success-color);
+                    }
+
+                    .timeline-marker.current {
+                        background: var(--primary-color);
+                    }
+
+                    .timeline-marker.pending {
+                        background: var(--light-gray);
+                        color: var(--gray);
+                    }
+
+                    .timeline-content {
+                        background: var(--white);
+                        border-radius: 16px;
+                        padding: 25px;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                        border: 2px solid var(--light-gray);
+                    }
+
+                    .timeline-item.completed .timeline-content {
+                        border-color: var(--success-color);
+                    }
+
+                    .timeline-item.current .timeline-content {
+                        border-color: var(--primary-color);
+                    }
+
+                    .timeline-date {
+                        color: var(--primary-color);
+                        font-weight: 600;
+                        font-size: 0.9rem;
+                        margin-bottom: 10px;
+                    }
+
+                    .timeline-title {
+                        color: var(--text-color);
+                        margin: 0 0 10px 0;
+                        font-size: 1.1rem;
+                    }
+
+                    .timeline-description {
+                        color: var(--gray);
+                        margin: 0;
+                        line-height: 1.6;
+                    }
+
+                    .timeline-status {
+                        display: inline-block;
+                        padding: 4px 12px;
+                        border-radius: 20px;
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                        margin-top: 10px;
+                    }
+
+                    .status-completed {
+                        background: rgba(46, 204, 113, 0.1);
+                        color: var(--success-color);
+                    }
+
+                    .status-in-progress {
+                        background: rgba(100, 1, 127, 0.1);
+                        color: var(--primary-color);
+                    }
+
+                    .status-upcoming {
+                        background: rgba(108, 117, 125, 0.1);
+                        color: var(--gray);
+                    }
+
+                    @media (max-width: 768px) {
+                        .timeline::before {
+                            left: 30px;
+                        }
+
+                        .timeline-marker {
+                            left: 30px;
+                            width: 40px;
+                            height: 40px;
+                            font-size: 1rem;
+                        }
+
+                        .timeline-item:nth-child(odd) .timeline-content,
+                        .timeline-item:nth-child(even) .timeline-content {
+                            margin-left: 70px;
+                            margin-right: 0;
+                            padding-left: 20px;
+                            padding-right: 20px;
+                            text-align: left;
+                        }
+                    }
+                </style>
+                
+                <div class="section-header">
+                    <h1>Wedding Timeline</h1>
+                    <p>Track your wedding planning progress and upcoming milestones</p>
+                </div>
+                
+                <div class="timeline-container">
+                    <div class="timeline">
+                        <div class="timeline-item current">
+                            <div class="timeline-marker current">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">Today</div>
+                                <h3 class="timeline-title">Submit Application</h3>
+                                <p class="timeline-description">Complete and submit your wedding venue application with all required documents.</p>
+                                <span class="timeline-status status-in-progress">In Progress</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker pending">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">Within 3-5 days</div>
+                                <h3 class="timeline-title">Application Review</h3>
+                                <p class="timeline-description">Church administration reviews your application and documents for completeness and approval.</p>
+                                <span class="timeline-status status-upcoming">Upcoming</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker pending">
+                                <i class="fas fa-calendar-plus"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">1-2 weeks</div>
+                                <h3 class="timeline-title">Schedule Counseling</h3>
+                                <p class="timeline-description">Attend mandatory pre-marital counseling sessions with church counselors.</p>
+                                <span class="timeline-status status-upcoming">Upcoming</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker pending">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">2-3 weeks</div>
+                                <h3 class="timeline-title">Payment Processing</h3>
+                                <p class="timeline-description">Complete payment for venue booking and associated services.</p>
+                                <span class="timeline-status status-upcoming">Upcoming</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker pending">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">3-4 weeks</div>
+                                <h3 class="timeline-title">Final Preparations</h3>
+                                <p class="timeline-description">Coordinate final details including decorations, music, and ceremony logistics.</p>
+                                <span class="timeline-status status-upcoming">Upcoming</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-marker pending">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-date">Wedding Day</div>
+                                <h3 class="timeline-title">Your Special Day</h3>
+                                <p class="timeline-description">Celebrate your wedding ceremony at Watoto Church surrounded by family and friends.</p>
+                                <span class="timeline-status status-upcoming">Upcoming</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Dashboard JavaScript Functions
+        let currentStep = 1;
+        let selectedCampusData = null;
+        let selectedDateData = null;
+        let selectedTimeData = null;
+        let currentCalendarDate = new Date(2025, 11); // December 2025
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show the requested section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to the corresponding nav item
+            document.querySelector(`[onclick="showSection('${sectionId}')"]`).classList.add('active');
+        }
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Campus Selection Functions
+        function selectCampus(campusId) {
+            // Remove previous selection
+            document.querySelectorAll('.campus-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selection to clicked campus
+            document.querySelector(`[data-campus="${campusId}"]`).classList.add('selected');
+            
+            // Store selection
+            selectedCampusData = {
+                id: campusId,
+                name: document.querySelector(`[data-campus="${campusId}"] h4`).textContent
+            };
+            
+            document.getElementById('selectedCampus').value = campusId;
+            
+            // Show date/time selection
+            document.getElementById('datetimeSection').style.display = 'block';
+            
+            // Generate calendar
+            generateCalendar();
+            
+            // Check if we can enable next button
+            checkFormCompletion();
+        }
+
+        // Calendar Functions
+        function generateCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            const currentMonthElement = document.getElementById('currentMonth');
+            
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            
+            // Update month display
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            currentMonthElement.textContent = `${monthNames[month]} ${year}`;
+            
+            // Clear previous days (keep headers)
+            const dayHeaders = calendarGrid.querySelectorAll('.day-header');
+            calendarGrid.innerHTML = '';
+            dayHeaders.forEach(header => calendarGrid.appendChild(header));
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+            
+            // Add previous month's trailing days
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day other-month';
+                dayElement.textContent = daysInPrevMonth - i;
+                calendarGrid.appendChild(dayElement);
+            }
+            
+            // Add current month's days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day available';
+                dayElement.textContent = day;
+                dayElement.onclick = () => selectDate(year, month, day);
+                
+                // Disable past dates
+                const dayDate = new Date(year, month, day);
+                const today = new Date();
+                if (dayDate < today) {
+                    dayElement.className = 'calendar-day unavailable';
+                    dayElement.onclick = null;
+                }
+                
+                calendarGrid.appendChild(dayElement);
+            }
+            
+            // Add next month's leading days
+            const totalCells = 42; // 6 rows × 7 days
+            const cellsUsed = firstDay + daysInMonth;
+            for (let day = 1; cellsUsed + day - 1 < totalCells; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day other-month';
+                dayElement.textContent = day;
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        function changeMonth(direction) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
+            generateCalendar();
+        }
+
+        function selectDate(year, month, day) {
+            // Remove previous selection
+            document.querySelectorAll('.calendar-day').forEach(day => {
+                day.classList.remove('selected');
+            });
+            
+            // Add selection to clicked date
+            event.target.classList.add('selected');
+            
+            // Store selection
+            const selectedDate = new Date(year, month, day);
+            selectedDateData = {
+                date: selectedDate,
+                formatted: selectedDate.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                })
+            };
+            
+            document.getElementById('selectedDate').value = selectedDate.toISOString().split('T')[0];
+            
+            // Show time selection
+            document.getElementById('timeSelection').style.display = 'block';
+            
+            // Check availability for this date (simulate)
+            checkTimeAvailability(selectedDate);
+        }
+
+        function checkTimeAvailability(date) {
+            // Simulate checking availability
+            const timeSlots = document.querySelectorAll('.time-slot');
+            timeSlots.forEach(slot => {
+                const availability = slot.querySelector('.availability');
+                // Random availability simulation
+                const isAvailable = Math.random() > 0.3;
+                if (isAvailable) {
+                    availability.textContent = 'Available';
+                    availability.className = 'availability available';
+                    slot.onclick = () => selectTime(slot.dataset.time);
+                } else {
+                    availability.textContent = 'Booked';
+                    availability.className = 'availability unavailable';
+                    slot.onclick = null;
+                    slot.style.opacity = '0.6';
+                    slot.style.cursor = 'not-allowed';
+                }
+            });
+        }
+
+        function selectTime(time) {
+            // Remove previous selection
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.classList.remove('selected');
+            });
+            
+            // Add selection to clicked time
+            document.querySelector(`[data-time="${time}"]`).classList.add('selected');
+            
+            // Store selection
+            selectedTimeData = {
+                time: time,
+                formatted: time === '10:00' ? '10:00 AM - 12:00 PM' : '2:00 PM - 4:00 PM'
+            };
+            
+            document.getElementById('selectedTime').value = time;
+            
+            // Show summary
+            updateSelectionSummary();
+            document.getElementById('selectionSummary').style.display = 'block';
+            
+            // Check if we can enable next button
+            checkFormCompletion();
+        }
+
+        function updateSelectionSummary() {
+            if (selectedCampusData) {
+                document.getElementById('summaryaCampus').textContent = selectedCampusData.name;
+            }
+            if (selectedDateData) {
+                document.getElementById('summaryDate').textContent = selectedDateData.formatted;
+            }
+            if (selectedTimeData) {
+                document.getElementById('summaryTime').textContent = selectedTimeData.formatted;
+            }
+        }
+
+        function checkFormCompletion() {
+            const nextButton = document.getElementById('nextButton');
+            if (selectedCampusData && selectedDateData && selectedTimeData) {
+                nextButton.disabled = false;
+            } else {
+                nextButton.disabled = true;
+            }
+        }
+
+        function nextStep() {
+            if (currentStep === 1 && selectedCampusData && selectedDateData && selectedTimeData) {
+                // Hide current step
+                document.querySelector(`[data-step="${currentStep}"]`).style.display = 'none';
+                
+                // Update step indicator
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('completed');
+                
+                // Move to next step
+                currentStep = 2;
+                
+                // Show next step
+                document.querySelector(`[data-step="${currentStep}"]`).style.display = 'block';
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+                
+                // Update navigation buttons
+                updateNavigationButtons();
+                
+                // Update progress
+                updateProgress();
+            } else if (currentStep === 2) {
+                if (validatePersonalDetails()) {
+                    proceedToStep(3);
+                }
+            } else if (currentStep === 3) {
+                if (validateAdditionalInfo()) {
+                    proceedToStep(4);
+                }
+            } else if (currentStep === 4) {
+                submitApplication();
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                // Hide current step
+                document.querySelector(`[data-step="${currentStep}"]`).style.display = 'none';
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+                
+                // Move to previous step
+                currentStep--;
+                
+                // Show previous step
+                document.querySelector(`[data-step="${currentStep}"]`).style.display = 'block';
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+                
+                // Update navigation buttons
+                updateNavigationButtons();
+                
+                // Update progress
+                updateProgress();
+            }
+        }
+
+        function proceedToStep(step) {
+            // Hide current step
+            document.querySelector(`[data-step="${currentStep}"]`).style.display = 'none';
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('completed');
+            
+            // Move to target step
+            currentStep = step;
+            
+            // Show target step
+            document.querySelector(`[data-step="${currentStep}"]`).style.display = 'block';
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+            
+            // Update navigation buttons
+            updateNavigationButtons();
+            
+            // Update progress
+            updateProgress();
+        }
+
+        function updateNavigationButtons() {
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+            
+            // Show/hide previous button
+            if (currentStep > 1) {
+                prevButton.style.display = 'block';
+            } else {
+                prevButton.style.display = 'none';
+            }
+            
+            // Update next button text and state
+            if (currentStep === 4) {
+                nextButton.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Application';
+            } else {
+                nextButton.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+            }
+            
+            // Enable/disable based on validation
+            if (currentStep === 1) {
+                nextButton.disabled = !(selectedCampusData && selectedDateData && selectedTimeData);
+            } else {
+                nextButton.disabled = false; // Will be handled by individual step validation
+            }
+        }
+
+        function updateProgress() {
+            const progressFill = document.querySelector('.progress-fill');
+            const progressPercentage = document.querySelector('.progress-percentage');
+            const overviewProgressFill = document.querySelector('#overview .progress-fill');
+            const overviewProgressPercentage = document.querySelector('#overview .progress-percentage');
+            
+            const progress = (currentStep - 1) * 25; // 25% per step
+            
+            if (progressFill) {
+                progressFill.style.width = `${progress}%`;
+            }
+            if (progressPercentage) {
+                progressPercentage.textContent = `${progress}% Complete`;
+            }
+            if (overviewProgressFill) {
+                overviewProgressFill.style.width = `${progress}%`;
+            }
+            if (overviewProgressPercentage) {
+                overviewProgressPercentage.textContent = `${progress}% Complete`;
+            }
+        }
+
+        function validatePersonalDetails() {
+            // Basic validation for personal details
+            const requiredFields = ['brideName', 'groomName', 'brideEmail', 'groomEmail', 'bridePhone', 'groomPhone'];
+            for (let field of requiredFields) {
+                const element = document.getElementById(field);
+                if (element && !element.value.trim()) {
+                    alert('Please fill in all required personal details.');
+                    element.focus();
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function validateAdditionalInfo() {
+            // Basic validation for additional information
+            const guestCount = document.getElementById('guestCount');
+            if (guestCount && (!guestCount.value || guestCount.value < 1)) {
+                alert('Please specify the number of guests.');
+                guestCount.focus();
+                return false;
+            }
+            return true;
+        }
+
+        function submitApplication() {
+            // Simulate application submission
+            alert('Application submitted successfully!\n\nYou will receive a confirmation email shortly.');
+            
+            // Update progress to 100%
+            const progressFill = document.querySelector('.progress-fill');
+            const progressPercentage = document.querySelector('.progress-percentage');
+            const overviewProgressFill = document.querySelector('#overview .progress-fill');
+            const overviewProgressPercentage = document.querySelector('#overview .progress-percentage');
+            
+            if (progressFill) {
+                progressFill.style.width = '100%';
+            }
+            if (progressPercentage) {
+                progressPercentage.textContent = '100% Complete';
+            }
+            if (overviewProgressFill) {
+                overviewProgressFill.style.width = '100%';
+            }
+            if (overviewProgressPercentage) {
+                overviewProgressPercentage.textContent = '100% Complete';
+            }
+            
+            // Redirect to overview
+            showSection('overview');
+        }
+
+        function populateReviewSection() {
+            // Populate venue and date information
+            if (selectedCampusData) {
+                document.getElementById('reviewCampus').textContent = selectedCampusData.name;
+            }
+            if (selectedDateData) {
+                document.getElementById('reviewDate').textContent = selectedDateData.formatted;
+            }
+            if (selectedTimeData) {
+                document.getElementById('reviewTime').textContent = selectedTimeData.formatted;
+            }
+            
+            // Populate personal details
+            const brideName = document.getElementById('brideName')?.value || '-';
+            const groomName = document.getElementById('groomName')?.value || '-';
+            const brideEmail = document.getElementById('brideEmail')?.value || '-';
+            const bridePhone = document.getElementById('bridePhone')?.value || '-';
+            
+            document.getElementById('reviewBrideName').textContent = brideName;
+            document.getElementById('reviewGroomName').textContent = groomName;
+            document.getElementById('reviewEmail').textContent = brideEmail;
+            document.getElementById('reviewPhone').textContent = bridePhone;
+            
+            // Populate wedding details
+            const guestCount = document.getElementById('guestCount')?.value || '-';
+            const musicPreference = document.getElementById('musicPreference')?.value || '-';
+            const specialRequests = document.getElementById('specialRequests')?.value || 'None';
+            
+            document.getElementById('reviewGuests').textContent = guestCount;
+            document.getElementById('reviewMusic').textContent = musicPreference === '' ? 'Not specified' : 
+                document.querySelector(`#musicPreference option[value="${musicPreference}"]`)?.textContent || musicPreference;
+            document.getElementById('reviewSpecialReq').textContent = specialRequests === '' ? 'None' : 
+                document.querySelector(`#specialRequests option[value="${specialRequests}"]`)?.textContent || specialRequests;
+        }
+
+        // Enhanced step navigation
+        function proceedToStep(step) {
+            // Hide current step
+            document.querySelector(`[data-step="${currentStep}"]`).style.display = 'none';
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('completed');
+            
+            // Move to target step
+            currentStep = step;
+            
+            // Special handling for review step
+            if (currentStep === 4) {
+                populateReviewSection();
+            }
+            
+            // Show target step
+            document.querySelector(`[data-step="${currentStep}"]`).style.display = 'block';
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+            
+            // Update navigation buttons
+            updateNavigationButtons();
+            
+            // Update progress
+            updateProgress();
+        }
+
+        // Add form validation event listeners
+        function setupFormValidation() {
+            // Real-time validation for required fields
+            const requiredFields = ['brideName', 'groomName', 'brideEmail', 'groomEmail', 'bridePhone', 'groomPhone'];
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('input', function() {
+                        if (this.value.trim()) {
+                            this.classList.remove('invalid');
+                            this.classList.add('valid');
+                        } else {
+                            this.classList.remove('valid');
+                            this.classList.add('invalid');
+                        }
+                    });
+                }
+            });
+            
+            // Terms acceptance validation
+            const acceptTerms = document.getElementById('acceptTerms');
+            if (acceptTerms) {
+                acceptTerms.addEventListener('change', function() {
+                    const nextButton = document.getElementById('nextButton');
+                    if (currentStep === 4) {
+                        nextButton.disabled = !this.checked;
+                    }
+                });
+            }
+        }
+
+        // Initialize calendar when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            generateCalendar();
+            setupFormValidation();
+            updateNavigationButtons();
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const toggle = document.querySelector('.dropdown-toggle');
+            
+            if (!toggle.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Auto-save functionality simulation
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('change', function() {
+                // Simulate auto-save
+                console.log('Form data saved automatically');
+            });
+        });
+
+        // Document upload functions
+        function triggerFileUpload(type) {
+            document.getElementById(type + '-upload').click();
+        }
+
+        // Message functions
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                addMessageToChat(message, true);
+                input.value = '';
+                
+                // Simulate response
+                setTimeout(() => {
+                    addMessageToChat("Thank you for your message! I'll get back to you shortly.", false);
+                }, 1000);
+            }
+        }
+
+        function sendQuickMessage(type) {
+            const messages = {
+                schedule: "Hi Pastor Sarah, I'd like to schedule our pre-marital counseling sessions. What times are available?",
+                documents: "Hello, I have some questions about the required documents. Could you please clarify what exactly is needed?",
+                venue: "Hi, I have some questions about the venue facilities and what's included in the booking.",
+                payment: "Hello, could you please provide information about the payment process and payment options?"
+            };
+            
+            if (messages[type]) {
+                addMessageToChat(messages[type], true);
+            }
+        }
+
+        function addMessageToChat(message, sent) {
+            const messagesBody = document.getElementById('messagesBody');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = sent ? 'message sent' : 'message';
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${sent ? 'JS' : 'SN'}</div>
+                <div class="message-content">
+                    <div class="message-bubble">${message}</div>
+                    <div class="message-time">Today, ${timeString}</div>
+                </div>
+            `;
+            
+            messagesBody.appendChild(messageDiv);
+            messagesBody.scrollTop = messagesBody.scrollHeight;
+        }
+
+        // Handle Enter key in message input
+        const messageInput = document.getElementById('messageInput');
+        if (messageInput) {
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        }
+    </script>
+
+    <script src="<?= base_url('js/script.js') ?>"></script>
+    <script src="<?= base_url('js/dashboard.js') ?>"></script>
+</body>
+</html>
