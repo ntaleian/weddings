@@ -44,634 +44,618 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('auth_right') ?>
-    <div class="auth-header">
-        <h2>Create Your Account</h2>
-        <p>Start your wedding booking journey with Watoto Church</p>
-    </div>
-
-    <!-- Flash Messages -->
-    <?= $this->include('partials/flash_messages') ?>
-
-    <form class="auth-form" method="post" action="<?= base_url('register') ?>" autocomplete="off" id="registerForm">
-        <?= csrf_field() ?>
-        
-        <div class="form-row">
-            <div class="form-group">
-                <label for="first_name">
-                    <i class="fas fa-user"></i>
-                    First Name
-                </label>
-                <input type="text" id="first_name" name="first_name" value="<?= old('first_name') ?>" required placeholder="Enter your first name">
-                <span class="form-error"></span>
+    <div class="register-container">
+        <div class="register-header">
+            <div class="register-icon">
+                <i class="fas fa-heart"></i>
             </div>
-            <div class="form-group">
-                <label for="last_name">
-                    <i class="fas fa-user"></i>
-                    Last Name
-                </label>
-                <input type="text" id="last_name" name="last_name" value="<?= old('last_name') ?>" required placeholder="Enter your last name">
-                <span class="form-error"></span>
-            </div>
+            <h1>Create Account</h1>
+            <p class="register-subtitle">Join us and begin your wedding journey</p>
         </div>
 
-        <div class="form-group">
-            <label for="email">
-                <i class="fas fa-envelope"></i>
-                Email Address
-            </label>
-            <input type="email" id="email" name="email" value="<?= old('email') ?>" required autocomplete="off" placeholder="Enter your email">
-            <span class="form-error"></span>
-        </div>
+        <!-- Flash Messages -->
+        <?= $this->include('partials/flash_messages') ?>
 
-        <div class="form-row">
-            <div class="form-group">
-                <label for="password">
-                    <i class="fas fa-lock"></i>
-                    Password
-                </label>
-                <div class="password-input">
-                    <input type="password" id="password" name="password" required autocomplete="new-password" placeholder="Create a password">
-                    <button type="button" class="password-toggle" onclick="togglePassword('password')" aria-label="Toggle password visibility">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-                <span class="form-error"></span>
-            </div>
-            <div class="form-group">
-                <label for="confirm_password">
-                    <i class="fas fa-lock"></i>
-                    Confirm Password
-                </label>
-                <div class="password-input">
-                    <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirm your password">
-                    <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')" aria-label="Toggle password visibility">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-                <span class="form-error"></span>
-            </div>
-        </div>
-
-        <!-- Math CAPTCHA -->
-        <div class="form-group math-captcha-group">
-            <label for="captcha_answer">
-                <i class="fas fa-shield-alt"></i>
-                Security Verification
-            </label>
-            <div class="captcha-container">
-                <div class="captcha-question">
-                    <div class="captcha-question-content">
-                        <i class="fas fa-calculator"></i>
-                        <span id="captcha-text">What is <?= $captcha_question ?? '2 + 2' ?>?</span>
+        <form class="register-form" method="post" action="<?= base_url('register') ?>" autocomplete="off" id="registerForm">
+            <?= csrf_field() ?>
+            
+            <div class="form-grid">
+                <div class="form-field">
+                    <label for="first_name" class="field-label">
+                        First Name
+                    </label>
+                    <div class="input-wrapper">
+                        <i class="input-icon fas fa-user"></i>
+                        <input type="text" id="first_name" name="first_name" value="<?= old('first_name') ?>" required placeholder="John">
                     </div>
-                    <button type="button" class="captcha-refresh" onclick="refreshCaptcha()" title="Get new question">
-                        <i class="fas fa-redo-alt"></i>
-                    </button>
+                    <span class="field-error"></span>
                 </div>
-                <input type="number" id="captcha_answer" name="captcha_answer" placeholder="Enter your answer" required>
-                <div class="captcha-help">Please solve the math question above to verify you're human</div>
+                
+                <div class="form-field">
+                    <label for="last_name" class="field-label">
+                        Last Name
+                    </label>
+                    <div class="input-wrapper">
+                        <i class="input-icon fas fa-user"></i>
+                        <input type="text" id="last_name" name="last_name" value="<?= old('last_name') ?>" required placeholder="Doe">
+                    </div>
+                    <span class="field-error"></span>
+                </div>
             </div>
-            <span class="form-error"></span>
+
+            <div class="form-field">
+                <label for="email" class="field-label">
+                    Email Address
+                </label>
+                <div class="input-wrapper">
+                    <i class="input-icon fas fa-envelope"></i>
+                    <input type="email" id="email" name="email" value="<?= old('email') ?>" required autocomplete="off" placeholder="john.doe@example.com">
+                </div>
+                <span class="field-error"></span>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-field">
+                    <label for="password" class="field-label">
+                        Password
+                    </label>
+                    <div class="input-wrapper">
+                        <i class="input-icon fas fa-lock"></i>
+                        <input type="password" id="password" name="password" required autocomplete="new-password" placeholder="••••••••">
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('password')" aria-label="Toggle password visibility">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <span class="field-error"></span>
+                </div>
+                
+                <div class="form-field">
+                    <label for="confirm_password" class="field-label">
+                        Confirm Password
+                    </label>
+                    <div class="input-wrapper">
+                        <i class="input-icon fas fa-lock"></i>
+                        <input type="password" id="confirm_password" name="confirm_password" required placeholder="••••••••">
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword('confirm_password')" aria-label="Toggle password visibility">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <span class="field-error"></span>
+                </div>
+            </div>
+
+            <!-- Math CAPTCHA -->
+            <div class="form-field captcha-field">
+                <label for="captcha_answer" class="field-label">
+                    Security Verification
+                </label>
+                <div class="captcha-box">
+                    <div class="captcha-display">
+                        <div class="captcha-text-wrapper">
+                            <i class="captcha-icon fas fa-calculator"></i>
+                            <span id="captcha-text"><?= $captcha_question ?? '2 + 2' ?> = ?</span>
+                        </div>
+                        <button type="button" class="captcha-refresh-btn" onclick="refreshCaptcha()" title="Get new question">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div class="input-wrapper captcha-input-wrapper">
+                        <i class="input-icon fas fa-keyboard"></i>
+                        <input type="number" id="captcha_answer" name="captcha_answer" placeholder="Enter answer" required>
+                    </div>
+                    <span class="captcha-hint">Solve the math question to verify you're human</span>
+                </div>
+                <span class="field-error"></span>
+            </div>
+
+            <div class="form-field checkbox-field">
+                <label class="custom-checkbox">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <span class="checkbox-indicator"></span>
+                    <span class="checkbox-text">
+                        I agree to the <a href="#" class="link-primary">Terms & Conditions</a> and <a href="#" class="link-primary">Privacy Policy</a>
+                    </span>
+                </label>
+                <span class="field-error"></span>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <span class="btn-text">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Create My Account</span>
+                </span>
+                <span class="btn-spinner" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </span>
+            </button>
+        </form>
+
+        <div class="register-footer">
+            <p>Already have an account? <a href="<?= base_url('login') ?>" class="login-link">Sign in</a></p>
         </div>
-
-        <div class="form-group checkbox-group">
-            <label class="checkbox-label">
-                <input type="checkbox" id="terms" name="terms" required>
-                <span class="checkmark"></span>
-                <span>I agree to the <a href="#">Terms & Conditions</a> and <a href="#">Privacy Policy</a></span>
-            </label>
-            <span class="form-error"></span>
-        </div>
-
-        <button type="submit" class="btn btn-primary btn-full">
-            <span class="btn-content">
-                <i class="fas fa-user-plus"></i>
-                <span>Create Account</span>
-            </span>
-            <span class="btn-loader" style="display: none;">
-                <i class="fas fa-spinner fa-spin"></i>
-            </span>
-        </button>
-    </form>
-
-    <div class="auth-footer">
-        <p>Already have an account? <a href="<?= base_url('login') ?>">Login here</a></p>
     </div>
 <?= $this->endSection() ?>
 
-<?= $this->section('additional_scripts') ?>
+<?= $this->section('additional_css') ?>
     <style>
-    /* Enhanced Register Page Styles - Clean & Organized */
-    .auth-welcome {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        animation: fadeInUp 0.6s ease-out;
+    /* Modern Register Page Design */
+    .register-container {
+        width: 100%;
+        max-width: 100%;
     }
 
-    .welcome-header {
-        margin-bottom: 50px;
+    .register-header {
+        text-align: center;
+        margin-bottom: 35px;
+        padding-bottom: 25px;
+        border-bottom: 1px solid #e9ecef;
     }
 
-    .welcome-header h1 {
-        margin-bottom: 12px;
-        font-size: 2.5rem;
-        line-height: 1.2;
-    }
-
-    .welcome-subtitle {
-        font-size: 1.1rem;
-        opacity: 0.9;
-        line-height: 1.5;
-        margin: 0;
-    }
-
-    .auth-features {
-        margin-bottom: 50px;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
-
-    .auth-feature {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        padding: 18px 20px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transition: all 0.3s ease;
-    }
-
-    .auth-feature:hover {
-        background: rgba(255, 255, 255, 0.12);
-        transform: translateX(4px);
-    }
-
-    .auth-feature i {
-        width: 44px;
-        height: 44px;
-        background: rgba(255, 255, 255, 0.15);
-        border-radius: 10px;
+    .register-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 20px;
+        background: linear-gradient(135deg, #25802D, #1a5a20);
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.2rem;
-        color: var(--white);
-        flex-shrink: 0;
+        box-shadow: 0 8px 20px rgba(37, 128, 45, 0.25);
     }
 
-    .auth-feature div {
+    .register-icon i {
+        font-size: 28px;
+        color: white;
+    }
+
+    .register-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 0 0 8px 0;
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .register-subtitle {
+        font-size: 15px;
+        color: #6c757d;
+        margin: 0;
+        font-weight: 400;
+    }
+
+    .register-form {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 22px;
     }
 
-    .auth-feature strong {
-        font-size: 0.95rem;
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .field-label {
+        font-size: 14px;
         font-weight: 600;
-        color: var(--white);
-        line-height: 1.3;
-    }
-
-    .auth-feature span {
-        font-size: 0.85rem;
-        opacity: 0.8;
-        color: var(--white);
-        line-height: 1.4;
-    }
-
-    .auth-quote {
-        margin-top: auto;
-        padding: 24px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 16px;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        text-align: center;
-        animation: fadeIn 0.8s ease-out 0.3s both;
-    }
-
-    .auth-quote i {
-        font-size: 1.5rem;
-        color: rgba(255, 255, 255, 0.6);
-        margin-bottom: 12px;
+        color: #343a40;
+        margin: 0;
         display: block;
     }
 
-    .auth-quote p {
-        font-style: italic;
-        font-size: 1rem;
-        margin-bottom: 10px;
-        line-height: 1.6;
-        color: var(--white);
-    }
-
-    .auth-quote cite {
-        font-size: 0.85rem;
-        opacity: 0.75;
-        font-style: normal;
-        color: var(--white);
-    }
-
-    .auth-header {
-        animation: fadeInDown 0.6s ease-out;
-    }
-
-    .auth-form {
-        animation: fadeInUp 0.6s ease-out 0.2s both;
-    }
-
-    .form-group label {
+    .input-wrapper {
+        position: relative;
         display: flex;
         align-items: center;
-        gap: 8px;
-        margin-bottom: 10px;
     }
 
-    .form-group label i {
-        color: #25802D;
-        font-size: 0.9rem;
+    .input-icon {
+        position: absolute;
+        left: 16px;
+        color: #6c757d;
+        font-size: 16px;
+        pointer-events: none;
+        z-index: 1;
     }
 
-    .form-group input {
-        padding: 16px 18px;
-        border: 2px solid #e8ecef;
-        border-radius: 12px;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        background: #f8f9fa;
+    .input-wrapper input {
+        width: 100%;
+        padding: 14px 16px 14px 48px;
+        border: 1.5px solid #dee2e6;
+        border-radius: 10px;
+        font-size: 15px;
+        font-family: 'Outfit', sans-serif;
+        background: #ffffff;
+        color: #1a1a1a;
+        outline: none;
+        transition: all 0.2s ease;
     }
 
-    .form-group input:focus {
-        background: white;
-        border-color: #25802D;
-        box-shadow: 0 0 0 4px rgba(37, 128, 45, 0.1);
-        transform: translateY(-1px);
-    }
-
-    .form-group input::placeholder {
+    .input-wrapper input::placeholder {
         color: #adb5bd;
     }
 
-    .password-input {
-        position: relative;
+    .input-wrapper input:focus {
+        border-color: #25802D;
+        box-shadow: 0 0 0 3px rgba(37, 128, 45, 0.1);
+        background: #ffffff;
     }
 
-    .password-toggle {
+    .input-wrapper input:hover:not(:focus) {
+        border-color: #adb5bd;
+    }
+
+    .password-toggle-btn {
         position: absolute;
-        right: 18px;
-        top: 50%;
-        transform: translateY(-50%);
+        right: 14px;
         background: none;
         border: none;
         color: #6c757d;
         cursor: pointer;
-        font-size: 1.1rem;
-        padding: 5px;
-        transition: all 0.3s ease;
+        font-size: 16px;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         z-index: 2;
+        border-radius: 6px;
+        transition: all 0.2s ease;
     }
 
-    .password-toggle:hover {
+    .password-toggle-btn:hover {
         color: #25802D;
-        transform: translateY(-50%) scale(1.1);
+        background: rgba(37, 128, 45, 0.08);
     }
 
-    .checkbox-label {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        cursor: pointer;
-        user-select: none;
+    .field-error {
+        font-size: 13px;
+        color: #dc3545;
+        display: none;
+        margin-top: 4px;
     }
 
-    .checkbox-label span:not(.checkmark) {
-        color: #495057;
-        font-size: 0.95rem;
+    .form-field.error .field-error {
+        display: block;
     }
 
-    .auth-footer {
-        margin-top: 30px;
-        padding-top: 25px;
-        border-top: 2px solid #e8ecef;
-        animation: fadeIn 0.8s ease-out 0.4s both;
+    .form-field.error .input-wrapper input {
+        border-color: #dc3545;
+        background: #fff5f5;
     }
 
-    .auth-footer p {
-        color: #6c757d;
-        font-size: 0.95rem;
+    /* CAPTCHA Styling */
+    .captcha-field {
+        margin-top: 8px;
     }
 
-    .auth-footer a {
-        color: #25802D;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .auth-footer a:hover {
-        color: #1a5a20;
-        text-decoration: underline;
-    }
-
-    .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 16px 30px;
-        border: none;
-        border-radius: 12px;
-        text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        font-size: 1.05rem;
-        line-height: 1.2;
-        white-space: nowrap;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #25802D 0%, #1a5a20 100%);
-        color: white;
-        box-shadow: 0 4px 15px rgba(37, 128, 45, 0.3);
-    }
-
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #1a5a20 0%, #25802D 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(37, 128, 45, 0.4);
-        color: white;
-    }
-
-    .btn-primary:active {
-        transform: translateY(0);
-    }
-
-    .btn-full {
-        width: 100%;
-        margin-top: 10px;
-    }
-
-    .btn-content {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .btn-loader {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* Enhanced CAPTCHA Design - Cleaner */
-    .math-captcha-group {
-        margin: 20px 0;
-        background: linear-gradient(135deg, rgba(37, 128, 45, 0.04) 0%, rgba(37, 128, 45, 0.01) 100%);
-        border-radius: 12px;
-        padding: 20px;
-        border: 2px solid rgba(37, 128, 45, 0.15);
-    }
-    
-    .math-captcha-group label {
-        font-weight: 600;
-        color: #25802D;
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    .captcha-container {
+    .captcha-box {
         display: flex;
         flex-direction: column;
         gap: 12px;
+        padding: 18px;
+        background: #f8f9fa;
+        border: 1.5px solid #e9ecef;
+        border-radius: 10px;
     }
-    
-    .captcha-question {
+
+    .captcha-display {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        padding: 14px 16px;
         background: white;
-        padding: 14px 18px;
-        border-radius: 10px;
-        border: 2px solid rgba(37, 128, 45, 0.15);
-        box-shadow: 0 2px 6px rgba(37, 128, 45, 0.08);
+        border: 1.5px solid #dee2e6;
+        border-radius: 8px;
+        gap: 12px;
     }
-    
-    .captcha-question-content {
+
+    .captcha-text-wrapper {
         display: flex;
         align-items: center;
         gap: 12px;
         flex: 1;
     }
-    
-    .captcha-question i {
-        color: #25802D;
-        font-size: 1rem;
+
+    .captcha-icon {
+        width: 36px;
+        height: 36px;
         background: rgba(37, 128, 45, 0.1);
-        padding: 8px;
+        color: #25802D;
         border-radius: 8px;
-        width: 32px;
-        height: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
     }
-    
-    .captcha-question span {
+
+    .captcha-text-wrapper span {
+        font-size: 16px;
         font-weight: 600;
-        color: #2c3e50;
-        font-size: 1rem;
+        color: #343a40;
+        font-family: 'Outfit', sans-serif;
     }
-    
-    .captcha-refresh {
+
+    .captcha-refresh-btn {
+        width: 38px;
+        height: 38px;
         background: #25802D;
         color: white;
         border: none;
         border-radius: 8px;
-        width: 36px;
-        height: 36px;
+        cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 6px rgba(37, 128, 45, 0.2);
+        font-size: 14px;
+        flex-shrink: 0;
+        transition: all 0.2s ease;
     }
-    
-    .captcha-refresh:hover {
+
+    .captcha-refresh-btn:hover {
         background: #1a5a20;
-        transform: rotate(180deg);
-        box-shadow: 0 4px 10px rgba(37, 128, 45, 0.3);
+        transform: scale(1.05);
     }
-    
-    .captcha-refresh:disabled {
+
+    .captcha-refresh-btn:disabled {
         opacity: 0.6;
         cursor: not-allowed;
         transform: none;
     }
-    
-    .math-captcha-group input[type="number"] {
-        background: white;
-        border: 2px solid rgba(37, 128, 45, 0.15);
-        border-radius: 10px;
-        padding: 14px 16px;
-        font-size: 1rem;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        width: 100%;
+
+    .captcha-input-wrapper {
+        margin-top: 4px;
     }
-    
-    .math-captcha-group input[type="number"]:focus {
-        outline: none;
-        border-color: #25802D;
-        box-shadow: 0 0 0 4px rgba(37, 128, 45, 0.1);
-        background: rgba(37, 128, 45, 0.02);
-    }
-    
-    .captcha-help {
-        font-size: 0.85rem;
+
+    .captcha-hint {
+        font-size: 12px;
         color: #6c757d;
+        margin-top: 4px;
         font-style: italic;
-        margin-top: 6px;
     }
 
-    /* Animations */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes fadeInDown {
-        from {
-            opacity: 0;
-            transform: translateY(-30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
-    }
-
-    /* Form validation styles */
-    .form-group.error input {
-        border-color: #dc3545;
-        background: #fff5f5;
-    }
-
-    .form-group.error .form-error {
-        display: block;
-        color: #dc3545;
-        font-size: 0.85rem;
+    /* Checkbox Styling */
+    .checkbox-field {
         margin-top: 8px;
+    }
+
+    .custom-checkbox {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        cursor: pointer;
+        user-select: none;
+        padding: 4px 0;
+    }
+
+    .custom-checkbox input[type="checkbox"] {
+        display: none;
+    }
+
+    .checkbox-indicator {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #dee2e6;
+        border-radius: 5px;
         display: flex;
         align-items: center;
-        gap: 5px;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 2px;
+        background: white;
+        transition: all 0.2s ease;
     }
 
-    .form-group.error .form-error::before {
-        content: '\f06a';
+    .custom-checkbox input[type="checkbox"]:checked + .checkbox-indicator {
+        background: #25802D;
+        border-color: #25802D;
+    }
+
+    .custom-checkbox input[type="checkbox"]:checked + .checkbox-indicator::after {
+        content: '\f00c';
         font-family: 'Font Awesome 6 Free';
         font-weight: 900;
+        color: white;
+        font-size: 12px;
     }
 
-    /* Responsive adjustments */
-    @media (max-width: 1024px) {
-        .welcome-header h1 {
-            font-size: 2.2rem;
-        }
-
-        .welcome-subtitle {
-            font-size: 1rem;
-        }
+    .checkbox-text {
+        font-size: 14px;
+        color: #495057;
+        line-height: 1.5;
+        flex: 1;
     }
 
+    .link-primary {
+        color: #25802D;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .link-primary:hover {
+        color: #1a5a20;
+        text-decoration: underline;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+        width: 100%;
+        padding: 16px 24px;
+        background: linear-gradient(135deg, #25802D 0%, #1a5a20 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        font-family: 'Outfit', sans-serif;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 8px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(37, 128, 45, 0.25);
+        transition: all 0.2s ease;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(37, 128, 45, 0.35);
+    }
+
+    .submit-btn:active:not(:disabled) {
+        transform: translateY(0);
+    }
+
+    .submit-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-text {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn-spinner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .submit-btn i {
+        font-size: 16px;
+    }
+
+    /* Footer */
+    .register-footer {
+        margin-top: 28px;
+        padding-top: 24px;
+        border-top: 1px solid #e9ecef;
+        text-align: center;
+    }
+
+    .register-footer p {
+        font-size: 14px;
+        color: #6c757d;
+        margin: 0;
+    }
+
+    .login-link {
+        color: #25802D;
+        text-decoration: none;
+        font-weight: 600;
+        margin-left: 4px;
+    }
+
+    .login-link:hover {
+        color: #1a5a20;
+        text-decoration: underline;
+    }
+
+    /* Responsive Design */
     @media (max-width: 768px) {
-        .auth-welcome {
-            text-align: center;
+        .register-header {
+            margin-bottom: 28px;
+            padding-bottom: 20px;
         }
 
-        .welcome-header {
-            margin-bottom: 40px;
+        .register-icon {
+            width: 56px;
+            height: 56px;
+            margin-bottom: 16px;
         }
 
-        .auth-features {
-            margin-bottom: 40px;
+        .register-icon i {
+            font-size: 24px;
         }
 
-        .auth-feature {
+        .register-header h1 {
+            font-size: 24px;
+        }
+
+        .register-subtitle {
+            font-size: 14px;
+        }
+
+        .register-form {
+            gap: 20px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .captcha-box {
             padding: 16px;
-            justify-content: center;
         }
 
-        .auth-feature:hover {
-            transform: translateY(-2px);
+        .captcha-display {
+            padding: 12px 14px;
         }
 
-        .auth-quote {
-            margin-top: 30px;
+        .captcha-text-wrapper span {
+            font-size: 15px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .register-header {
+            margin-bottom: 24px;
         }
 
-        .math-captcha-group {
-            padding: 16px;
+        .register-header h1 {
+            font-size: 22px;
         }
-        
-        .captcha-question {
-            padding: 12px 15px;
+
+        .register-form {
+            gap: 18px;
         }
-        
-        .captcha-question span {
-            font-size: 0.95rem;
+
+        .input-wrapper input {
+            padding: 13px 14px 13px 44px;
+            font-size: 14px;
         }
-        
-        .captcha-refresh {
-            width: 32px;
-            height: 32px;
+
+        .submit-btn {
+            padding: 14px 20px;
+            font-size: 15px;
         }
     }
     </style>
-    
+<?= $this->endSection() ?>
+
+<?= $this->section('additional_scripts') ?>
     <script>
         // Form submission loading state
         document.getElementById('registerForm').addEventListener('submit', function(e) {
-            const btn = this.querySelector('.btn-primary');
-            const btnContent = btn.querySelector('.btn-content');
-            const btnLoader = btn.querySelector('.btn-loader');
+            const btn = this.querySelector('.submit-btn');
+            const btnText = btn.querySelector('.btn-text');
+            const btnSpinner = btn.querySelector('.btn-spinner');
             
-            if (btnContent && btnLoader) {
-                btnContent.style.display = 'none';
-                btnLoader.style.display = 'flex';
+            if (btnText && btnSpinner) {
+                btnText.style.display = 'none';
+                btnSpinner.style.display = 'flex';
                 btn.disabled = true;
             }
         });
 
-        // Enhanced password toggle
+        // Password toggle function
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
-            const toggle = input.nextElementSibling;
-            const icon = toggle.querySelector('i');
+            const toggleBtn = input.closest('.input-wrapper').querySelector('.password-toggle-btn');
+            const icon = toggleBtn.querySelector('i');
             
             if (input.type === 'password') {
                 input.type = 'text';
@@ -684,78 +668,111 @@
             }
         }
 
-        // Simple form validation for math captcha
+        // Form validation for math captcha
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             const captchaAnswer = document.getElementById('captcha_answer').value;
-            const errorElement = document.querySelector('.math-captcha-group .form-error');
+            const errorElement = document.querySelector('.captcha-field .field-error');
+            const submitBtn = this.querySelector('.submit-btn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const btnSpinner = submitBtn.querySelector('.btn-spinner');
             
             if (!captchaAnswer || captchaAnswer.trim() === '') {
                 e.preventDefault();
                 errorElement.textContent = 'Please answer the security question.';
                 errorElement.style.display = 'block';
                 errorElement.style.color = '#dc3545';
+                this.querySelector('.captcha-field').classList.add('error');
                 
                 // Re-enable button if validation fails
-                const btn = this.querySelector('.btn-primary');
-                const btnContent = btn.querySelector('.btn-content');
-                const btnLoader = btn.querySelector('.btn-loader');
-                if (btnContent && btnLoader) {
-                    btnContent.style.display = 'flex';
-                    btnLoader.style.display = 'none';
-                    btn.disabled = false;
+                if (btnText && btnSpinner) {
+                    btnText.style.display = 'flex';
+                    btnSpinner.style.display = 'none';
+                    submitBtn.disabled = false;
                 }
                 return false;
             } else {
                 errorElement.style.display = 'none';
+                this.querySelector('.captcha-field').classList.remove('error');
             }
         });
 
-        // Clear error when user types
+        // Clear error when user types in captcha
         document.getElementById('captcha_answer').addEventListener('input', function() {
-            const errorElement = document.querySelector('.math-captcha-group .form-error');
+            const errorElement = document.querySelector('.captcha-field .field-error');
             errorElement.style.display = 'none';
+            this.closest('.captcha-field').classList.remove('error');
         });
 
         // Refresh captcha function
         function refreshCaptcha() {
-            const refreshBtn = document.querySelector('.captcha-refresh');
+            const refreshBtn = document.querySelector('.captcha-refresh-btn');
             const captchaText = document.getElementById('captcha-text');
             const captchaInput = document.getElementById('captcha_answer');
+            
+            if (!refreshBtn || !captchaText || !captchaInput) return;
             
             // Show loading state
             refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             refreshBtn.disabled = true;
             
+            // Get CSRF token from form
+            const csrfToken = document.querySelector('input[name="<?= csrf_token() ?>"]');
+            const csrfValue = csrfToken ? csrfToken.value : '';
+            const csrfHeader = '<?= csrf_header() ?>';
+            const csrfName = '<?= csrf_token() ?>';
+            
+            // Prepare form data
+            const formData = new URLSearchParams();
+            if (csrfValue && csrfName) {
+                formData.append(csrfName, csrfValue);
+            }
+            
+            // Prepare headers
+            const headers = {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest'
+            };
+            
+            // Add CSRF token to header if available
+            if (csrfHeader && csrfValue) {
+                headers[csrfHeader] = csrfValue;
+            }
+            
             fetch('<?= base_url('refresh-captcha') ?>', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
+                headers: headers,
+                body: formData
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    return response.text().then(text => {
+                        throw new Error(`Server returned ${response.status}: ${text}`);
+                    });
                 }
                 return response.json();
             })
             .then(data => {
-                if (data.success) {
-                    captchaText.textContent = 'What is ' + data.question + '?';
+                if (data.success && data.question) {
+                    captchaText.textContent = data.question + ' = ?';
                     captchaInput.value = '';
                     captchaInput.focus();
+                    // Update CSRF token if provided
+                    if (data.csrf_token && csrfToken) {
+                        csrfToken.value = data.csrf_token;
+                    }
                 } else {
-                    console.error('Server error:', data.message);
+                    console.error('Server error:', data.message || 'Unknown error');
+                    alert('Failed to refresh captcha. Please try again.');
                     captchaInput.value = '';
                 }
             })
             .catch(error => {
                 console.error('Error refreshing captcha:', error);
+                alert('Failed to refresh captcha. Please reload the page and try again.');
                 captchaInput.value = '';
-                captchaInput.focus();
             })
             .finally(() => {
-                refreshBtn.innerHTML = '<i class="fas fa-redo-alt"></i>';
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
                 refreshBtn.disabled = false;
             });
         }

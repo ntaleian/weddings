@@ -13,3 +13,11 @@
     
     <?= $this->include('partials/footer') ?>
 <?= $this->endSection() ?>
+
+<?= $this->section('styles') ?>
+    <?= $this->renderSection('styles') ?>
+<?= $this->endSection() ?>
+
+<?= $this->section('scripts') ?>
+    <?= $this->renderSection('scripts') ?>
+<?= $this->endSection() ?>

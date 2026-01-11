@@ -7,19 +7,37 @@
         .application-header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
-            padding: 30px;
-            border-radius: 16px;
-            margin-bottom: 30px;
+            padding: 24px 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
             text-align: center;
+            box-shadow: 0 2px 12px rgba(100, 1, 127, 0.12);
+        }
+
+        .application-header h1 {
+            margin: 0 0 8px 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .application-header p {
+            margin: 0;
+            font-size: 0.95rem;
+            opacity: 0.95;
         }
 
         .status-badge {
             display: inline-block;
-            padding: 10px 20px;
-            border-radius: 25px;
+            padding: 6px 16px;
+            border-radius: 20px;
             font-weight: 600;
-            margin-top: 15px;
-            font-size: 1.1rem;
+            margin-top: 12px;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
         }
 
         .status-pending {
@@ -44,79 +62,255 @@
 
         .application-details {
             background: white;
-            border-radius: 16px;
-            padding: 30px;
+            border-radius: 12px;
+            padding: 24px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
         }
 
         .detail-section {
-            margin-bottom: 30px;
-            border-bottom: 1px solid #eee;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #e9ecef;
             padding-bottom: 20px;
         }
 
         .detail-section:last-child {
             border-bottom: none;
             margin-bottom: 0;
+            padding-bottom: 0;
         }
 
         .section-title {
             color: var(--primary-color);
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 15px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid rgba(100, 1, 127, 0.1);
+        }
+
+        .section-title i {
+            font-size: 1.1rem;
         }
 
         .detail-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
         }
 
         .detail-item {
             display: flex;
             flex-direction: column;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
         }
 
         .detail-label {
             font-weight: 600;
-            color: var(--gray);
-            font-size: 0.9rem;
-            margin-bottom: 5px;
+            color: #6c757d;
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .detail-value {
             color: var(--text-color);
-            font-size: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            line-height: 1.4;
+            word-wrap: break-word;
         }
 
         .detail-value:empty::after {
             content: "Not provided";
-            color: var(--light-gray);
+            color: #adb5bd;
             font-style: italic;
+            font-weight: 400;
+        }
+
+        .detail-item h4 {
+            color: var(--primary-color);
+            margin: 0 0 10px 0;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(100, 1, 127, 0.1);
+        }
+
+        .detail-item h4 i {
+            font-size: 0.9rem;
         }
 
         .action-buttons {
             display: flex;
-            gap: 15px;
-            margin-top: 30px;
+            gap: 12px;
+            margin-top: 20px;
             justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons .btn {
+            min-width: 140px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .application-header {
+                padding: 20px 16px;
+                margin-bottom: 16px;
+            }
+
+            .application-header h1 {
+                font-size: 1.3rem;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .application-header p {
+                font-size: 0.9rem;
+            }
+
+            .status-badge {
+                padding: 6px 14px;
+                font-size: 0.85rem;
+                margin-top: 10px;
+            }
+
+            .application-details {
+                padding: 20px 16px;
+                margin-bottom: 16px;
+            }
+
+            .detail-section {
+                margin-bottom: 20px;
+                padding-bottom: 16px;
+            }
+
+            .section-title {
+                font-size: 1.1rem;
+                margin-bottom: 14px;
+                padding-bottom: 6px;
+            }
+
+            .section-title i {
+                font-size: 1rem;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .detail-item {
+                padding: 12px;
+            }
+
+            .detail-label {
+                font-size: 0.7rem;
+                margin-bottom: 4px;
+            }
+
+            .detail-value {
+                font-size: 0.85rem;
+            }
+
+            .detail-item h4 {
+                font-size: 0.95rem;
+                margin-bottom: 8px;
+                padding-bottom: 6px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 16px;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+                min-width: auto;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .application-header {
+                padding: 18px 14px;
+            }
+
+            .application-header h1 {
+                font-size: 1.2rem;
+            }
+
+            .application-header p {
+                font-size: 0.85rem;
+            }
+
+            .status-badge {
+                padding: 5px 12px;
+                font-size: 0.8rem;
+            }
+
+            .application-details {
+                padding: 16px 14px;
+            }
+
+            .detail-section {
+                margin-bottom: 18px;
+                padding-bottom: 14px;
+            }
+
+            .section-title {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+
+            .detail-item {
+                padding: 10px;
+            }
+
+            .detail-label {
+                font-size: 0.7rem;
+            }
+
+            .detail-value {
+                font-size: 0.85rem;
+            }
+
+            .detail-item h4 {
+                font-size: 0.9rem;
+                margin-bottom: 8px;
+            }
         }
 
         @media print {
             .action-buttons,
             .dashboard-container nav,
-            .user-sidebar {
+            .dashboard-sidebar,
+            .dashboard-nav {
                 display: none !important;
             }
 
             .application-details {
                 box-shadow: none;
                 border: 1px solid #ddd;
+            }
+
+            .detail-item {
+                background: white;
+                border: 1px solid #e9ecef;
             }
         }
     </style>

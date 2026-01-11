@@ -6,21 +6,12 @@
 
 <?= $this->section('content') ?>
     <div class="admin-login-container">
-        <div class="login-card">
-            <div class="login-header">
-                <img src="<?= base_url('images/watoto_logo.png') ?>" alt="Watoto Church" class="logo">
-                <h2>Admin Portal</h2>
-                <p>Wedding Booking System</p>
-            </div>
-            
-            <!-- Flash Messages -->
-            <?= $this->include('partials/flash_messages') ?>
-            
+        <div class="admin-login-card">
             <?= $this->renderSection('main_content') ?>
         </div>
     </div>
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-    <script src="<?= base_url('js/admin-login.js') ?>"></script>
+    <?= $this->renderSection('scripts') ?>
 <?= $this->endSection() ?>

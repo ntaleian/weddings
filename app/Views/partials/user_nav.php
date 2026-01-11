@@ -2,6 +2,9 @@
     <nav class="navbar dashboard-nav">
         <div class="container">
             <div class="nav-brand">
+                <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <a href="<?= site_url('dashboard') ?>">
                     <img src="<?= base_url('images/watoto_logo.png') ?>" alt="Watoto Church" class="logo">
                     <!-- <span class="brand-text">Wedding Booking</span> -->

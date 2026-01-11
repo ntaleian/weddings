@@ -28,10 +28,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Navbar Background on Scroll
     window.addEventListener('scroll', function() {
-        const navbar = document.querySelector('.navbar');
-        if (window.scrollY > 50) {
+        const navbar = document.querySelector('.navbar') || document.querySelector('.main-navbar');
+        if (navbar && window.scrollY > 50) {
             navbar.classList.add('scrolled');
-        } else {
+        } else if (navbar) {
             navbar.classList.remove('scrolled');
         }
     });

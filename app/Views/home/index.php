@@ -5,10 +5,343 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('styles') ?>
-<!-- Swiper CSS -->
-<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" /> -->
+<!-- Choices.js CSS for beautiful dropdowns -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+<!-- Flatpickr CSS for datepicker -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
-/* Custom Select Dropdown Z-index Fix - Override existing styles */
+/* ============================================
+   CHURCH WEDDING LANDING PAGE DESIGN
+   Elegant, Traditional, Sacred
+   ============================================ */
+
+/* Modern Hero Section */
+.hero {
+    position: relative;
+    min-height: 80vh;
+    background: linear-gradient(135deg, #25802D 0%, #1a5a20 100%);
+    display: flex;
+    align-items: center;
+    padding: 100px 0 60px;
+    margin-top: 70px;
+    overflow: hidden;
+}
+
+/* Subtle pattern overlay */
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 30%),
+        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.05) 0%, transparent 35%);
+    background-size: cover, cover;
+    background-position: center;
+    background-repeat: no-repeat, no-repeat;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 1;
+}
+
+.hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-left {
+    color: var(--white);
+}
+
+.hero-content {
+    max-width: 100%;
+}
+
+/* Modern Hero Content */
+.hero-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.title-line {
+    display: block;
+}
+
+.title-line.highlight {
+    color: #ffffff;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.9));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1.15rem;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 32px;
+    line-height: 1.7;
+    font-family: 'Outfit', sans-serif;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+/* Modern Quick Booking Card */
+.quick-booking-card {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    position: relative;
+    overflow: visible;
+    z-index: 10;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.quick-booking-card h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 28px;
+    text-align: center;
+    position: relative;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.quick-booking-card h3::after {
+    display: none;
+}
+
+.quick-form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.quick-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.quick-form label {
+    font-weight: 600;
+    color: #343a40;
+    font-size: 14px;
+    font-family: 'Outfit', sans-serif;
+}
+
+.quick-form input,
+.quick-form select {
+    padding: 14px 16px;
+    border: 1.5px solid #dee2e6;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: 'Outfit', sans-serif;
+    background: #ffffff;
+    color: #1a1a1a;
+    outline: none;
+}
+
+.quick-form input:focus,
+.quick-form select:focus {
+    border-color: #25802D;
+    box-shadow: 0 0 0 3px rgba(37, 128, 45, 0.1);
+    background: #ffffff;
+}
+
+.quick-form input::placeholder {
+    color: #adb5bd;
+}
+
+.btn-check {
+    background: linear-gradient(135deg, #25802D 0%, #1a5a20 100%);
+    color: white;
+    border: none;
+    padding: 16px 24px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37, 128, 45, 0.25);
+}
+
+.btn-check:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 128, 45, 0.35);
+}
+
+.btn-check:active {
+    transform: translateY(0);
+}
+
+
+/* Modern Contact Section */
+.contact-section {
+    padding: 80px 0;
+    background: #f8f9fa;
+    position: relative;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.section-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+}
+
+.section-subtitle {
+    font-size: 16px;
+    color: #6c757d;
+    max-width: 600px;
+    margin: 0 auto;
+    font-family: 'Outfit', sans-serif;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 24px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e9ecef;
+}
+
+.contact-item:hover {
+    box-shadow: 0 4px 12px rgba(37, 128, 45, 0.1);
+    border-color: rgba(37, 128, 45, 0.2);
+}
+
+.contact-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #25802D, #1a5a20);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(37, 128, 45, 0.2);
+}
+
+.contact-icon i {
+    font-size: 20px;
+    color: #ffffff;
+}
+
+.contact-content h4 {
+    font-size: 16px;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+}
+
+.contact-content p {
+    color: #6c757d;
+    font-size: 15px;
+    margin: 0;
+    font-family: 'Outfit', sans-serif;
+}
+
+.contact-form {
+    padding: 32px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e9ecef;
+}
+
+.contact-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.contact-form .form-group {
+    margin-bottom: 20px;
+}
+
+.contact-form input,
+.contact-form textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid #dee2e6;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: 'Outfit', sans-serif;
+    background: #ffffff;
+    color: #1a1a1a;
+    outline: none;
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+    color: #adb5bd;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+    border-color: #25802D;
+    box-shadow: 0 0 0 3px rgba(37, 128, 45, 0.1);
+    background: #ffffff;
+}
+
+.contact-form textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+
+/* Custom Select - Refined Styling */
 .custom-select-wrapper {
     position: relative;
     z-index: 1000;
@@ -38,6 +371,101 @@
 }
 
 /* Force the dropdown to appear with higher specificity */
+/* Flatpickr Datepicker - Simple Styling */
+.datepicker-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--green-100);
+    border-radius: 10px;
+    font-size: 1rem;
+    background: var(--white);
+    color: var(--dark-gray);
+    outline: none;
+    cursor: pointer;
+    font-family: 'Outfit', sans-serif;
+}
+
+.datepicker-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--green-100);
+}
+
+.datepicker-input::placeholder {
+    color: var(--gray);
+    font-style: italic;
+}
+
+/* Choices.js Custom Styling for Campus - Reduced Padding */
+.choices {
+    margin-bottom: 0;
+}
+
+.campus-select + .choices .choices__inner {
+    padding: 12px 16px;
+    border: 2px solid var(--green-100);
+    border-radius: 10px;
+    font-size: 1rem;
+    background: var(--white);
+    min-height: auto;
+    font-family: 'Outfit', sans-serif;
+}
+
+.campus-select + .choices .choices__inner:focus,
+.campus-select + .choices[data-type*="select-one"] .choices__inner:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--green-100);
+}
+
+.campus-select + .choices .choices__list--single {
+    padding: 0;
+}
+
+.campus-select + .choices .choices__item--selectable {
+    padding: 6px 12px;
+}
+
+.campus-select + .choices .choices__placeholder {
+    opacity: 0.6;
+    color: var(--gray);
+}
+
+.campus-select + .choices .choices__list--dropdown {
+    border: 2px solid var(--primary-color);
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    z-index: 99999;
+}
+
+.campus-select + .choices .choices__list--dropdown .choices__item--selectable.is-highlighted {
+    background: rgba(37, 128, 45, 0.1);
+    color: var(--primary-color);
+}
+
+.campus-select + .choices .choices__list--dropdown .choices__item {
+    padding: 6px 12px;
+}
+
+.campus-select + .choices[data-type*="select-one"] .choices__inner {
+    padding-bottom: 12px;
+}
+
+.campus-select + .choices[data-type*="select-one"]::after {
+    border-color: var(--primary-color) transparent transparent;
+    border-width: 6px;
+    margin-top: -3px;
+    right: 16px;
+}
+
+.campus-select + .choices[data-type*="select-one"].is-open::after {
+    margin-top: -9px;
+    border-color: transparent transparent var(--primary-color);
+}
+
+.campus-select + .choices {
+    width: 100%;
+}
+
 .hero .quick-booking-card .custom-select .select-options {
     position: absolute !important;
     top: 100% !important;
@@ -55,6 +483,7 @@
     visibility: hidden !important;
     transform: translateY(-10px) !important;
     transition: all 0.3s ease !important;
+    margin-top: 0 !important;
 }
 
 /* Show dropdown when active with higher specificity */
@@ -77,12 +506,11 @@
     z-index: 0;
 }
 
-/* Option styling */
+/* Option styling - Refined */
 .hero .quick-booking-card .custom-select .select-options .option {
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(37, 128, 45, 0.1);
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(37, 128, 45, 0.08);
     cursor: pointer;
-    transition: all 0.2s ease;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -90,8 +518,7 @@
 
 .hero .quick-booking-card .custom-select .select-options .option:hover,
 .hero .quick-booking-card .custom-select .select-options .option.highlighted {
-    background: rgba(37, 128, 45, 0.05);
-    transform: translateX(2px);
+    background: rgba(37, 128, 45, 0.06);
 }
 
 .hero .quick-booking-card .custom-select .select-options .option:last-child {
@@ -197,30 +624,186 @@
     box-shadow: 0 4px 12px rgba(100, 1, 127, 0.3);
 }
 
+/* Button Styles */
+.hero-actions .btn {
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.hero-actions .btn-primary {
+    background: rgba(255, 255, 255, 0.95);
+    color: #25802D;
+}
+
+.hero-actions .btn-primary:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.hero-actions .btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.hero-actions .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-2px);
+}
+
+.contact-form .btn-primary {
+    background: linear-gradient(135deg, #25802D 0%, #1a5a20 100%);
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37, 128, 45, 0.25);
+    width: 100%;
+}
+
+.contact-form .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 128, 45, 0.35);
+}
+
+/* Responsive Design - Modern Mobile */
 @media (max-width: 768px) {
-    .venues-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
-        margin-top: 30px;
+    .hero {
+        min-height: 75vh;
+        padding: 90px 0 40px;
+        margin-top: 64px;
     }
     
-    .venue-image {
-        height: 200px;
+    .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
     }
     
-    .venue-content {
+    .hero-title {
+        font-size: 2.2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.05rem;
+    }
+    
+    .hero-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .hero-actions .btn {
+        width: 100%;
+    }
+    
+    .quick-booking-card {
+        padding: 24px 20px;
+        margin-top: 24px;
+    }
+    
+    .quick-booking-card h3 {
+        font-size: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .quick-form {
+        gap: 18px;
+    }
+    
+    .section-title {
+        font-size: 1.875rem;
+    }
+    
+    .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+    
+    .contact-item {
         padding: 20px;
     }
     
-    .venue-name {
-        font-size: 1.1rem;
+    .contact-form {
+        padding: 24px 20px;
+    }
+    
+    .contact-form .form-row {
+        grid-template-columns: 1fr;
+        gap: 18px;
     }
 }
 
 @media (max-width: 480px) {
-    .venues-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
+    .hero {
+        min-height: 70vh;
+        padding: 75px 0 30px;
+        margin-top: 56px;
+    }
+    
+    .hero-title {
+        font-size: 1.875rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .quick-booking-card {
+        padding: 20px 16px;
+        border-radius: 12px;
+        margin-top: 20px;
+    }
+    
+    .quick-booking-card h3 {
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+    
+    .quick-form {
+        gap: 16px;
+    }
+    
+    .quick-form label {
+        font-size: 13px;
+    }
+    
+    .section-title {
+        font-size: 1.625rem;
+    }
+    
+    .section-subtitle {
+        font-size: 14px;
+    }
+    
+    .contact-grid {
+        gap: 24px;
+    }
+    
+    .contact-item {
+        padding: 18px;
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .contact-form {
+        padding: 20px 16px;
     }
 }
 
@@ -404,7 +987,6 @@
 <?= $this->section('main_content') ?>
 <!-- Hero Section -->
 <section id="home" class="hero">
-    <div class="hero-overlay"></div>
     <div class="container">
         <div class="hero-grid">
             <!-- Left Side - Main Content -->
@@ -421,7 +1003,7 @@
                     </p>
                     <div class="hero-actions">
                         <a href="<?= base_url('register') ?>" class="btn btn-primary">Book Your Date</a>
-                        <a href="#venues" class="btn btn-secondary">Explore Campuses</a>
+                        <a href="#about" class="btn btn-secondary">Learn More</a>
                     </div>
                 </div>
             </div>
@@ -433,34 +1015,20 @@
                     <form class="quick-form">
                         <div class="form-group">
                             <label for="wedding-date">Wedding Date</label>
-                            <input type="date" id="wedding-date" name="wedding_date" required style="font-family: 'Outfit', sans-serif;">
+                            <input type="text" id="wedding-date" name="wedding_date" class="datepicker-input" placeholder="Select Year, Month & Day" required readonly>
                         </div>
                         <div class="form-group">
                             <label for="campus">Preferred Campus</label>
-                            <div class="custom-select-wrapper">
-                                <div class="custom-select" id="campus-select">
-                                    <div class="select-trigger">
-                                        <span class="select-value">Select Campus</span>
-                                        <i class="fas fa-chevron-down select-arrow"></i>
-                                    </div>
-                                    <div class="select-options">
-                                        <div class="option" data-value="">
-                                            <span class="option-text">Select Campus</span>
-                                        </div>
-                                        <?php if (!empty($campuses)): ?>
-                                            <?php foreach ($campuses as $campus): ?>
-                                                <div class="option" data-value="<?= $campus['id'] ?>">
-                                                    <div class="option-content">
-                                                        <span class="option-text"><?= esc($campus['name']) ?></span>
-                                                        <span class="option-location"><?= esc($campus['location']) ?></span>
-                                                    </div>
-                                                </div>
-                                            <?php endforeach; ?>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                                <input type="hidden" id="campus" name="campus_id" value="">
-                            </div>
+                            <select id="campus" name="campus_id" class="campus-select" required>
+                                <option value="">Select Campus</option>
+                                <?php if (!empty($campuses)): ?>
+                                    <?php foreach ($campuses as $campus): ?>
+                                        <option value="<?= $campus['id'] ?>" data-location="<?= esc($campus['location']) ?>">
+                                            <?= esc($campus['name']) ?> - <?= esc($campus['location']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
                         </div>
                         <button type="submit" class="btn btn-check">Check Availability</button>
                     </form>
@@ -510,58 +1078,6 @@
     </div>
 </section>
 -->
-
-<!-- About Section -->
-<section id="about" class="about-section">
-    <div class="container">
-        <div class="about-grid">
-            <div class="about-content">
-                <h2 class="section-title">Why Choose Watoto Church?</h2>
-                <div class="features-list">
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-heart"></i>
-                        </div>
-                        <div class="feature-content">
-                            <h4>Sacred Atmosphere</h4>
-                            <p>Begin your marriage journey in a blessed environment filled with God's presence.</p>
-                        </div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="feature-content">
-                            <h4>Experienced Team</h4>
-                            <p>Our dedicated team ensures your special day runs smoothly from start to finish.</p>
-                        </div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-church"></i>
-                        </div>
-                        <div class="feature-content">
-                            <h4>Beautiful Campuses</h4>
-                            <p>Choose from our stunning campus locations across Uganda, each with unique charm.</p>
-                        </div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-icon">
-                            <i class="fas fa-hand-holding-heart"></i>
-                        </div>
-                        <div class="feature-content">
-                            <h4>Pastoral Care</h4>
-                            <p>Receive spiritual guidance and support throughout your wedding planning journey.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="about-image">
-                <img src="<?= base_url('images/watoto_logo.png') ?>" alt="Watoto Church">
-            </div>
-        </div>
-    </div>
-</section>
 
 <!-- Contact Section -->
 <section id="contact" class="contact-section">
@@ -627,6 +1143,10 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
+<!-- Choices.js for beautiful dropdowns -->
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<!-- Flatpickr for datepicker -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <!-- Swiper JS -->
 <!-- <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script> -->
 <script>
@@ -646,130 +1166,82 @@
     
     // Initialize when DOM is ready
     function init() {
-        initCustomSelect();
+        initCustomDatepicker();
+        initCampusSelect();
         initQuickBookingForm();
         initSmoothScrolling();
+        initHamburgerMenu();
         // initVenuesSlider(); // COMMENTED OUT
     }
     
-    // Custom Select Functionality
-    function initCustomSelect() {
-        const customSelect = document.getElementById('campus-select');
-        if (!customSelect) return;
+    // Custom Datepicker with Flatpickr
+    let datepicker, campusChoice;
+    
+    function initCustomDatepicker() {
+        const dateInput = document.getElementById('wedding-date');
+        if (!dateInput) return;
         
-        const selectTrigger = customSelect.querySelector('.select-trigger');
-        const selectValue = customSelect.querySelector('.select-value');
-        const hiddenInput = document.getElementById('campus');
-        const options = customSelect.querySelectorAll('.option');
+        // Calculate max date (5 years from now)
+        const maxDate = new Date();
+        maxDate.setFullYear(maxDate.getFullYear() + 5);
         
-        if (!selectTrigger || !selectValue || !hiddenInput || options.length === 0) return;
-        
-        // Toggle dropdown
-        function toggleDropdown(e) {
-            if (e) {
-                e.stopPropagation();
+        // Initialize Flatpickr with year/month dropdowns
+        datepicker = flatpickr(dateInput, {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            maxDate: maxDate,
+            defaultDate: null,
+            allowInput: false,
+            clickOpens: true,
+            // Enable month and year dropdowns - this allows selecting year and month easily
+            monthSelectorType: "static",
+            animate: true,
+            // Custom date format for display
+            altInput: false,
+            // Show calendar below input
+            inline: false,
+            static: false,
+            // Enable year navigation
+            enableTime: false,
+            // Custom locale for better UX
+            locale: {
+                firstDayOfWeek: 1,
+                weekdays: {
+                    shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                    longhand: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+                },
+                months: {
+                    shorthand: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                    longhand: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+                }
+            },
+            // Custom onChange handler
+            onChange: function(selectedDates, dateStr, instance) {
+                // The dateStr is already in YYYY-MM-DD format
+                // dateInput.value is automatically updated by Flatpickr
             }
-            customSelect.classList.toggle('active');
-        }
+        });
+    }
+    
+    // Initialize Campus Select with Choices.js
+    function initCampusSelect() {
+        const campusSelect = document.getElementById('campus');
+        if (!campusSelect) return;
         
-        selectTrigger.addEventListener('click', toggleDropdown);
-        
-        // Handle option selection
-        function selectOption(option) {
-            const value = option.getAttribute('data-value');
-            const text = option.querySelector('.option-text');
-            
-            if (!text) return;
-            
-            const textContent = text.textContent;
-            
-            // Update display
-            selectValue.textContent = textContent;
-            selectValue.classList.remove('placeholder');
-            
-            // Update hidden input
-            hiddenInput.value = value;
-            
-            // Update selected state
-            options.forEach(function(opt) {
-                opt.classList.remove('selected');
-            });
-            option.classList.add('selected');
-            
-            // Close dropdown
-            customSelect.classList.remove('active');
-            
-            // Handle placeholder option
-            if (value === '') {
-                selectValue.textContent = 'Select Campus';
-                selectValue.classList.add('placeholder');
+        campusChoice = new Choices(campusSelect, {
+            placeholder: true,
+            placeholderValue: 'Select Campus',
+            searchEnabled: true,
+            itemSelectText: '',
+            classNames: {
+                containerOuter: 'choices',
+                containerInner: 'choices__inner',
             }
-        }
-        
-        options.forEach(function(option) {
-            option.addEventListener('click', function(e) {
-                e.stopPropagation();
-                selectOption(option);
-            });
         });
         
-        // Close dropdown when clicking outside
-        function handleOutsideClick(e) {
-            if (!customSelect.contains(e.target)) {
-                customSelect.classList.remove('active');
-            }
-        }
-        
-        document.addEventListener('click', handleOutsideClick);
-        
-        // Keyboard navigation
-        function handleKeydown(e) {
-            const activeOption = customSelect.querySelector('.option.highlighted');
-            let nextOption;
-            
-            switch(e.key) {
-                case 'ArrowDown':
-                    e.preventDefault();
-                    if (!customSelect.classList.contains('active')) {
-                        customSelect.classList.add('active');
-                    } else {
-                        nextOption = activeOption ? activeOption.nextElementSibling : options[0];
-                        if (nextOption) {
-                            if (activeOption) activeOption.classList.remove('highlighted');
-                            nextOption.classList.add('highlighted');
-                            nextOption.scrollIntoView({ block: 'nearest' });
-                        }
-                    }
-                    break;
-                    
-                case 'ArrowUp':
-                    e.preventDefault();
-                    if (customSelect.classList.contains('active')) {
-                        nextOption = activeOption ? activeOption.previousElementSibling : options[options.length - 1];
-                        if (nextOption) {
-                            if (activeOption) activeOption.classList.remove('highlighted');
-                            nextOption.classList.add('highlighted');
-                            nextOption.scrollIntoView({ block: 'nearest' });
-                        }
-                    }
-                    break;
-                    
-                case 'Enter':
-                    e.preventDefault();
-                    if (activeOption) {
-                        selectOption(activeOption);
-                    }
-                    break;
-                    
-                case 'Escape':
-                    customSelect.classList.remove('active');
-                    break;
-            }
-        }
-        
-        customSelect.addEventListener('keydown', handleKeydown);
-        customSelect.setAttribute('tabindex', '0');
+        // Note: Custom class 'campus-choice' is not needed as styling is handled via .campus-select + .choices selector
     }
+    
     
     // Quick booking form
     function initQuickBookingForm() {
@@ -780,13 +1252,13 @@
             e.preventDefault();
             
             const weddingDateInput = document.getElementById('wedding-date');
-            const campusInput = document.getElementById('campus');
+            const campusSelect = document.getElementById('campus');
             const submitButton = this.querySelector('button[type="submit"]');
             
-            if (!weddingDateInput || !campusInput || !submitButton) return;
+            if (!weddingDateInput || !campusSelect || !submitButton) return;
             
             const weddingDate = weddingDateInput.value;
-            const campusId = campusInput.value;
+            const campusId = campusChoice ? campusChoice.getValue(true) : campusSelect.value;
             
             if (!weddingDate) {
                 alert('Please select a wedding date');
@@ -936,13 +1408,94 @@
                 e.preventDefault();
                 const target = document.querySelector(href);
                 if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
+                    // Account for fixed navbar and bottom nav
+                    const offset = window.innerWidth <= 768 ? 80 : 70;
+                    const targetPosition = target.offsetTop - offset;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
                     });
+                    
+                    // Close mobile menu if open
+                    closeMobileMenu();
                 }
             });
         });
+    }
+    
+    // Hamburger Menu Toggle - Simple & Reliable
+    function initHamburgerMenu() {
+        const hamburger = document.getElementById('main-hamburger');
+        const mobileMenu = document.getElementById('main-mobile-menu');
+        
+        if (!hamburger) {
+            console.error('Hamburger button not found');
+            return;
+        }
+        
+        if (!mobileMenu) {
+            console.error('Mobile menu not found');
+            return;
+        }
+        
+        function toggleMenu() {
+            const isOpen = mobileMenu.classList.contains('show');
+            console.log('Toggle menu - isOpen:', isOpen);
+            
+            if (isOpen) {
+                // Close menu
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('show');
+                document.body.style.overflow = '';
+                console.log('Menu closed');
+            } else {
+                // Open menu
+                hamburger.classList.add('active');
+                mobileMenu.classList.add('show');
+                document.body.style.overflow = 'hidden';
+                console.log('Menu opened');
+            }
+        }
+        
+        function closeMenu() {
+            hamburger.classList.remove('active');
+            mobileMenu.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+        
+        // Toggle on hamburger click
+        hamburger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Hamburger clicked');
+            toggleMenu();
+        });
+        
+        // Close when clicking menu links
+        const menuLinks = mobileMenu.querySelectorAll('.main-mobile-link');
+        menuLinks.forEach(function(link) {
+            link.addEventListener('click', closeMenu);
+        });
+        
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && mobileMenu.classList.contains('show')) {
+                closeMenu();
+            }
+        });
+        
+        // Close when clicking outside
+        document.addEventListener('click', function(e) {
+            if (mobileMenu.classList.contains('show')) {
+                if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
+                    closeMenu();
+                }
+            }
+        });
+        
+        // Make closeMenu globally accessible
+        window.closeMobileMenu = closeMenu;
     }
     
     // Venues Slider Functionality using Swiper.js - COMMENTED OUT

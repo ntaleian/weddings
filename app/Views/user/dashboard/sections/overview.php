@@ -296,24 +296,168 @@
 }
 
 @media (max-width: 768px) {
+    .welcome-section {
+        flex-direction: column;
+        text-align: center;
+        padding: 30px 20px;
+        gap: 24px;
+        align-items: center;
+    }
+    
+    .welcome-content h1 {
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+    }
+    
+    .welcome-content p {
+        font-size: 1rem;
+    }
+    
+    .welcome-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+    }
+    
+    .welcome-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .progress-overview {
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    
+    .section-header h2 {
+        font-size: 1.4rem;
+    }
+    
     .progress-steps {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-    }
-    
-    .progress-step {
-        min-height: 70px;
-        padding: 8px;
-    }
-    
-    .quick-actions {
         grid-template-columns: 1fr;
         gap: 12px;
     }
     
+    .progress-step {
+        min-height: auto;
+        padding: 14px;
+    }
+    
+    .step-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+    }
+    
+    .step-content h5 {
+        font-size: 0.9rem;
+    }
+    
+    .step-content small {
+        font-size: 0.7rem;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
     .action-card {
-        min-height: 100px;
+        min-height: auto;
+        padding: 20px;
+    }
+    
+    .card-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+    }
+    
+    .card-content h4 {
+        font-size: 0.95rem;
+    }
+    
+    .card-content p {
+        font-size: 0.8rem;
+    }
+    
+    .payment-alert {
+        flex-direction: column;
+        padding: 20px;
+        gap: 16px;
+    }
+    
+    .payment-alert > div:first-child {
+        width: 100%;
+    }
+    
+    .payment-alert > div:first-child > div:first-child {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+    
+    .payment-alert .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-section {
+        padding: 24px 16px;
+    }
+    
+    .welcome-content h1 {
+        font-size: 1.3rem;
+    }
+    
+    .progress-overview {
+        padding: 16px;
+    }
+    
+    .section-header h2 {
+        font-size: 1.2rem;
+    }
+    
+    .progress-step {
         padding: 12px;
+    }
+    
+    .step-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+    }
+    
+    .action-card {
+        padding: 16px;
+    }
+    
+    .card-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .payment-alert {
+        padding: 16px;
+    }
+    
+    .payment-alert h3 {
+        font-size: 1.2rem;
+    }
+    
+    .payment-alert > div:first-child > div:last-child {
+        flex-direction: column;
+        gap: 12px;
     }
 }
 </style>

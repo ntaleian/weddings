@@ -367,28 +367,30 @@
     <style>
         /* Profile-specific styles */
         .profile-section {
-            padding: 20px;
+            padding: 0;
             max-width: 1200px;
             margin: 0 auto;
         }
 
+        /* Modern Profile Header */
         .section-header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
-            padding: 30px;
+            padding: 24px 30px;
             border-radius: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 16px;
+            box-shadow: 0 2px 12px rgba(100, 1, 127, 0.15);
         }
 
         .header-content {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
         }
 
         .profile-avatar {
@@ -396,14 +398,14 @@
         }
 
         .avatar-placeholder {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 1.8rem;
             border: 3px solid rgba(255, 255, 255, 0.3);
         }
 
@@ -415,61 +417,136 @@
             color: var(--primary-color);
             border: none;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .avatar-edit-btn:hover {
+            transform: scale(1.1);
         }
 
         .profile-info h1 {
-            margin: 0 0 5px 0;
-            font-size: 1.8rem;
-            font-weight: 600;
+            margin: 0 0 4px 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .profile-email {
+            margin: 0 0 4px 0;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .profile-member-since {
+            margin: 0;
+            font-size: 0.85rem;
+            opacity: 0.8;
         }
 
         .header-actions .btn {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.3);
             color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
         }
 
-        /* Form styling to match payment page */
+        .header-actions .btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Modern Card Design */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .card-header h3 {
+            margin: 0 0 6px 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header h3 i {
+            font-size: 1.1rem;
+        }
+
+        .card-header p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        /* Modern Form Styling */
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 18px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 6px;
-            font-weight: 500;
+            font-weight: 600;
             color: #495057;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .form-control {
             width: 100%;
-            padding: 10px 12px;
+            padding: 10px 14px;
             border: 1px solid #ced4da;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 0.95rem;
-            transition: border-color 0.15s ease;
+            transition: all 0.2s ease;
             background: #fff;
             box-sizing: border-box;
         }
 
         .form-control:focus {
             outline: none;
-            border-color: #64017f;
-            box-shadow: 0 0 0 2px rgba(100, 1, 127, 0.1);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(100, 1, 127, 0.1);
         }
 
         .form-control[readonly] {
-            background: #e9ecef;
+            background: #f8f9fa;
             cursor: not-allowed;
+            border-color: #e9ecef;
         }
 
         .form-help {
@@ -479,15 +556,15 @@
             color: #6c757d;
         }
 
-        /* Button styling */
+        /* Button Styling */
         .btn {
             padding: 10px 20px;
             border: none;
-            border-radius: 4px;
-            font-size: 0.95rem;
-            font-weight: 500;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.15s ease;
+            transition: all 0.2s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -495,12 +572,14 @@
         }
 
         .btn-primary {
-            background: #64017f;
+            background: var(--primary-color);
             color: white;
         }
 
         .btn-primary:hover {
             background: #4a0159;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(100, 1, 127, 0.3);
         }
 
         .btn-secondary {
@@ -514,12 +593,12 @@
 
         .btn-outline-primary {
             background: transparent;
-            color: #64017f;
-            border: 1px solid #64017f;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
         }
 
         .btn-outline-primary:hover {
-            background: #64017f;
+            background: var(--primary-color);
             color: white;
         }
 
@@ -532,16 +611,21 @@
             border-top: 1px solid #e9ecef;
         }
 
+        /* Security Section */
         .security-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
+            padding: 16px 0;
             border-bottom: 1px solid #e9ecef;
         }
 
+        .security-item:last-child {
+            border-bottom: none;
+        }
+
         .security-info h4 {
-            margin: 0 0 5px 0;
+            margin: 0 0 4px 0;
             color: var(--text-color);
             font-size: 1rem;
             font-weight: 600;
@@ -549,8 +633,8 @@
 
         .security-info p {
             margin: 0;
-            color: var(--gray);
-            font-size: 0.9rem;
+            color: #6c757d;
+            font-size: 0.85rem;
         }
 
         .password-form {
@@ -561,26 +645,35 @@
             border: 1px solid #e9ecef;
         }
 
+        /* Preferences Section */
         .preferences-section {
-            margin-bottom: 30px;
+            margin-bottom: 24px;
+        }
+
+        .preferences-section:last-child {
+            margin-bottom: 0;
         }
 
         .preferences-section h4 {
-            margin: 0 0 20px 0;
+            margin: 0 0 16px 0;
             color: var(--text-color);
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1rem;
+            font-weight: 700;
             padding-bottom: 10px;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 2px solid #e9ecef;
         }
 
         .preference-item {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            padding: 15px 0;
+            padding: 16px 0;
             border-bottom: 1px solid #f0f0f0;
-            gap: 15px;
+            gap: 20px;
+        }
+
+        .preference-item:last-child {
+            border-bottom: none;
         }
 
         .preference-info {
@@ -590,21 +683,27 @@
         .preference-info label {
             font-weight: 600;
             color: var(--text-color);
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             display: block;
+            font-size: 0.9rem;
         }
 
         .preference-info p {
             margin: 0;
-            color: var(--gray);
-            font-size: 0.9rem;
+            color: #6c757d;
+            font-size: 0.85rem;
         }
 
+        .preference-control {
+            flex-shrink: 0;
+        }
+
+        /* Modern Toggle Switch */
         .switch {
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 24px;
+            width: 48px;
+            height: 26px;
         }
 
         .switch input {
@@ -621,20 +720,21 @@
             right: 0;
             bottom: 0;
             background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
+            transition: 0.3s;
+            border-radius: 26px;
         }
 
         .slider:before {
             position: absolute;
             content: "";
-            height: 18px;
-            width: 18px;
+            height: 20px;
+            width: 20px;
             left: 3px;
             bottom: 3px;
             background-color: white;
-            transition: .4s;
+            transition: 0.3s;
             border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         input:checked + .slider {
@@ -642,17 +742,19 @@
         }
 
         input:checked + .slider:before {
-            transform: translateX(26px);
+            transform: translateX(22px);
         }
 
+        /* Verification Status */
         .verification-status {
             margin-top: 8px;
-            padding: 6px 10px;
-            border-radius: 4px;
+            padding: 6px 12px;
+            border-radius: 6px;
             font-size: 0.8rem;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
+            font-weight: 500;
         }
 
         .verification-status.verified {
@@ -672,27 +774,113 @@
             text-decoration: underline;
             cursor: pointer;
             font-size: 0.8rem;
-            margin-left: 5px;
+            margin-left: 4px;
+            font-weight: 600;
         }
 
+        .verify-btn:hover {
+            color: #4a0159;
+        }
+
+        /* Mobile Responsive Styles */
         @media (max-width: 768px) {
             .section-header {
+                padding: 20px;
                 flex-direction: column;
                 text-align: center;
+                gap: 16px;
             }
             
             .header-content {
                 flex-direction: column;
                 text-align: center;
+                width: 100%;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .header-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .card-header {
+                padding: 16px 20px;
+            }
+
+            .card-header h3 {
+                font-size: 1.1rem;
+            }
+
+            .card-body {
+                padding: 20px;
+            }
+
+            .form-group {
+                margin-bottom: 16px;
+            }
+
+            .security-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .security-item .btn {
+                width: 100%;
+            }
+
+            .preference-item {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .preference-control {
+                align-self: flex-start;
             }
             
             .form-actions {
                 flex-direction: column;
             }
             
-            .btn {
+            .form-actions .btn {
                 width: 100%;
                 justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .section-header {
+                padding: 18px 16px;
+            }
+
+            .profile-info h1 {
+                font-size: 1.3rem;
+            }
+
+            .avatar-placeholder {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+
+            .card-header {
+                padding: 14px 16px;
+            }
+
+            .card-body {
+                padding: 16px;
+            }
+
+            .form-group label {
+                font-size: 0.8rem;
+            }
+
+            .form-control {
+                padding: 9px 12px;
+                font-size: 0.9rem;
             }
         }
     </style>

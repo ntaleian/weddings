@@ -1,19 +1,29 @@
-<!-- Navigation -->
-<nav class="navbar">
-    <div class="container">
-        <div class="nav-brand">
-            <a href="<?= base_url('/') ?>">
-                <img src="<?= base_url('images/watoto_logo.png') ?>" alt="Watoto Church" class="logo">
-                <!-- <span class="brand-text">Family Office</span> -->
+<!-- Modern Auth Navigation -->
+<nav class="auth-navbar">
+    <div class="auth-navbar-container">
+        <a href="<?= base_url('/') ?>" class="auth-nav-logo">
+            <img src="<?= base_url('images/watoto_logo.png') ?>" alt="Watoto Church" class="auth-logo-img">
+        </a>
+        
+        <div class="auth-nav-actions">
+            <a href="<?= base_url('/') ?>" class="auth-nav-link">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
             </a>
-        </div>
-        <div class="nav-menu">
-            <a href="<?= base_url('/') ?>" class="nav-link">Home</a>
             <?php if (current_url() === base_url('login')): ?>
-                <a href="<?= base_url('register') ?>" class="nav-link">Register</a>
+                <a href="<?= base_url('register') ?>" class="auth-nav-btn auth-btn-primary">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Register</span>
+                </a>
             <?php else: ?>
-                <a href="<?= base_url('login') ?>" class="nav-link">Login</a>
+                <a href="<?= base_url('login') ?>" class="auth-nav-btn auth-btn-primary">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Login</span>
+                </a>
             <?php endif; ?>
+            <a href="<?= base_url('admin/login') ?>" class="auth-nav-icon" title="Admin Login" target="_blank">
+                <i class="fas fa-user-shield"></i>
+            </a>
         </div>
     </div>
 </nav>

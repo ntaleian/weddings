@@ -164,13 +164,34 @@ class Auth extends Controller
 
     public function refreshCaptcha()
     {
-        $this->mathCaptchaLibrary->generateQuestion();
-        $question = $this->mathCaptchaLibrary->getCurrentQuestion();
+        // Only allow POST requests
+        if ($this->request->getMethod() !== 'post') {
+            return $this->response->setStatusCode(405)->setJSON([
+                'success' => false,
+                'message' => 'Method not allowed'
+            ]);
+        }
         
-        return $this->response->setJSON([
-            'success' => true,
-            'question' => $question
-        ]);
+        try {
+            $this->mathCaptchaLibrary->generateQuestion();
+            $question = $this->mathCaptchaLibrary->getCurrentQuestion();
+            
+            if (!$question) {
+                throw new \Exception('Failed to generate captcha question');
+            }
+            
+            return $this->response->setJSON([
+                'success' => true,
+                'question' => $question,
+                'csrf_token' => csrf_hash()
+            ]);
+        } catch (\Exception $e) {
+            log_message('error', 'Captcha refresh error: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON([
+                'success' => false,
+                'message' => 'Failed to generate captcha. Please try again.'
+            ]);
+        }
     }
 
     public function verifyEmail()

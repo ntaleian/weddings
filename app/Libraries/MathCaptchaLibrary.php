@@ -2,8 +2,18 @@
 
 namespace App\Libraries;
 
+use Config\Services;
+
 class MathCaptchaLibrary
 {
+    protected $session;
+    
+    public function __construct()
+    {
+        $this->session = Services::session();
+        helper('session');
+    }
+    
     /**
      * Generate a simple math question
      *
@@ -13,6 +23,11 @@ class MathCaptchaLibrary
     {
         $operations = ['+', '-', '*'];
         $operation = $operations[array_rand($operations)];
+        
+        $num1 = 0;
+        $num2 = 0;
+        $answer = 0;
+        $question = '';
         
         switch ($operation) {
             case '+':
@@ -35,12 +50,26 @@ class MathCaptchaLibrary
                 $answer = $num1 * $num2;
                 $question = "{$num1} × {$num2}";
                 break;
+            
+            default:
+                // Fallback to addition if something goes wrong
+                $num1 = rand(1, 20);
+                $num2 = rand(1, 20);
+                $answer = $num1 + $num2;
+                $question = "{$num1} + {$num2}";
+                break;
         }
         
         // Store the answer in session for verification
-        session()->set('captcha_answer', $answer);
-        session()->set('captcha_question', $question);
-        session()->set('captcha_timestamp', time());
+        if ($this->session) {
+            $this->session->set('captcha_answer', $answer);
+            $this->session->set('captcha_question', $question);
+            $this->session->set('captcha_timestamp', time());
+        } else {
+            session()->set('captcha_answer', $answer);
+            session()->set('captcha_question', $question);
+            session()->set('captcha_timestamp', time());
+        }
         
         return [
             'question' => $question,
@@ -56,8 +85,8 @@ class MathCaptchaLibrary
      */
     public function verify($userAnswer)
     {
-        $sessionAnswer = session()->get('captcha_answer');
-        $timestamp = session()->get('captcha_timestamp');
+        $sessionAnswer = $this->session ? $this->session->get('captcha_answer') : session()->get('captcha_answer');
+        $timestamp = $this->session ? $this->session->get('captcha_timestamp') : session()->get('captcha_timestamp');
         
         // Check if captcha exists and is not too old (5 minutes)
         if (!$sessionAnswer || !$timestamp || (time() - $timestamp) > 300) {
@@ -67,9 +96,15 @@ class MathCaptchaLibrary
         // Verify the answer
         if ((int)$userAnswer === (int)$sessionAnswer) {
             // Clear the captcha from session after successful verification
-            session()->remove('captcha_answer');
-            session()->remove('captcha_question');
-            session()->remove('captcha_timestamp');
+            if ($this->session) {
+                $this->session->remove('captcha_answer');
+                $this->session->remove('captcha_question');
+                $this->session->remove('captcha_timestamp');
+            } else {
+                session()->remove('captcha_answer');
+                session()->remove('captcha_question');
+                session()->remove('captcha_timestamp');
+            }
             return true;
         }
         
@@ -83,7 +118,7 @@ class MathCaptchaLibrary
      */
     public function getCurrentQuestion()
     {
-        return session()->get('captcha_question');
+        return $this->session ? $this->session->get('captcha_question') : session()->get('captcha_question');
     }
 
     /**
@@ -91,9 +126,15 @@ class MathCaptchaLibrary
      */
     public function clearCaptcha()
     {
-        session()->remove('captcha_answer');
-        session()->remove('captcha_question');
-        session()->remove('captcha_timestamp');
+        if ($this->session) {
+            $this->session->remove('captcha_answer');
+            $this->session->remove('captcha_question');
+            $this->session->remove('captcha_timestamp');
+        } else {
+            session()->remove('captcha_answer');
+            session()->remove('captcha_question');
+            session()->remove('captcha_timestamp');
+        }
     }
 
     /**
@@ -103,7 +144,7 @@ class MathCaptchaLibrary
      */
     public function isExpired()
     {
-        $timestamp = session()->get('captcha_timestamp');
+        $timestamp = $this->session ? $this->session->get('captcha_timestamp') : session()->get('captcha_timestamp');
         return !$timestamp || (time() - $timestamp) > 300;
     }
 }
