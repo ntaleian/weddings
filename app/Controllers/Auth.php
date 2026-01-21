@@ -164,32 +164,35 @@ class Auth extends Controller
 
     public function refreshCaptcha()
     {
-        // Only allow POST requests
-        if ($this->request->getMethod() !== 'post') {
-            return $this->response->setStatusCode(405)->setJSON([
-                'success' => false,
-                'message' => 'Method not allowed'
-            ]);
-        }
-        
+        // Route already enforces POST method, so we can proceed directly
         try {
-            $this->mathCaptchaLibrary->generateQuestion();
+            // Generate new captcha question
+            $result = $this->mathCaptchaLibrary->generateQuestion();
             $question = $this->mathCaptchaLibrary->getCurrentQuestion();
             
+            // Fallback to result array if getCurrentQuestion returns null
+            if (!$question && isset($result['question'])) {
+                $question = $result['question'];
+            }
+            
             if (!$question) {
+                log_message('error', 'Captcha refresh: Failed to get question after generation');
                 throw new \Exception('Failed to generate captcha question');
             }
             
             return $this->response->setJSON([
                 'success' => true,
                 'question' => $question,
-                'csrf_token' => csrf_hash()
+                'csrf_token' => csrf_hash(),
+                'csrf_name' => csrf_token()
             ]);
         } catch (\Exception $e) {
             log_message('error', 'Captcha refresh error: ' . $e->getMessage());
+            log_message('error', 'Stack trace: ' . $e->getTraceAsString());
             return $this->response->setStatusCode(500)->setJSON([
                 'success' => false,
-                'message' => 'Failed to generate captcha. Please try again.'
+                'message' => 'Failed to generate captcha. Please try again.',
+                'error' => $e->getMessage()
             ]);
         }
     }

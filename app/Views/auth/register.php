@@ -716,16 +716,22 @@
             refreshBtn.disabled = true;
             
             // Get CSRF token from form
-            const csrfToken = document.querySelector('input[name="<?= csrf_token() ?>"]');
+            const csrfTokenName = '<?= csrf_token() ?>';
+            const csrfToken = document.querySelector('input[name="' + csrfTokenName + '"]');
             const csrfValue = csrfToken ? csrfToken.value : '';
             const csrfHeader = '<?= csrf_header() ?>';
-            const csrfName = '<?= csrf_token() ?>';
+            
+            if (!csrfValue) {
+                console.error('CSRF token not found in form');
+                alert('Security token missing. Please refresh the page and try again.');
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                refreshBtn.disabled = false;
+                return;
+            }
             
             // Prepare form data
             const formData = new URLSearchParams();
-            if (csrfValue && csrfName) {
-                formData.append(csrfName, csrfValue);
-            }
+            formData.append(csrfTokenName, csrfValue);
             
             // Prepare headers
             const headers = {
@@ -738,21 +744,43 @@
                 headers[csrfHeader] = csrfValue;
             }
             
-            fetch('<?= base_url('refresh-captcha') ?>', {
+            fetch('<?= site_url('refresh-captcha') ?>', {
                 method: 'POST',
                 headers: headers,
-                body: formData
+                body: formData,
+                credentials: 'same-origin'
             })
             .then(response => {
+                // Check content type
+                const contentType = response.headers.get('content-type');
+                
                 if (!response.ok) {
+                    // Try to get error message from response
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json().then(data => {
+                            throw new Error(data.message || `Server returned ${response.status}`);
+                        });
+                    } else {
+                        return response.text().then(text => {
+                            console.error('Non-JSON error response:', text);
+                            throw new Error(`Server returned ${response.status}. Please check the console for details.`);
+                        });
+                    }
+                }
+                
+                // Check if response is JSON
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    // If not JSON, try to parse as text first
                     return response.text().then(text => {
-                        throw new Error(`Server returned ${response.status}: ${text}`);
+                        console.error('Expected JSON but got:', text);
+                        throw new Error('Server returned invalid response format');
                     });
                 }
-                return response.json();
             })
             .then(data => {
-                if (data.success && data.question) {
+                if (data && data.success && data.question) {
                     captchaText.textContent = data.question + ' = ?';
                     captchaInput.value = '';
                     captchaInput.focus();
@@ -760,15 +788,21 @@
                     if (data.csrf_token && csrfToken) {
                         csrfToken.value = data.csrf_token;
                     }
+                    // Also update CSRF token name if provided
+                    if (data.csrf_name && csrfToken) {
+                        csrfToken.name = data.csrf_name;
+                    }
                 } else {
-                    console.error('Server error:', data.message || 'Unknown error');
-                    alert('Failed to refresh captcha. Please try again.');
+                    console.error('Server error:', data);
+                    const errorMsg = data && data.message ? data.message : 'Unknown error occurred';
+                    alert('Failed to refresh captcha: ' + errorMsg);
                     captchaInput.value = '';
                 }
             })
             .catch(error => {
                 console.error('Error refreshing captcha:', error);
-                alert('Failed to refresh captcha. Please reload the page and try again.');
+                const errorMsg = error.message || 'Network error or server unavailable';
+                alert('Failed to refresh captcha: ' + errorMsg + '\n\nPlease check your connection and try again.');
                 captchaInput.value = '';
             })
             .finally(() => {
