@@ -5,8 +5,6 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('styles') ?>
-<!-- Choices.js CSS for beautiful dropdowns -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 <!-- Flatpickr CSS for datepicker -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
@@ -52,7 +50,8 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.15);
-    z-index: 1;
+    z-index: 0;
+    pointer-events: none;
 }
 
 .hero-grid {
@@ -191,6 +190,9 @@
     font-family: 'Outfit', sans-serif;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(37, 128, 45, 0.25);
+    position: relative;
+    z-index: 1;
+    pointer-events: auto;
 }
 
 .btn-check:hover {
@@ -395,75 +397,35 @@
     font-style: italic;
 }
 
-/* Choices.js Custom Styling for Campus - Reduced Padding */
-.choices {
-    margin-bottom: 0;
-}
-
-.campus-select + .choices .choices__inner {
-    padding: 12px 16px;
-    border: 2px solid var(--green-100);
-    border-radius: 10px;
-    font-size: 1rem;
-    background: var(--white);
-    min-height: auto;
-    font-family: 'Outfit', sans-serif;
-}
-
-.campus-select + .choices .choices__inner:focus,
-.campus-select + .choices[data-type*="select-one"] .choices__inner:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px var(--green-100);
-}
-
-.campus-select + .choices .choices__list--single {
-    padding: 0;
-}
-
-.campus-select + .choices .choices__item--selectable {
-    padding: 6px 12px;
-}
-
-.campus-select + .choices .choices__placeholder {
-    opacity: 0.6;
-    color: var(--gray);
-}
-
-.campus-select + .choices .choices__list--dropdown {
-    border: 2px solid var(--primary-color);
-    border-top: none;
-    border-radius: 0 0 10px 10px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-    z-index: 99999;
-}
-
-.campus-select + .choices .choices__list--dropdown .choices__item--selectable.is-highlighted {
-    background: rgba(37, 128, 45, 0.1);
-    color: var(--primary-color);
-}
-
-.campus-select + .choices .choices__list--dropdown .choices__item {
-    padding: 6px 12px;
-}
-
-.campus-select + .choices[data-type*="select-one"] .choices__inner {
-    padding-bottom: 12px;
-}
-
-.campus-select + .choices[data-type*="select-one"]::after {
-    border-color: var(--primary-color) transparent transparent;
-    border-width: 6px;
-    margin-top: -3px;
-    right: 16px;
-}
-
-.campus-select + .choices[data-type*="select-one"].is-open::after {
-    margin-top: -9px;
-    border-color: transparent transparent var(--primary-color);
-}
-
-.campus-select + .choices {
+/* Native Select Styling for Campus */
+.campus-select {
     width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid #dee2e6;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: 'Outfit', sans-serif;
+    background: #ffffff;
+    color: #1a1a1a;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2325802D' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+.campus-select:focus {
+    border-color: #25802D;
+    box-shadow: 0 0 0 3px rgba(37, 128, 45, 0.1);
+    background-color: #ffffff;
+}
+
+.campus-select option {
+    padding: 10px;
+    background: #ffffff;
+    color: #1a1a1a;
 }
 
 .hero .quick-booking-card .custom-select .select-options {
@@ -501,9 +463,35 @@
     overflow: visible !important;
 }
 
-/* Fix any potential overlay conflicts */
-.hero-overlay {
-    z-index: 0;
+.quick-booking-card form {
+    position: relative;
+    z-index: 11;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+/* Ensure form groups create proper stacking context */
+.quick-booking-card .form-group {
+    position: relative;
+}
+
+/* Button container - lower z-index */
+.quick-booking-card .form-group:has(.btn-check),
+.quick-booking-card form > .btn-check {
+    z-index: 1;
+    position: relative;
+}
+
+.quick-booking-card .btn-check {
+    position: relative;
+    pointer-events: auto !important;
+    margin-top: 0;
+}
+
+/* Form groups */
+.quick-booking-card .form-group {
+    position: relative;
 }
 
 /* Option styling - Refined */
@@ -1143,8 +1131,6 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-<!-- Choices.js for beautiful dropdowns -->
-<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 <!-- Flatpickr for datepicker -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <!-- Swiper JS -->
@@ -1175,7 +1161,7 @@
     }
     
     // Custom Datepicker with Flatpickr
-    let datepicker, campusChoice;
+    let datepicker;
     
     function initCustomDatepicker() {
         const dateInput = document.getElementById('wedding-date');
@@ -1223,23 +1209,10 @@
         });
     }
     
-    // Initialize Campus Select with Choices.js
+    // Initialize Campus Select (native select - no initialization needed)
     function initCampusSelect() {
-        const campusSelect = document.getElementById('campus');
-        if (!campusSelect) return;
-        
-        campusChoice = new Choices(campusSelect, {
-            placeholder: true,
-            placeholderValue: 'Select Campus',
-            searchEnabled: true,
-            itemSelectText: '',
-            classNames: {
-                containerOuter: 'choices',
-                containerInner: 'choices__inner',
-            }
-        });
-        
-        // Note: Custom class 'campus-choice' is not needed as styling is handled via .campus-select + .choices selector
+        // Native select doesn't need initialization
+        // Styling is handled via CSS
     }
     
     
@@ -1258,7 +1231,7 @@
             if (!weddingDateInput || !campusSelect || !submitButton) return;
             
             const weddingDate = weddingDateInput.value;
-            const campusId = campusChoice ? campusChoice.getValue(true) : campusSelect.value;
+            const campusId = campusSelect.value;
             
             if (!weddingDate) {
                 alert('Please select a wedding date');

@@ -85,7 +85,7 @@ $filterContent = ob_get_clean();
         </div>
         
         <div class="table-wrapper">
-            <table id="bookingsDataTable" class="data-table" style="width:100%; min-width: 1000px;">
+            <table id="bookingsDataTable" class="data-table" style="width:100%;">
                 <thead>
                     <tr>
                         <th>SNO</th>
@@ -359,6 +359,7 @@ $filterContent = ob_get_clean();
     gap: 6px;
     align-items: center;
     min-width: 100px;
+    flex-wrap: wrap;
 }
 
 .btn-action {
@@ -408,6 +409,176 @@ $filterContent = ob_get_clean();
 
 .select2-container {
     width: 100% !important;
+}
+
+/* Prevent page-level horizontal scroll */
+body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+}
+
+.card {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.card-body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+    padding: 1.5rem;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+.data-table {
+    min-width: 1000px;
+    width: 100% !important;
+    margin: 0;
+    display: table;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+    .filter-row {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .filter-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .filter-actions button {
+        width: 100%;
+    }
+
+    .table-wrapper {
+        margin: 0 -15px;
+        padding: 0 15px;
+    }
+
+    .data-table {
+        font-size: 0.85rem;
+    }
+
+    .data-table thead th {
+        padding: 8px 6px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+    .data-table tbody td {
+        padding: 8px 6px;
+        font-size: 0.85rem;
+    }
+
+    .couple-names {
+        max-width: 140px;
+        font-size: 0.85rem;
+    }
+
+    .date-info {
+        font-size: 0.85rem;
+    }
+
+    .date-info small {
+        font-size: 0.75rem;
+    }
+
+    .contact-info {
+        font-size: 0.7rem;
+    }
+
+    .action-buttons {
+        flex-wrap: wrap;
+        gap: 4px;
+        min-width: auto;
+    }
+
+    .btn-action {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 1rem;
+    }
+
+    .dataTables_wrapper .dataTables_length select,
+    .dataTables_wrapper .dataTables_filter input {
+        font-size: 0.9rem;
+        padding: 0.4rem;
+    }
+
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_paginate {
+        font-size: 0.85rem;
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-header h3 {
+        font-size: 1.1rem;
+    }
+
+    .data-table {
+        font-size: 0.8rem;
+        min-width: 800px;
+    }
+
+    .data-table thead th {
+        padding: 6px 4px;
+        font-size: 0.75rem;
+    }
+
+    .data-table tbody td {
+        padding: 6px 4px;
+        font-size: 0.8rem;
+    }
+
+    .couple-names {
+        max-width: 120px;
+    }
+
+    .action-buttons {
+        gap: 3px;
+    }
+
+    .btn-action {
+        width: 26px !important;
+        height: 26px !important;
+        font-size: 0.7rem !important;
+    }
+
+    .badge {
+        font-size: 0.7rem;
+        padding: 0.2em 0.4em;
+    }
+
+    .alert {
+        padding: 0.75rem;
+        font-size: 0.85rem;
+    }
 }
 </style>
 <?= $this->endSection() ?>
@@ -562,31 +733,35 @@ $(document).ready(function() {
         applyFilters();
     });
     
+    // Check if mobile device
+    const isMobile = window.innerWidth <= 768;
+    
     $('#bookingsDataTable').DataTable({
         responsive: false,
-        scrollX: true,
+        scrollX: !isMobile,
+        scrollCollapse: true,
         autoWidth: false,
-        pageLength: 25,
+        pageLength: isMobile ? 10 : 25,
         lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
         order: [[0, 'asc']],
         columnDefs: [
-            { targets: [7], orderable: false, searchable: false, width: '120px' },
-            { targets: [0], width: '60px' },
-            { targets: [1], width: '200px' },
-            { targets: [2], width: '120px' },
-            { targets: [3], type: 'num', width: '140px' },
-            { targets: [4], width: '100px' },
-            { targets: [5], width: '100px' },
-            { targets: [6], width: '150px' }
+            { targets: [7], orderable: false, searchable: false, width: isMobile ? '100px' : '120px' },
+            { targets: [0], width: isMobile ? '50px' : '60px' },
+            { targets: [1], width: isMobile ? '150px' : '200px' },
+            { targets: [2], width: isMobile ? '100px' : '120px' },
+            { targets: [3], type: 'num', width: isMobile ? '120px' : '140px' },
+            { targets: [4], width: isMobile ? '80px' : '100px' },
+            { targets: [5], width: isMobile ? '90px' : '100px' },
+            { targets: [6], width: isMobile ? '120px' : '150px' }
         ],
         language: {
-            search: "Search bookings:",
-            lengthMenu: "Show _MENU_ bookings per page",
-            info: "Showing _START_ to _END_ of _TOTAL_ bookings",
-            infoEmpty: "No bookings found",
-            infoFiltered: "(filtered from _MAX_ total bookings)",
-            emptyTable: "No wedding bookings have been submitted yet",
-            zeroRecords: "No matching bookings found"
+            search: "Search:",
+            lengthMenu: "Show _MENU_ per page",
+            info: "_START_ to _END_ of _TOTAL_",
+            infoEmpty: "No bookings",
+            infoFiltered: "(filtered from _MAX_ total)",
+            emptyTable: "No wedding bookings yet",
+            zeroRecords: "No matching bookings"
         },
         dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
              '<"row"<"col-sm-12"tr>>' +
