@@ -8,8 +8,8 @@ $w2marital = $booking['witness2_marital_status'] ?? $booking['witness2_relations
 ?>
 
 <?= $this->section('styles') ?>
-    <link href="<?= base_url('assets/css/dashboard.css') ?>" rel="stylesheet">
-    <link href="<?= base_url('assets/css/dashboard-components.css') ?>" rel="stylesheet">
+    <link href="<?= asset_url('assets/css/dashboard.css') ?>" rel="stylesheet">
+    <link href="<?= asset_url('assets/css/dashboard-components.css') ?>" rel="stylesheet">
     <style>
         .application-header {
             background: var(--primary-color);

@@ -2,7 +2,7 @@
 
 <?= $this->section('styles') ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-    <link href="<?= base_url('css/auth.css') ?>" rel="stylesheet">
+    <link href="<?= asset_url('css/auth.css') ?>" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
     <style>
         /* Custom Toastr styling to match brand colors */
@@ -67,7 +67,7 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-    <script src="<?= base_url('js/auth.js') ?>"></script>
+    <script src="<?= asset_url('js/auth.js') ?>"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
         // Configure Toastr to match brand colors

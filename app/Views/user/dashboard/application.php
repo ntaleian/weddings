@@ -1,9 +1,9 @@
 <?= $this->extend('layouts/user/base') ?>
 
 <?= $this->section('styles') ?>
-    <link href="<?= base_url('assets/css/dashboard.css') ?>" rel="stylesheet">
-    <link href="<?= base_url('assets/css/dashboard-components.css') ?>" rel="stylesheet">
-    <link href="<?= base_url('assets/css/dashboard-sections.css') ?>" rel="stylesheet">
+    <link href="<?= asset_url('assets/css/dashboard.css') ?>" rel="stylesheet">
+    <link href="<?= asset_url('assets/css/dashboard-components.css') ?>" rel="stylesheet">
+    <link href="<?= asset_url('assets/css/dashboard-sections.css') ?>" rel="stylesheet">
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>

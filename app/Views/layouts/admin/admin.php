@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/admin/base') ?>
 
 <?= $this->section('styles') ?>
-    <link href="<?= base_url('css/admin.css') ?>" rel="stylesheet">
+    <link href="<?= asset_url('css/admin.css') ?>" rel="stylesheet">
     
     <style>
         body {
@@ -627,5 +627,5 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-    <script src="<?php echo base_url('js/admin-dashboard.js') ?>"></script>
+    <script src="<?php echo asset_url('js/admin-dashboard.js') ?>"></script>
 <?= $this->endSection() ?>

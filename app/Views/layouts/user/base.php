@@ -6,7 +6,7 @@
     <title>Wedding Dashboard - Watoto Church Wedding Booking</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="<?= base_url('css/style.css') ?>" rel="stylesheet">
+    <link href="<?= asset_url('css/style.css') ?>" rel="stylesheet">
     <?= $this->renderSection('styles') ?>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -486,7 +486,7 @@
             initSidebarToggle();
         }
     </script>
-    <script src="<?= base_url('js/script.js') ?>"></script>
+    <script src="<?= asset_url('js/script.js') ?>"></script>
     <?= $this->renderSection('scripts') ?>
 </body>
 </html>

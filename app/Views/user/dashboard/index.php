@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/user/base') ?>
 
 <?= $this->section('styles') ?>
-    <link href="<?= base_url('css/dashboard.css') ?>" rel="stylesheet">
+    <link href="<?= asset_url('css/dashboard.css') ?>" rel="stylesheet">
 <?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
@@ -27,5 +27,5 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('scripts') ?>
-    <script src="<?= base_url('js/dashboard.js') ?>"></script>
+    <script src="<?= asset_url('js/dashboard.js') ?>"></script>
 <?= $this->endSection() ?>

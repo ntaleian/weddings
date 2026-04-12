@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
     
     <!-- Custom Admin Styles -->
-    <link rel="stylesheet" href="<?= base_url('css/admin-template.css') ?>">
+    <link rel="stylesheet" href="<?= asset_url('css/admin-template.css') ?>">
     
     <?= $this->renderSection('styles') ?>
 </head>
@@ -190,7 +190,7 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
     
-    <script src="<?= base_url('js/admin-template.js') ?>"></script>
+    <script src="<?= asset_url('js/admin-template.js') ?>"></script>
     
     <?= $this->renderSection('scripts') ?>
 </body>
