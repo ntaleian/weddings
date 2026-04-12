@@ -7,25 +7,25 @@
     <style>
         /* Custom Toastr styling to match brand colors */
         .toast-success {
-            background: linear-gradient(135deg, rgba(37, 128, 45, 0.1) 0%, rgba(37, 128, 45, 0.15) 100%) !important;
-            color: #1a5a20 !important;
-            border-left: 4px solid #25802D !important;
+            background: rgba(0, 140, 21, 0.12) !important;
+            color: #006010 !important;
+            border-left: 4px solid #008C15 !important;
         }
         
         .toast-error {
-            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%) !important;
+            background: #f8d7da !important;
             color: #721c24 !important;
             border-left: 4px solid #dc3545 !important;
         }
         
         .toast-info {
-            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%) !important;
+            background: #d1ecf1 !important;
             color: #0c5460 !important;
             border-left: 4px solid #17a2b8 !important;
         }
         
         .toast-warning {
-            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%) !important;
+            background: #fff3cd !important;
             color: #856404 !important;
             border-left: 4px solid #ffc107 !important;
         }

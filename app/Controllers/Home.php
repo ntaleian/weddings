@@ -13,9 +13,10 @@ class Home extends BaseController
         $bookingModel = new BookingModel();
         
         $data = [
-            'campuses' => $campusModel->getActiveCampuses(),
-            'recentBookings' => $bookingModel->getAllBookingsWithDetails(['status' => 'approved']),
-            'title' => 'Watoto Church Wedding Booking - Your Perfect Day Awaits'
+            'campuses'         => $campusModel->getActiveCampuses(),
+            'recentBookings'   => $bookingModel->getAllBookingsWithDetails(['status' => 'approved']),
+            'minBookingDate'   => $bookingModel->getMinimumBookingDate(),
+            'title'            => 'Watoto Church Wedding Booking - Your Perfect Day Awaits',
         ];
         
         return view('home/index', $data);

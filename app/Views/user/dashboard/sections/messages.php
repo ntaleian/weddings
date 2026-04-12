@@ -163,7 +163,7 @@
 
 .quick-action-btn:hover {
     border-color: var(--primary-color);
-    background: rgba(100, 1, 127, 0.05);
+    background: rgba(0, 140, 21, 0.05);
 }
 
 .empty-messages {
@@ -180,7 +180,7 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: rgba(100, 1, 127, 0.1);
+    background: rgba(0, 140, 21, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -226,7 +226,7 @@
         <div class="messages-header">
             <h3>Chat with <?= esc($coordinator['name'] ?? 'Wedding Coordinator') ?></h3>
             <span class="status-indicator">
-                <i class="fas fa-circle" style="color: #2ecc71; font-size: 0.8rem;"></i>
+                <i class="fas fa-circle" style="color: #008C15; font-size: 0.8rem;"></i>
                 Online
             </span>
         </div>
@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', function() {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: ${type === 'success' ? '#2ecc71' : type === 'error' ? '#e74c3c' : '#3498db'};
+            background: ${type === 'success' ? '#008C15' : type === 'error' ? '#e74c3c' : '#3498db'};
             color: white;
             padding: 15px 20px;
             border-radius: 8px;

@@ -60,23 +60,23 @@ class API extends Controller
             ]);
         }
 
-        // Check existing bookings for each time slot (9 AM, 11 AM, 1 PM - Saturdays only)
+        // Check existing bookings for each time slot (9 AM, 11 AM, 1 PM ceremony starts)
         $availableTimeSlots = [
             '09:00:00' => [
-                'time' => '09:00',
-                'display' => '9:00 AM - 12:00 PM',
-                'available' => true
+                'time'      => '09:00',
+                'display'   => '9:00 AM',
+                'available' => true,
             ],
             '11:00:00' => [
-                'time' => '11:00',
-                'display' => '11:00 AM - 2:00 PM',
-                'available' => true
+                'time'      => '11:00',
+                'display'   => '11:00 AM',
+                'available' => true,
             ],
             '13:00:00' => [
-                'time' => '13:00',
-                'display' => '1:00 PM - 4:00 PM',
-                'available' => true
-            ]
+                'time'      => '13:00',
+                'display'   => '1:00 PM',
+                'available' => true,
+            ],
         ];
 
         // Get existing bookings for this campus and date
@@ -206,7 +206,7 @@ class API extends Controller
                 ])->setStatusCode(404);
             }
 
-            // Validate date according to guidelines (6 months, Saturday-only)
+            // Validate date according to guidelines (advance booking, Fri/Sat only, time slots)
             $dateValidation = $this->bookingModel->validateBookingDateTime($date, '09:00'); // Use any time for date validation
             if (!$dateValidation['valid']) {
                 return $this->response->setJSON([
@@ -233,23 +233,23 @@ class API extends Controller
                 ]);
             }
 
-            // Check existing bookings for time slots (9 AM, 11 AM, 1 PM - Saturdays only)
+            // Check existing bookings for time slots (9 AM, 11 AM, 1 PM ceremony starts)
             $availableTimeSlots = [
                 '09:00:00' => [
-                    'time' => '09:00',
-                    'display' => '9:00 AM - 12:00 PM',
-                    'available' => true
+                    'time'      => '09:00',
+                    'display'   => '9:00 AM',
+                    'available' => true,
                 ],
                 '11:00:00' => [
-                    'time' => '11:00',
-                    'display' => '11:00 AM - 2:00 PM',
-                    'available' => true
+                    'time'      => '11:00',
+                    'display'   => '11:00 AM',
+                    'available' => true,
                 ],
                 '13:00:00' => [
-                    'time' => '13:00',
-                    'display' => '1:00 PM - 4:00 PM',
-                    'available' => true
-                ]
+                    'time'      => '13:00',
+                    'display'   => '1:00 PM',
+                    'available' => true,
+                ],
             ];
 
             // Get existing bookings for this campus and date

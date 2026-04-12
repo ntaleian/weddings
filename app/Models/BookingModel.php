@@ -26,10 +26,12 @@ class BookingModel extends Model
         'groom_cell_leader_phone', 'groom_church_name', 'groom_senior_pastor', 'groom_pastor_phone',
         'relationship_duration', 'previous_marriage', 'guest_count', 'ceremony_style', 'ceremony_language',
         'music_preference', 'reception_venue', 'special_requirements', 'special_instructions',
-        'bride_father', 'bride_father_occupation', 'bride_mother', 'bride_mother_occupation', 'bride_family_phone',
-        'groom_father', 'groom_father_occupation', 'groom_mother', 'groom_mother_occupation', 'groom_family_phone',
-        'witness1_name', 'witness1_phone', 'witness1_id_number', 'witness1_relationship',
-        'witness2_name', 'witness2_phone', 'witness2_id_number', 'witness2_relationship',
+        'bride_father', 'bride_father_occupation', 'bride_father_status', 'bride_mother', 'bride_mother_occupation', 'bride_mother_status',
+        'bride_family_phone', 'bride_father_phone', 'bride_mother_phone',
+        'groom_father', 'groom_father_occupation', 'groom_father_status', 'groom_mother', 'groom_mother_occupation', 'groom_mother_status',
+        'groom_family_phone', 'groom_father_phone', 'groom_mother_phone',
+        'witness1_name', 'witness1_phone', 'witness1_id_number', 'witness1_marital_status',
+        'witness2_name', 'witness2_phone', 'witness2_id_number', 'witness2_marital_status',
         'premarital_counseling', 'counseling_pastor', 'pastor_recommendation',
         'accept_terms', 'application_step', 'is_draft', 'status', 'total_cost', 'admin_notes',
         // Admin-managed fields
@@ -269,62 +271,146 @@ class BookingModel extends Model
     }
 
     /**
-     * Get minimum booking date (6 months from today)
+     * Earliest calendar date users may select (Y-m-d), from setting `earliest_selectable_date`, or null if unset.
+     */
+    public function getEarliestSelectableDateSetting(): ?string
+    {
+        $settingsModel = new \App\Models\SettingsModel();
+        $raw           = $settingsModel->getSetting('earliest_selectable_date', '');
+
+        if ($raw === null || $raw === '') {
+            return null;
+        }
+
+        $trim = trim((string) $raw);
+        if ($trim === '' || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $trim)) {
+            return null;
+        }
+
+        return $trim;
+    }
+
+    /**
+     * Minimum booking date: the later of (today + advance_booking_days) and optional admin
+     * `earliest_selectable_date` (first day users may choose).
+     *
      * @return string Date in Y-m-d format
      */
     public function getMinimumBookingDate()
     {
         $settingsModel = new \App\Models\SettingsModel();
-        $advanceDays = $settingsModel->getSetting('advance_booking_days', 180);
-        
-        $minDate = new \DateTime();
-        $minDate->modify("+{$advanceDays} days");
-        
-        return $minDate->format('Y-m-d');
+        $advanceDays   = (int) $settingsModel->getSetting('advance_booking_days', 180);
+
+        $fromAdvance = new \DateTime('today');
+        $fromAdvance->modify("+{$advanceDays} days");
+
+        $adminEarliest = $this->getEarliestSelectableDateSetting();
+        if ($adminEarliest === null) {
+            return $fromAdvance->format('Y-m-d');
+        }
+
+        $fromAdmin = new \DateTime($adminEarliest . ' 00:00:00');
+
+        return ($fromAdvance > $fromAdmin) ? $fromAdvance->format('Y-m-d') : $fromAdmin->format('Y-m-d');
     }
 
     /**
-     * Check if booking date meets the 6-month advance requirement
+     * Check if booking date is on or after the effective minimum selectable date.
+     *
      * @param string $weddingDate Date in Y-m-d format
-     * @return array ['valid' => bool, 'message' => string, 'days_advance' => int]
+     *
+     * @return array{valid: bool, message: string, min_date: string, days_before_min: int}
      */
     public function isBookingDateValid($weddingDate)
     {
-        $settingsModel = new \App\Models\SettingsModel();
-        $advanceDays = $settingsModel->getSetting('advance_booking_days', 180);
-        
-        $today = new \DateTime();
-        $wedding = new \DateTime($weddingDate);
-        $diff = $today->diff($wedding);
-        $daysAdvance = (int)$diff->format('%r%a');
-        
-        if ($daysAdvance < $advanceDays) {
-            $months = round($advanceDays / 30, 1);
+        $minDateStr = $this->getMinimumBookingDate();
+        $wedding    = new \DateTime($weddingDate . ' 00:00:00');
+        $min        = new \DateTime($minDateStr . ' 00:00:00');
+
+        if ($wedding < $min) {
+            $daysBefore = (int) floor(($min->getTimestamp() - $wedding->getTimestamp()) / 86400);
+
             return [
-                'valid' => false,
-                'message' => "Wedding date must be at least {$months} months ({$advanceDays} days) in advance. You selected a date only {$daysAdvance} days away.",
-                'days_advance' => $daysAdvance,
-                'required_days' => $advanceDays
+                'valid'           => false,
+                'message'         => 'Wedding date must be on or after ' . $min->format('F j, Y') . '.',
+                'min_date'        => $minDateStr,
+                'days_before_min' => $daysBefore,
             ];
         }
-        
+
         return [
-            'valid' => true,
-            'message' => 'Date meets advance booking requirement',
-            'days_advance' => $daysAdvance,
-            'required_days' => $advanceDays
+            'valid'           => true,
+            'message'         => 'Date meets minimum booking requirement',
+            'min_date'        => $minDateStr,
+            'days_before_min' => 0,
         ];
+    }
+
+    /**
+     * Weekday names allowed for weddings (lowercase), from settings `wedding_days_allowed`
+     * (comma-separated, e.g. "friday,saturday") or JSON array.
+     *
+     * @return list<string>
+     */
+    public function getAllowedWeddingWeekdayNames(): array
+    {
+        $settingsModel = new \App\Models\SettingsModel();
+        $raw = $settingsModel->getSetting('wedding_days_allowed', 'friday,saturday');
+
+        if (is_array($raw)) {
+            return array_values(array_filter(array_map('strtolower', $raw)));
+        }
+
+        $raw = strtolower(trim((string) $raw));
+        if ($raw === '') {
+            return ['friday', 'saturday'];
+        }
+
+        return array_values(array_filter(array_map('trim', explode(',', $raw))));
+    }
+
+    /**
+     * @param string $date Date in Y-m-d format
+     */
+    public function isAllowedWeddingWeekday(string $date): bool
+    {
+        $allowed = $this->getAllowedWeddingWeekdayNames();
+        $dayName = strtolower((new \DateTime($date))->format('l'));
+
+        return in_array($dayName, $allowed, true);
+    }
+
+    /**
+     * @param list<string> $names Lowercase weekday names, e.g. ['friday','saturday']
+     */
+    public function formatAllowedDaysLabel(array $names): string
+    {
+        $parts = array_map(static fn (string $d): string => ucfirst($d) . 's', $names);
+
+        if ($parts === []) {
+            return 'Fridays and Saturdays';
+        }
+
+        if (count($parts) === 1) {
+            return $parts[0];
+        }
+
+        $last = array_pop($parts);
+
+        return implode(', ', $parts) . ' and ' . $last;
     }
 
     /**
      * Check if date is a Saturday
      * @param string $date Date in Y-m-d format
      * @return bool
+     * @deprecated Use isAllowedWeddingWeekday()
      */
     public function isSaturday($date)
     {
         $dateTime = new \DateTime($date);
-        $dayOfWeek = (int)$dateTime->format('w'); // 0 = Sunday, 6 = Saturday
+        $dayOfWeek = (int) $dateTime->format('w'); // 0 = Sunday, 6 = Saturday
+
         return $dayOfWeek === 6;
     }
 
@@ -419,9 +505,10 @@ class BookingModel extends Model
             $errors[] = $dateValidation['message'];
         }
         
-        // Check if Saturday
-        if (!$this->isSaturday($date)) {
-            $errors[] = 'Weddings can only be booked on Saturdays. Please select a Saturday date.';
+        if (! $this->isAllowedWeddingWeekday($date)) {
+            $allowed = $this->getAllowedWeddingWeekdayNames();
+            $label   = $this->formatAllowedDaysLabel($allowed);
+            $errors[] = "Weddings can only be booked on {$label}. Please select an allowed day.";
         }
         
         // Check time slot

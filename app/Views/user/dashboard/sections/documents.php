@@ -119,13 +119,13 @@
 
 .document-card.uploaded {
     border-color: var(--success-color);
-    background: linear-gradient(to bottom, rgba(46, 204, 113, 0.03), var(--white));
+    background: rgba(0, 140, 21, 0.04);
     padding: 10px;
 }
 
 .document-card.uploaded:hover {
     border-color: var(--success-color);
-    box-shadow: 0 2px 10px rgba(46, 204, 113, 0.2);
+    box-shadow: 0 2px 10px rgba(0, 140, 21, 0.2);
 }
 
 .document-header {
@@ -139,7 +139,7 @@
     width: 32px;
     height: 32px;
     border-radius: 6px;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: var(--primary-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -150,7 +150,7 @@
 }
 
 .document-card.uploaded .document-icon {
-    background: linear-gradient(135deg, var(--success-color), #27ae60);
+    background: var(--success-color);
 }
 
 .document-info {
@@ -185,13 +185,13 @@
 }
 
 .status-uploaded {
-    background: rgba(46, 204, 113, 0.1);
+    background: rgba(0, 140, 21, 0.1);
     color: var(--success-color);
 }
 
 .status-pending {
-    background: rgba(255, 193, 7, 0.1);
-    color: #f39c12;
+    background: rgba(251, 209, 16, 0.2);
+    color: #856404;
 }
 
 .upload-area {
@@ -207,12 +207,12 @@
 
 .upload-area:hover {
     border-color: var(--primary-color);
-    background: rgba(100, 1, 127, 0.05);
+    background: rgba(0, 140, 21, 0.05);
 }
 
 .upload-area.dragover {
     border-color: var(--primary-color);
-    background: rgba(100, 1, 127, 0.1);
+    background: rgba(0, 140, 21, 0.1);
 }
 
 .upload-area i {
@@ -430,7 +430,7 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
     
     <!-- Progress Bar -->
     <div style="background: #e9ecef; border-radius: 8px; height: 8px; overflow: hidden; margin-bottom: 12px; position: relative;">
-        <div style="background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); height: 100%; width: <?= $progressPercentage ?>%; transition: width 0.5s ease; border-radius: 8px;"></div>
+        <div style="background: var(--primary-color); height: 100%; width: <?= $progressPercentage ?>%; transition: width 0.5s ease; border-radius: 8px;"></div>
     </div>
     
     <!-- Quick Stats -->
@@ -447,7 +447,7 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
             </div>
             <div style="font-size: 0.75rem; color: #6c757d; font-weight: 500;">Remaining</div>
         </div>
-        <div style="text-align: center; padding: 10px; background: rgba(100, 1, 127, 0.1); border-radius: 6px;">
+        <div style="text-align: center; padding: 10px; background: rgba(0, 140, 21, 0.1); border-radius: 6px;">
             <div style="font-size: 1.3rem; font-weight: 700; color: var(--primary-color); margin-bottom: 3px;">
                 <?= $totalDocs ?>
             </div>
@@ -456,7 +456,7 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
     </div>
     
     <?php if ($uploadedCount < $totalDocs): ?>
-    <div style="padding: 10px; background: rgba(255, 193, 7, 0.1); border-left: 3px solid #f39c12; border-radius: 4px;">
+    <div style="padding: 10px; background: rgba(251, 209, 16, 0.15); border-left: 3px solid #FBD110; border-radius: 4px;">
         <p style="margin: 0; color: #856404; font-size: 0.8rem; line-height: 1.4;">
             <i class="fas fa-info-circle" style="margin-right: 6px;"></i>
             <strong>Note:</strong> You can upload documents one at a time. Your progress is saved automatically.
@@ -807,7 +807,7 @@ function updateDocumentStatus(docId, data) {
         // Update icon
         const icon = card.querySelector('.document-icon');
         if (icon) {
-            icon.style.background = 'linear-gradient(135deg, var(--success-color), #27ae60)';
+            icon.style.background = 'var(--success-color)';
         }
         
         // Update upload area text

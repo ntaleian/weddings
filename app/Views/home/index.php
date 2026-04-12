@@ -17,7 +17,7 @@
 .hero {
     position: relative;
     min-height: 80vh;
-    background: linear-gradient(135deg, #25802D 0%, #1a5a20 100%);
+    background: #008C15;
     display: flex;
     align-items: center;
     padding: 100px 0 60px;
@@ -25,22 +25,8 @@
     overflow: hidden;
 }
 
-/* Subtle pattern overlay */
 .hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08) 0%, transparent 30%),
-        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.05) 0%, transparent 35%);
-    background-size: cover, cover;
-    background-position: center;
-    background-repeat: no-repeat, no-repeat;
-    opacity: 0.5;
-    pointer-events: none;
+    display: none;
 }
 
 .hero-overlay {
@@ -86,11 +72,7 @@
 }
 
 .title-line.highlight {
-    color: #ffffff;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.9));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #FBD110;
 }
 
 .hero-subtitle {
@@ -170,8 +152,8 @@
 
 .quick-form input:focus,
 .quick-form select:focus {
-    border-color: #25802D;
-    box-shadow: 0 0 0 3px rgba(37, 128, 45, 0.1);
+    border-color: #008C15;
+    box-shadow: 0 0 0 3px rgba(0, 140, 21, 0.1);
     background: #ffffff;
 }
 
@@ -180,7 +162,7 @@
 }
 
 .btn-check {
-    background: linear-gradient(135deg, #25802D 0%, #1a5a20 100%);
+    background: #008C15;
     color: white;
     border: none;
     padding: 16px 24px;
@@ -189,15 +171,16 @@
     font-weight: 600;
     font-family: 'Outfit', sans-serif;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(37, 128, 45, 0.25);
+    box-shadow: 0 4px 12px rgba(0, 140, 21, 0.25);
     position: relative;
     z-index: 1;
     pointer-events: auto;
 }
 
 .btn-check:hover {
+    background: #006010;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(37, 128, 45, 0.35);
+    box-shadow: 0 6px 20px rgba(0, 140, 21, 0.35);
 }
 
 .btn-check:active {
@@ -258,20 +241,20 @@
 }
 
 .contact-item:hover {
-    box-shadow: 0 4px 12px rgba(37, 128, 45, 0.1);
-    border-color: rgba(37, 128, 45, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 140, 21, 0.1);
+    border-color: rgba(0, 140, 21, 0.2);
 }
 
 .contact-icon {
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, #25802D, #1a5a20);
+    background: #008C15;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(37, 128, 45, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 140, 21, 0.2);
 }
 
 .contact-icon i {
@@ -332,8 +315,8 @@
 
 .contact-form input:focus,
 .contact-form textarea:focus {
-    border-color: #25802D;
-    box-shadow: 0 0 0 3px rgba(37, 128, 45, 0.1);
+    border-color: #008C15;
+    box-shadow: 0 0 0 3px rgba(0, 140, 21, 0.1);
     background: #ffffff;
 }
 
@@ -410,15 +393,15 @@
     outline: none;
     cursor: pointer;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2325802D' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23008C15' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 16px center;
     padding-right: 40px;
 }
 
 .campus-select:focus {
-    border-color: #25802D;
-    box-shadow: 0 0 0 3px rgba(37, 128, 45, 0.1);
+    border-color: #008C15;
+    box-shadow: 0 0 0 3px rgba(0, 140, 21, 0.1);
     background-color: #ffffff;
 }
 
@@ -497,7 +480,7 @@
 /* Option styling - Refined */
 .hero .quick-booking-card .custom-select .select-options .option {
     padding: 14px 18px;
-    border-bottom: 1px solid rgba(37, 128, 45, 0.08);
+    border-bottom: 1px solid rgba(0, 140, 21, 0.08);
     cursor: pointer;
     display: flex;
     justify-content: space-between;
@@ -506,7 +489,7 @@
 
 .hero .quick-booking-card .custom-select .select-options .option:hover,
 .hero .quick-booking-card .custom-select .select-options .option.highlighted {
-    background: rgba(37, 128, 45, 0.06);
+    background: rgba(0, 140, 21, 0.06);
 }
 
 .hero .quick-booking-card .custom-select .select-options .option:last-child {
@@ -631,7 +614,7 @@
 
 .hero-actions .btn-primary {
     background: rgba(255, 255, 255, 0.95);
-    color: #25802D;
+    color: #008C15;
 }
 
 .hero-actions .btn-primary:hover {
@@ -653,7 +636,7 @@
 }
 
 .contact-form .btn-primary {
-    background: linear-gradient(135deg, #25802D 0%, #1a5a20 100%);
+    background: #008C15;
     color: white;
     border: none;
     padding: 16px 32px;
@@ -662,13 +645,14 @@
     font-weight: 600;
     font-family: 'Outfit', sans-serif;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(37, 128, 45, 0.25);
+    box-shadow: 0 4px 12px rgba(0, 140, 21, 0.25);
     width: 100%;
 }
 
 .contact-form .btn-primary:hover {
+    background: #006010;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(37, 128, 45, 0.35);
+    box-shadow: 0 6px 20px rgba(0, 140, 21, 0.35);
 }
 
 /* Responsive Design - Modern Mobile */
@@ -1092,7 +1076,7 @@
                     </div>
                     <div class="contact-content">
                         <h4>Email</h4>
-                        <p>weddings@watotochurch.com</p>
+                        <p>family@watotochurch.com</p>
                     </div>
                 </div>
                 <div class="contact-item">
@@ -1170,12 +1154,20 @@
         // Calculate max date (5 years from now)
         const maxDate = new Date();
         maxDate.setFullYear(maxDate.getFullYear() + 5);
+
+        const minBookingYmd = '<?= esc($minBookingDate ?? '', 'js') ?>';
         
         // Initialize Flatpickr with year/month dropdowns
         datepicker = flatpickr(dateInput, {
             dateFormat: "Y-m-d",
-            minDate: "today",
+            minDate: minBookingYmd || "today",
             maxDate: maxDate,
+            disable: [
+                function(date) {
+                    const dow = date.getDay();
+                    return dow !== 5 && dow !== 6;
+                }
+            ],
             defaultDate: null,
             allowInput: false,
             clickOpens: true,

@@ -143,7 +143,7 @@
 .form-group select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(100, 1, 127, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 140, 21, 0.1);
 }
 
 /* Radio Options */
@@ -167,7 +167,7 @@
 
 .radio-option:hover {
     border-color: var(--primary-color);
-    background: rgba(100, 1, 127, 0.05);
+    background: rgba(0, 140, 21, 0.05);
 }
 
 .radio-option input[type="radio"] {
@@ -213,7 +213,7 @@
 </style>
 
 <div class="application-header">
-    <h1>Wedding Venue Application</h1>
+    <h1>Wedding Application</h1>
     <p>Complete all sections to submit your application. Your progress is automatically saved.</p>
 </div>
 
@@ -261,17 +261,13 @@
                     </ul>
                 </div>
                 <div class="action-buttons">
-                    <a href="<?= site_url('dashboard') ?>" class="btn btn-primary">
+                    <a href="<?= site_url('dashboard/application') ?>" class="btn btn-primary">
+                        <i class="fas fa-file-alt"></i>
+                        View application &amp; PDF
+                    </a>
+                    <a href="<?= site_url('dashboard') ?>" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i>
                         Back to Dashboard
-                    </a>
-                    <button onclick="window.print()" class="btn btn-outline">
-                        <i class="fas fa-print"></i>
-                        Print Application
-                    </button>
-                    <a href="<?= site_url('dashboard/messages') ?>" class="btn btn-outline">
-                        <i class="fas fa-comments"></i>
-                        Contact Coordinator
                     </a>
                 </div>
             </div>
@@ -290,7 +286,7 @@
 
     .submitted-notice i.fa-check-circle {
         font-size: 4rem;
-        color: #27ae60;
+        color: #008C15;
         margin-bottom: 20px;
     }
 
@@ -320,12 +316,12 @@
     }
 
     .status-pending {
-        background-color: #f39c12;
+        background-color: #FBD110;
         color: white;
     }
 
     .status-approved {
-        background-color: #27ae60;
+        background-color: #008C15;
         color: white;
     }
 
@@ -406,7 +402,10 @@
         <?= $this->include('user/dashboard/components/step1_venue_date', ['application' => $application]) ?>
         
         <!-- Step 2: Personal Details -->
-        <?= $this->include('user/dashboard/components/step2_personal_details', ['application' => $application]) ?>
+        <?= $this->include('user/dashboard/components/step2_personal_details', [
+            'application' => $application,
+            'countries' => $countries ?? [],
+        ]) ?>
         
         <!-- Step 3: Additional Information -->
         <?= $this->include('user/dashboard/components/step3_additional_info', ['application' => $application]) ?>
@@ -538,7 +537,7 @@ async function loadApplicationDraft() {
         loadingIndicator.style.cssText = 'position: fixed; top: 20px; right: 20px; background: var(--primary-color); color: white; padding: 10px 15px; border-radius: 5px; z-index: 1000;';
         document.body.appendChild(loadingIndicator);
         
-        populateFormFields(savedData);
+        await populateFormFields(savedData);
         
         // Remove loading indicator
         setTimeout(() => {
@@ -570,7 +569,7 @@ async function loadApplicationDraft() {
         
         if (result.success && result.data) {
             // Populate form fields with saved data
-            populateFormFields(result.data);
+            await populateFormFields(result.data);
             
             // Set current step if saved
             if (result.current_step && result.current_step > 1) {
@@ -588,7 +587,7 @@ async function loadApplicationDraft() {
 }
 
 // Function to populate form fields
-function populateFormFields(data) {
+async function populateFormFields(data) {
     console.log('Populating form fields with:', data);
     
     Object.keys(data).forEach(key => {
@@ -605,34 +604,8 @@ function populateFormFields(data) {
         }
     });
     
-    // Special handling for step 1 selections
-    if (data.selectedCampus) {
-        // Trigger campus selection in step 1
-        setTimeout(() => {
-            if (window.selectCampus) {
-                window.selectCampus(data.selectedCampus);
-            }
-        }, 100);
-    }
-    
-    if (data.selectedDate) {
-        // Set the calendar to show the selected date
-        setTimeout(() => {
-            const dateField = document.getElementById('selectedDate');
-            if (dateField) {
-                dateField.value = data.selectedDate;
-                dateField.dispatchEvent(new Event('change'));
-            }
-        }, 200);
-    }
-    
-    if (data.selectedTime) {
-        // Select the time slot
-        setTimeout(() => {
-            if (window.selectTime) {
-                window.selectTime(data.selectedTime);
-            }
-        }, 300);
+    if (window.restoreVenueDateTimeFromDraft) {
+        await window.restoreVenueDateTimeFromDraft(data);
     }
     
     // Trigger church membership field visibility for bride and groom
@@ -649,6 +622,12 @@ function populateFormFields(data) {
             window.toggleGroomChurchFields();
         }
     }, 400);
+
+    setTimeout(() => {
+        if (window.initStep3ParentContactToggles) {
+            window.initStep3ParentContactToggles();
+        }
+    }, 450);
 }
 
 // Add event listeners for auto-save

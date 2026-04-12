@@ -163,7 +163,7 @@
 }
 
 .nav-item.active {
-    background: rgba(44, 90, 160, 0.1);
+    background: rgba(0, 140, 21, 0.1);
     color: var(--primary-color);
     border-right: 3px solid var(--primary-color);
 }
@@ -242,7 +242,7 @@
 .stat-icon {
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: var(--primary-color);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -469,7 +469,7 @@
 }
 
 .message-item.unread {
-    background: rgba(44, 90, 160, 0.02);
+    background: rgba(0, 140, 21, 0.04);
     border-color: var(--primary-color);
 }
 

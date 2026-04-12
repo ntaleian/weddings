@@ -25,8 +25,12 @@
                         </button>
                         <div class="dropdown-menu" id="userDropdown">
                             <a href="<?= site_url('dashboard/profile') ?>"><i class="fas fa-user"></i> Profile</a>
-                            <a href="<?= site_url('dashboard/settings') ?>"><i class="fas fa-cog"></i> Settings</a>
-                            <a href="<?= site_url('help') ?>"><i class="fas fa-question-circle"></i> Help</a>
+                            <div class="dropdown-menu-section" role="group" aria-label="Help">
+                                <span class="dropdown-menu-label"><i class="fas fa-question-circle"></i> Help</span>
+                                <a href="<?= site_url('/') ?>#contact" class="dropdown-sublink"><i class="fas fa-envelope"></i> Contact Watoto</a>
+                                <a href="<?= site_url('dashboard/download-checklist') ?>" class="dropdown-sublink"><i class="fas fa-download"></i> Wedding checklist</a>
+                                <!-- <a href="<?= site_url('dashboard/messages') ?>" class="dropdown-sublink"><i class="fas fa-comments"></i> Message coordinator</a> -->
+                            </div>
                             <hr>
                             <a href="<?= site_url('logout') ?>" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
                         </div>

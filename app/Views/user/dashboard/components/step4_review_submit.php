@@ -82,6 +82,94 @@
                     <strong>Groom Marital Status:</strong>
                     <span id="reviewGroomMaritalStatus">-</span>
                 </div>
+                <div class="review-item" style="grid-column: 1 / -1;">
+                    <strong>Bride residential address:</strong>
+                    <span id="reviewBrideResidential">-</span>
+                </div>
+                <div class="review-item" style="grid-column: 1 / -1;">
+                    <strong>Groom residential address:</strong>
+                    <span id="reviewGroomResidential">-</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="review-section">
+            <h3 class="section-title">
+                <i class="fas fa-sitemap"></i>
+                Family information
+            </h3>
+            <p class="review-section-lead">Parents (from additional information)</p>
+            
+            <h4 class="review-subheading">Bride's parents</h4>
+            <div class="review-grid">
+                <div class="review-item">
+                    <strong>Bride's father — name:</strong>
+                    <span id="reviewBrideFatherName">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Bride's father — occupation:</strong>
+                    <span id="reviewBrideFatherOccupation">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Bride's father — status:</strong>
+                    <span id="reviewBrideFatherStatus">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Bride's father — contact phone:</strong>
+                    <span id="reviewBrideFatherPhone">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Bride's mother — name:</strong>
+                    <span id="reviewBrideMotherName">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Bride's mother — occupation:</strong>
+                    <span id="reviewBrideMotherOccupation">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Bride's mother — status:</strong>
+                    <span id="reviewBrideMotherStatus">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Bride's mother — contact phone:</strong>
+                    <span id="reviewBrideMotherPhone">-</span>
+                </div>
+            </div>
+            
+            <h4 class="review-subheading">Groom's parents</h4>
+            <div class="review-grid">
+                <div class="review-item">
+                    <strong>Groom's father — name:</strong>
+                    <span id="reviewGroomFatherName">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Groom's father — occupation:</strong>
+                    <span id="reviewGroomFatherOccupation">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Groom's father — status:</strong>
+                    <span id="reviewGroomFatherStatus">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Groom's father — contact phone:</strong>
+                    <span id="reviewGroomFatherPhone">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Groom's mother — name:</strong>
+                    <span id="reviewGroomMotherName">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Groom's mother — occupation:</strong>
+                    <span id="reviewGroomMotherOccupation">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Groom's mother — status:</strong>
+                    <span id="reviewGroomMotherStatus">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Groom's mother — contact phone:</strong>
+                    <span id="reviewGroomMotherPhone">-</span>
+                </div>
             </div>
         </div>
         
@@ -104,8 +192,8 @@
                     <span id="reviewWitness1Id">-</span>
                 </div>
                 <div class="review-item">
-                    <strong>Best Man Relationship:</strong>
-                    <span id="reviewWitness1Relationship">-</span>
+                    <strong>Best Man Marital status:</strong>
+                    <span id="reviewWitness1MaritalStatus">-</span>
                 </div>
                 <div class="review-item">
                     <strong>Matron Name:</strong>
@@ -120,8 +208,8 @@
                     <span id="reviewWitness2Id">-</span>
                 </div>
                 <div class="review-item">
-                    <strong>Matron Relationship:</strong>
-                    <span id="reviewWitness2Relationship">-</span>
+                    <strong>Matron Marital status:</strong>
+                    <span id="reviewWitness2MaritalStatus">-</span>
                 </div>
             </div>
         </div>
@@ -205,23 +293,19 @@ function populateStep4Review() {
         }
     }
     
+    const reviewTimeLabels = {
+        '09:00': '9:00 AM',
+        '11:00': '11:00 AM',
+        '13:00': '1:00 PM'
+    };
     // Time - check global variable first
     if (typeof selectedTime !== 'undefined' && selectedTime) {
-        const timeSlots = {
-            '11:00': '11:00 AM',
-            '13:00': '1:00 PM'
-        };
-        setReviewText('reviewTime', timeSlots[selectedTime] || selectedTime);
+        setReviewText('reviewTime', reviewTimeLabels[selectedTime] || selectedTime);
     } else {
-        // Fallback: check form field
-        const timeField = document.querySelector('[name="wedding_time"]');
+        const timeField = document.getElementById('selectedTime') || document.querySelector('[name="wedding_time"]');
         if (timeField && timeField.value) {
             const timeValue = timeField.value;
-            const timeSlots = {
-                '11:00': '11:00 AM',
-                '13:00': '1:00 PM'
-            };
-            setReviewText('reviewTime', timeSlots[timeValue] || timeValue);
+            setReviewText('reviewTime', reviewTimeLabels[timeValue] || timeValue);
         }
     }
     
@@ -237,7 +321,7 @@ function populateStep4Review() {
     setReviewText('reviewBrideEmail', brideEmail ? brideEmail.value : null);
     setReviewText('reviewBridePhone', bridePhone ? bridePhone.value : null);
     setReviewText('reviewBrideAge', brideAge && brideAge.value ? brideAge.value + ' years' : null);
-    setReviewText('reviewBrideNationality', brideNationality ? brideNationality.value : null);
+    setReviewText('reviewBrideNationality', brideNationality ? getSelectText(brideNationality) : null);
     setReviewText('reviewBrideMaritalStatus', getSelectText(brideMaritalStatus));
     
     // 3. Personal Details - Groom
@@ -252,30 +336,101 @@ function populateStep4Review() {
     setReviewText('reviewGroomEmail', groomEmail ? groomEmail.value : null);
     setReviewText('reviewGroomPhone', groomPhone ? groomPhone.value : null);
     setReviewText('reviewGroomAge', groomAge && groomAge.value ? groomAge.value + ' years' : null);
-    setReviewText('reviewGroomNationality', groomNationality ? groomNationality.value : null);
+    setReviewText('reviewGroomNationality', groomNationality ? getSelectText(groomNationality) : null);
     setReviewText('reviewGroomMaritalStatus', getSelectText(groomMaritalStatus));
+    
+    function residentialReviewSummary(prefix) {
+        const spec = [
+            ['Country', prefix + 'ResCountry'],
+            ['Region', prefix + 'ResRegion'],
+            ['District', prefix + 'ResDistrict'],
+            ['Sub county', prefix + 'ResSubCounty'],
+            ['Parish', prefix + 'ResParish'],
+            ['Village', prefix + 'ResVillage'],
+        ];
+        const parts = [];
+        spec.forEach(function(pair) {
+            const el = document.getElementById(pair[1]);
+            if (!el) return;
+            const v = (el.value || '').trim();
+            if (!v) return;
+            let display = v;
+            if (el.tagName === 'SELECT') {
+                const opt = el.options[el.selectedIndex];
+                display = opt && opt.value ? opt.text : v;
+            }
+            parts.push(pair[0] + ': ' + display);
+        });
+        return parts.length ? parts.join('; ') : null;
+    }
+    setReviewText('reviewBrideResidential', residentialReviewSummary('bride'));
+    setReviewText('reviewGroomResidential', residentialReviewSummary('groom'));
+    
+    function parentStatusLabel(inputName) {
+        const checked = document.querySelector('input[name="' + inputName + '"]:checked');
+        if (!checked || !checked.value) {
+            return null;
+        }
+        const v = checked.value.toLowerCase();
+        if (v === 'alive') {
+            return 'Alive';
+        }
+        if (v === 'deceased') {
+            return 'Deceased';
+        }
+        return checked.value;
+    }
+    
+    function parentPhoneDisplay(statusName, phoneInputId) {
+        const st = parentStatusLabel(statusName);
+        if (st === 'Deceased') {
+            return '—';
+        }
+        const phoneEl = document.getElementById(phoneInputId);
+        return phoneEl && phoneEl.value.trim() ? phoneEl.value.trim() : null;
+    }
+    
+    setReviewText('reviewBrideFatherName', document.getElementById('brideFather') ? document.getElementById('brideFather').value : null);
+    setReviewText('reviewBrideFatherOccupation', document.getElementById('brideFatherOccupation') ? document.getElementById('brideFatherOccupation').value : null);
+    setReviewText('reviewBrideFatherStatus', parentStatusLabel('bride_father_status'));
+    setReviewText('reviewBrideFatherPhone', parentPhoneDisplay('bride_father_status', 'brideFatherPhone'));
+    
+    setReviewText('reviewBrideMotherName', document.getElementById('brideMother') ? document.getElementById('brideMother').value : null);
+    setReviewText('reviewBrideMotherOccupation', document.getElementById('brideMotherOccupation') ? document.getElementById('brideMotherOccupation').value : null);
+    setReviewText('reviewBrideMotherStatus', parentStatusLabel('bride_mother_status'));
+    setReviewText('reviewBrideMotherPhone', parentPhoneDisplay('bride_mother_status', 'brideMotherPhone'));
+    
+    setReviewText('reviewGroomFatherName', document.getElementById('groomFather') ? document.getElementById('groomFather').value : null);
+    setReviewText('reviewGroomFatherOccupation', document.getElementById('groomFatherOccupation') ? document.getElementById('groomFatherOccupation').value : null);
+    setReviewText('reviewGroomFatherStatus', parentStatusLabel('groom_father_status'));
+    setReviewText('reviewGroomFatherPhone', parentPhoneDisplay('groom_father_status', 'groomFatherPhone'));
+    
+    setReviewText('reviewGroomMotherName', document.getElementById('groomMother') ? document.getElementById('groomMother').value : null);
+    setReviewText('reviewGroomMotherOccupation', document.getElementById('groomMotherOccupation') ? document.getElementById('groomMotherOccupation').value : null);
+    setReviewText('reviewGroomMotherStatus', parentStatusLabel('groom_mother_status'));
+    setReviewText('reviewGroomMotherPhone', parentPhoneDisplay('groom_mother_status', 'groomMotherPhone'));
     
     // 4. Witness Details - Best Man
     const witness1Name = document.getElementById('witness1Name');
     const witness1Phone = document.getElementById('witness1Phone');
     const witness1IdNumber = document.getElementById('witness1IdNumber');
-    const witness1Relationship = document.getElementById('witness1Relationship');
+    const witness1MaritalStatus = document.getElementById('witness1MaritalStatus');
     
     setReviewText('reviewWitness1', witness1Name ? witness1Name.value : null);
     setReviewText('reviewWitness1Phone', witness1Phone ? witness1Phone.value : null);
     setReviewText('reviewWitness1Id', witness1IdNumber ? witness1IdNumber.value : null);
-    setReviewText('reviewWitness1Relationship', getSelectText(witness1Relationship));
+    setReviewText('reviewWitness1MaritalStatus', witness1MaritalStatus ? getSelectText(witness1MaritalStatus) : null);
     
     // 5. Witness Details - Matron
     const witness2Name = document.getElementById('witness2Name');
     const witness2Phone = document.getElementById('witness2Phone');
     const witness2IdNumber = document.getElementById('witness2IdNumber');
-    const witness2Relationship = document.getElementById('witness2Relationship');
+    const witness2MaritalStatus = document.getElementById('witness2MaritalStatus');
     
     setReviewText('reviewWitness2', witness2Name ? witness2Name.value : null);
     setReviewText('reviewWitness2Phone', witness2Phone ? witness2Phone.value : null);
     setReviewText('reviewWitness2Id', witness2IdNumber ? witness2IdNumber.value : null);
-    setReviewText('reviewWitness2Relationship', getSelectText(witness2Relationship));
+    setReviewText('reviewWitness2MaritalStatus', witness2MaritalStatus ? getSelectText(witness2MaritalStatus) : null);
     
     console.log('Step 4 review populated');
 }
@@ -348,6 +503,25 @@ document.addEventListener('DOMContentLoaded', function() {
     border: 1px solid var(--light-gray);
 }
 
+.review-section-lead {
+    margin: -8px 0 16px;
+    font-size: 0.9rem;
+    color: var(--gray, #6c757d);
+}
+
+.review-subheading {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 20px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.review-section .review-subheading:first-of-type {
+    margin-top: 0;
+}
+
 .review-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -373,7 +547,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /* Terms Section */
 .terms-section {
-    background: rgba(100, 1, 127, 0.05);
+    background: rgba(0, 140, 21, 0.05);
     border: 2px solid var(--primary-color);
     border-radius: 12px;
     padding: 25px;

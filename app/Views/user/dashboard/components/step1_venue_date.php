@@ -31,8 +31,7 @@
                 <div class="campus-info">
                     <h4><?= $campus['name'] ?></h4>
                     <p><i class="fas fa-map-marker-alt"></i> <?= $campus['location'] ?></p>
-                    <p><i class="fas fa-users"></i> Capacity: <?= $campus['capacity'] ?></p>
-                    <p><i class="fas fa-clock"></i> Available: 9:00 AM, 11:00 AM, 1:00 PM (Saturdays only)</p>
+                    <p><i class="fas fa-clock"></i> Available: 9:00 AM, 11:00 AM, 1:00 PM (Fridays &amp; Saturdays)</p>
                 </div>
                 <div class="campus-select-indicator">
                     <i class="fas fa-check-circle"></i>
@@ -90,17 +89,17 @@
             <div class="time-slots">
                 <div class="time-slot" data-time="09:00" onclick="selectTime('09:00')">
                     <i class="fas fa-clock"></i>
-                    <span>9:00 AM - 12:00 PM</span>
+                    <span>9:00 AM</span>
                     <span class="availability available">Available</span>
                 </div>
                 <div class="time-slot" data-time="11:00" onclick="selectTime('11:00')">
                     <i class="fas fa-clock"></i>
-                    <span>11:00 AM - 2:00 PM</span>
+                    <span>11:00 AM</span>
                     <span class="availability available">Available</span>
                 </div>
                 <div class="time-slot" data-time="13:00" onclick="selectTime('13:00')">
                     <i class="fas fa-clock"></i>
-                    <span>1:00 PM - 4:00 PM</span>
+                    <span>1:00 PM</span>
                     <span class="availability available">Available</span>
                 </div>
             </div>
@@ -166,12 +165,12 @@
 .campus-card:hover {
     border-color: var(--primary-color);
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(100, 1, 127, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 140, 21, 0.1);
 }
 
 .campus-card.selected {
     border-color: var(--primary-color);
-    background: rgba(100, 1, 127, 0.05);
+    background: rgba(0, 140, 21, 0.05);
 }
 
 .campus-card.selected .campus-select-indicator {
@@ -296,7 +295,7 @@
 }
 
 .calendar-day:hover {
-    background: rgba(100, 1, 127, 0.1);
+    background: rgba(0, 140, 21, 0.1);
 }
 
 .calendar-day.available {
@@ -375,12 +374,12 @@
 
 .time-slot:hover {
     border-color: var(--primary-color);
-    background: rgba(100, 1, 127, 0.05);
+    background: rgba(0, 140, 21, 0.05);
 }
 
 .time-slot.selected {
     border-color: var(--primary-color);
-    background: rgba(100, 1, 127, 0.1);
+    background: rgba(0, 140, 21, 0.1);
 }
 
 .time-slot i {
@@ -438,7 +437,7 @@
 
 /* Selection Summary Styles */
 .summary-card {
-    background: rgba(100, 1, 127, 0.05);
+    background: rgba(0, 140, 21, 0.05);
     border: 2px solid var(--primary-color);
     border-radius: 12px;
     padding: 25px;
@@ -464,19 +463,20 @@
 </style>
 
 <script>
-// Global variables
-// Initialize currentDate to minimum booking date (6 months from today)
-const today = new Date();
-const minBookingDate = new Date(today);
-minBookingDate.setDate(minBookingDate.getDate() + 180); // 6 months = 180 days
+// Global variables — minimum booking date from server (advance_booking_days setting)
+const minBookingDateStr = '<?= esc($minBookingDate ?? date('Y-m-d', strtotime('+180 days')), 'js') ?>';
 
-// Start calendar at minimum booking date month
+function parseLocalYmd(ymd) {
+    const p = ymd.split('-').map(Number);
+    return new Date(p[0], p[1] - 1, p[2]);
+}
+
+const minBookingDate = parseLocalYmd(minBookingDateStr);
 let currentDate = new Date(minBookingDate.getFullYear(), minBookingDate.getMonth(), 1);
 let selectedCampusId = null;
 let selectedDate = null;
 let selectedTime = null;
 let campusData = <?= json_encode($campuses) ?>;
-let minBookingDateStr = '<?= isset($minBookingDate) ? $minBookingDate : date('Y-m-d', strtotime('+180 days')) ?>';
 
 // Helper function to format date for API without timezone issues
 function formatDateForAPI(date) {
@@ -484,6 +484,24 @@ function formatDateForAPI(date) {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+}
+
+/** Normalize saved time strings (e.g. "09:00:00") to slot data-time format "HH:MM". */
+function normalizeSlotTime(t) {
+    if (t === null || t === undefined) {
+        return '';
+    }
+    const s = String(t).trim();
+    if (!s) {
+        return '';
+    }
+    const m = s.match(/^(\d{1,2}):(\d{2})/);
+    if (!m) {
+        return '';
+    }
+    const h = String(parseInt(m[1], 10)).padStart(2, '0');
+    const min = m[2];
+    return `${h}:${min}`;
 }
 
 // Check if a specific date is blocked for the selected campus
@@ -622,33 +640,29 @@ function generateCalendar() {
         if (dayDate.getMonth() !== currentDate.getMonth()) {
             dayElement.classList.add('other-month');
         } else {
-            // Check if date is available (6 months in advance, Saturday only)
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            
-            // Calculate minimum booking date (6 months = 180 days from today)
-            const minBookingDate = new Date(today);
-            minBookingDate.setDate(minBookingDate.getDate() + 180);
-            
-            // Check if date is Saturday (day 6)
-            const isSaturday = dayDate.getDay() === 6;
-            
-            // Check if date meets requirements: Saturday, at least 6 months away
-            if (isSaturday && dayDate >= minBookingDate) {
+            dayDate.setHours(0, 0, 0, 0);
+            const minBd = parseLocalYmd(minBookingDateStr);
+            minBd.setHours(0, 0, 0, 0);
+
+            const dow = dayDate.getDay();
+            const isFridayOrSaturday = dow === 5 || dow === 6;
+
+            if (isFridayOrSaturday && dayDate >= minBd) {
                 dayElement.classList.add('available');
-                dayElement.onclick = () => selectDate(dayDate);
-                
-                // Check if date is blocked for the selected campus (async)
+                dayElement.onclick = () => selectDate(dayDate, dayElement);
+
                 if (selectedCampusId) {
                     checkAndMarkBlockedDate(dayElement, dayDate, selectedCampusId);
                 }
             } else {
                 dayElement.classList.add('unavailable');
-                if (!isSaturday) {
-                    dayElement.title = 'Weddings can only be booked on Saturdays';
-                } else if (dayDate < minBookingDate) {
-                    const daysShort = Math.ceil((minBookingDate - dayDate) / (1000 * 60 * 60 * 24));
-                    dayElement.title = `Wedding date must be at least 6 months (180 days) in advance. This date is ${daysShort} days too early.`;
+                if (!isFridayOrSaturday) {
+                    dayElement.title = 'Weddings can only be booked on Fridays and Saturdays';
+                } else if (dayDate < minBd) {
+                    const daysShort = Math.ceil((minBd - dayDate) / (1000 * 60 * 60 * 24));
+                    dayElement.title = 'This date is before the minimum advance booking date. It is ' + daysShort + ' day(s) too early.';
                 } else if (dayDate < today) {
                     dayElement.title = 'Past dates are not available';
                 }
@@ -676,69 +690,91 @@ async function checkAndMarkBlockedDate(dayElement, dayDate, campusId) {
     }
 }
 
-// Date selection function
-function selectDate(date) {
-    console.log('selectDate called with:', date);
-    console.log('Selected date object:', date.toString());
-    console.log('Selected date local components:', {
-        year: date.getFullYear(),
-        month: date.getMonth() + 1,
-        day: date.getDate()
-    });
-    
-    // Remove previous selection
+/**
+ * Apply a calendar date to state and UI. Used by user clicks and draft restore.
+ * @param {{ keepExistingTime?: boolean, skipAvailabilityCheck?: boolean, programmatic?: boolean }} opts
+ */
+function applyDateSelection(date, dayElement, opts) {
+    opts = opts || {};
+    const keepExistingTime = !!opts.keepExistingTime;
+    const skipAvailabilityCheck = !!opts.skipAvailabilityCheck;
+    const programmatic = !!opts.programmatic;
+
     document.querySelectorAll('.calendar-day').forEach(day => {
         day.classList.remove('selected');
     });
-    
-    // Add selection to clicked date
-    event.target.classList.add('selected');
-    
+
+    let targetEl = dayElement;
+    if (!targetEl) {
+        const d = date.getDate();
+        document.querySelectorAll('.calendar-day').forEach(day => {
+            if (day.textContent == d &&
+                !day.classList.contains('other-month') &&
+                !day.classList.contains('unavailable')) {
+                targetEl = day;
+            }
+        });
+    }
+    if (targetEl) {
+        targetEl.classList.add('selected');
+    }
+
     selectedDate = date;
-    // Fix timezone issue: format date properly without timezone conversion
     const formattedDate = formatDateForAPI(date);
-    console.log('Formatted date for API:', formattedDate);
     document.getElementById('selectedDate').value = formattedDate;
-    
-    // Show time selection
+
     document.getElementById('timeSelection').style.display = 'block';
-    
-    // Update summary
-    const options = { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
+
+    const summaryOpts = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
     };
-    document.getElementById('summaryDate').textContent = date.toLocaleDateString('en-US', options);
-    
-    // Reset time selection
-    selectedTime = null;
-    document.getElementById('selectedTime').value = '';
-    document.getElementById('summaryTime').textContent = '-';
-    document.querySelectorAll('.time-slot').forEach(slot => {
-        slot.classList.remove('selected');
-    });
-    
-    // Check time slot availability for the selected date
-    checkTimeSlotAvailability(selectedCampusId, formattedDate);
-    
-    // Check completion status and auto-save
+    document.getElementById('summaryDate').textContent = date.toLocaleDateString('en-US', summaryOpts);
+
+    if (!keepExistingTime) {
+        selectedTime = null;
+        document.getElementById('selectedTime').value = '';
+        document.getElementById('summaryTime').textContent = '-';
+        document.querySelectorAll('.time-slot').forEach(slot => {
+            slot.classList.remove('selected');
+        });
+    }
+
+    if (!skipAvailabilityCheck) {
+        checkTimeSlotAvailability(selectedCampusId, formattedDate);
+    }
+
     handleSelectionChange();
-    
-    // Scroll to time selection
-    document.getElementById('timeSelection').scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
+
+    if (!programmatic) {
+        document.getElementById('timeSelection').scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+}
+
+// Date selection function (user click passes dayElement; programmatic restore may omit it)
+function selectDate(date, dayElement) {
+    applyDateSelection(date, dayElement, {
+        keepExistingTime: false,
+        skipAvailabilityCheck: false,
+        programmatic: false
     });
 }
 
 // Time selection function
-function selectTime(time) {
-    // Check if the time slot is available (not disabled/unavailable)
-    const timeSlot = document.querySelector(`[data-time="${time}"]`);
-    if (timeSlot && timeSlot.classList.contains('unavailable')) {
-        // Don't allow selection of unavailable slots
+function selectTime(time, options) {
+    options = options || {};
+    const force = !!options.force;
+    const timeNorm = normalizeSlotTime(time) || String(time).trim();
+    if (!timeNorm) {
+        return;
+    }
+    const timeSlot = document.querySelector(`[data-time="${timeNorm}"]`);
+    if (!force && timeSlot && timeSlot.classList.contains('unavailable')) {
         return;
     }
     
@@ -752,16 +788,15 @@ function selectTime(time) {
         timeSlot.classList.add('selected');
     }
     
-    selectedTime = time;
-    document.getElementById('selectedTime').value = time;
-    
-    // Update summary
+    selectedTime = timeNorm;
+    document.getElementById('selectedTime').value = timeNorm;
+
     const timeSlots = {
-        '09:00': '9:00 AM - 12:00 PM',
-        '11:00': '11:00 AM - 2:00 PM',
-        '13:00': '1:00 PM - 4:00 PM'
+        '09:00': '9:00 AM',
+        '11:00': '11:00 AM',
+        '13:00': '1:00 PM'
     };
-    document.getElementById('summaryTime').textContent = timeSlots[time] || time;
+    document.getElementById('summaryTime').textContent = timeSlots[timeNorm] || timeNorm;
     
     // Show selection summary
     document.getElementById('selectionSummary').style.display = 'block';
@@ -769,24 +804,78 @@ function selectTime(time) {
     // Check completion status, auto-save, and enable next button
     handleSelectionChange();
     
-    // Only scroll if this is a user interaction (not during data loading)
-    if (event && event.type) {
-        document.getElementById('selectionSummary').scrollIntoView({ 
+    if (!options.programmatic) {
+        document.getElementById('selectionSummary').scrollIntoView({
             behavior: 'smooth',
             block: 'start'
         });
     }
 }
 
+/**
+ * Restore campus / date / time after async draft load (populateFormFields).
+ * Waits for availability API so time slots are wired before selectTime.
+ */
+window.restoreVenueDateTimeFromDraft = async function(data) {
+    if (!data) {
+        return;
+    }
+    const campusEl = document.getElementById('selectedCampus');
+    const dateEl = document.getElementById('selectedDate');
+    const timeEl = document.getElementById('selectedTime');
+
+    let campus = data.selectedCampus != null && String(data.selectedCampus).trim() !== ''
+        ? String(data.selectedCampus).trim()
+        : (campusEl && campusEl.value ? campusEl.value.trim() : '');
+    let dateStr = data.selectedDate != null ? String(data.selectedDate).trim() : '';
+    if (!dateStr && dateEl && dateEl.value) {
+        dateStr = dateEl.value.trim();
+    }
+    let timeRaw = data.selectedTime != null ? String(data.selectedTime).trim() : '';
+    if (!timeRaw && timeEl && timeEl.value) {
+        timeRaw = timeEl.value.trim();
+    }
+    const timeNorm = normalizeSlotTime(timeRaw);
+
+    if (!campus && !dateStr && !timeNorm) {
+        return;
+    }
+
+    if (campus) {
+        selectCampus(String(campus));
+    }
+
+    if (dateStr) {
+        const date = new Date(dateStr + 'T12:00:00');
+        if (isNaN(date.getTime())) {
+            return;
+        }
+        currentDate = new Date(date.getFullYear(), date.getMonth(), 1);
+        generateCalendar();
+        applyDateSelection(date, null, {
+            keepExistingTime: false,
+            skipAvailabilityCheck: true,
+            programmatic: true
+        });
+        await checkTimeSlotAvailability(selectedCampusId, formatDateForAPI(date), { suppressErrorUI: true });
+    }
+
+    if (timeNorm) {
+        selectTime(timeNorm, { programmatic: true, force: true });
+    }
+
+    if (dateStr || timeNorm || campus) {
+        handleSelectionChange();
+    }
+};
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Step 1 initializing...');
     
-    // Set current month to minimum booking date month (6 months from today)
-    const today = new Date();
-    const minDate = new Date(today);
-    minDate.setDate(minDate.getDate() + 180); // 6 months = 180 days
-    currentDate = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+    // Set current month to minimum booking date month (from advance_booking_days)
+    const minBdInit = parseLocalYmd(minBookingDateStr);
+    currentDate = new Date(minBdInit.getFullYear(), minBdInit.getMonth(), 1);
     
     // Get saved values - check both camelCase and snake_case versions
     const existingCampus = document.getElementById('selectedCampus').value;
@@ -914,9 +1003,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Update summary
                 const timeSlots = {
-                    '09:00': '9:00 AM - 12:00 PM',
-                    '11:00': '11:00 AM - 2:00 PM',
-                    '13:00': '1:00 PM - 4:00 PM'
+                    '09:00': '9:00 AM',
+                    '11:00': '11:00 AM',
+                    '13:00': '1:00 PM'
                 };
                 document.getElementById('summaryTime').textContent = timeSlots[existingTime] || existingTime;
                 
@@ -957,16 +1046,17 @@ function checkAvailability(campusId, date) {
     return date >= today;
 }
 
-// Check time slot availability for a specific campus and date
-function checkTimeSlotAvailability(campusId, date) {
+// Check time slot availability for a specific campus and date (returns Promise for draft restore sequencing)
+function checkTimeSlotAvailability(campusId, date, options) {
+    options = options || {};
+    const suppressErrorUI = !!options.suppressErrorUI;
+
     if (!campusId || !date) {
-        return;
+        return Promise.resolve();
     }
-    
+
     console.log('Checking time slot availability for campus:', campusId, 'date:', date);
-    console.log('Date type:', typeof date, 'Date value:', date);
-    
-    // Show loading state
+
     const timeSlots = document.querySelectorAll('.time-slot');
     timeSlots.forEach(slot => {
         const availability = slot.querySelector('.availability');
@@ -977,89 +1067,82 @@ function checkTimeSlotAvailability(campusId, date) {
         slot.style.opacity = '0.7';
         slot.onclick = null;
     });
-    
-    // Make API call to check availability
-    fetch(`<?= site_url('api/campuses/') ?>${campusId}/availability/${date}`, {
+
+    return fetch(`<?= site_url('api/campuses/') ?>${campusId}/availability/${date}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
         }
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Availability response:', data);
-        
-        if (data.status === 'error') {
-            // Handle blocked dates or other errors
-            console.error('Date selection error:', data.message);
-            
-            // Show error message to user
-            alert(`Sorry, this date is not available: ${data.message}`);
-            
-            // Reset the date selection
-            selectedDate = null;
-            document.getElementById('selectedDate').value = '';
-            document.getElementById('summaryDate').textContent = '-';
-            
-            // Remove date selection visually
-            document.querySelectorAll('.calendar-day').forEach(day => {
-                day.classList.remove('selected');
-            });
-            
-            // Hide time selection
-            document.getElementById('timeSelection').style.display = 'none';
-            document.getElementById('selectionSummary').style.display = 'none';
-            
-            // Reset time selection
-            selectedTime = null;
-            document.getElementById('selectedTime').value = '';
-            document.getElementById('summaryTime').textContent = '-';
-            document.querySelectorAll('.time-slot').forEach(slot => {
-                slot.classList.remove('selected');
-            });
-            
-            return;
-        }
-        
-        if (data.status === 'success' && data.time_slots) {
-            // Update each time slot based on availability
-            data.time_slots.forEach(timeSlotData => {
-                const timeSlot = document.querySelector(`[data-time="${timeSlotData.time}"]`);
-                if (timeSlot) {
-                    const availability = timeSlot.querySelector('.availability');
-                    
-                    if (timeSlotData.available) {
-                        // Time slot is available
-                        availability.textContent = 'Available';
-                        availability.className = 'availability available';
-                        timeSlot.style.opacity = '1';
-                        timeSlot.onclick = () => selectTime(timeSlotData.time);
-                        timeSlot.style.cursor = 'pointer';
-                        timeSlot.classList.remove('unavailable');
-                    } else {
-                        // Time slot is booked
-                        const status = timeSlotData.booking_status || 'booked';
-                        availability.textContent = status === 'pending' ? 'Pending' : 'Booked';
-                        availability.className = 'availability unavailable';
-                        timeSlot.style.opacity = '0.5';
-                        timeSlot.onclick = null;
-                        timeSlot.style.cursor = 'not-allowed';
-                        timeSlot.classList.add('unavailable');
-                        timeSlot.title = `This time slot is ${status === 'pending' ? 'pending approval' : 'already booked'}`;
-                    }
+        .then(response => response.json())
+        .then(data => {
+            console.log('Availability response:', data);
+
+            if (data.status === 'error') {
+                console.error('Date selection error:', data.message);
+
+                if (!suppressErrorUI) {
+                    alert(`Sorry, this date is not available: ${data.message}`);
+
+                    selectedDate = null;
+                    document.getElementById('selectedDate').value = '';
+                    document.getElementById('summaryDate').textContent = '-';
+
+                    document.querySelectorAll('.calendar-day').forEach(day => {
+                        day.classList.remove('selected');
+                    });
+
+                    document.getElementById('timeSelection').style.display = 'none';
+                    document.getElementById('selectionSummary').style.display = 'none';
+
+                    selectedTime = null;
+                    document.getElementById('selectedTime').value = '';
+                    document.getElementById('summaryTime').textContent = '-';
+                    document.querySelectorAll('.time-slot').forEach(slot => {
+                        slot.classList.remove('selected');
+                    });
+                } else {
+                    resetTimeSlotAvailability();
                 }
-            });
-        } else {
-            // Error or no data - reset to default state
-            console.error('Error checking availability:', data.message || 'Unknown error');
+                return;
+            }
+
+            if (data.status === 'success' && data.time_slots) {
+                data.time_slots.forEach(timeSlotData => {
+                    const slotTime = normalizeSlotTime(timeSlotData.time) || timeSlotData.time;
+                    const timeSlot = document.querySelector(`[data-time="${slotTime}"]`);
+                    if (timeSlot) {
+                        const availability = timeSlot.querySelector('.availability');
+
+                        if (timeSlotData.available) {
+                            availability.textContent = 'Available';
+                            availability.className = 'availability available';
+                            timeSlot.style.opacity = '1';
+                            timeSlot.onclick = () => selectTime(slotTime);
+                            timeSlot.style.cursor = 'pointer';
+                            timeSlot.classList.remove('unavailable');
+                        } else {
+                            const status = timeSlotData.booking_status || 'booked';
+                            availability.textContent = status === 'pending' ? 'Pending' : 'Booked';
+                            availability.className = 'availability unavailable';
+                            timeSlot.style.opacity = '0.5';
+                            timeSlot.onclick = null;
+                            timeSlot.style.cursor = 'not-allowed';
+                            timeSlot.classList.add('unavailable');
+                            timeSlot.title = `This time slot is ${status === 'pending' ? 'pending approval' : 'already booked'}`;
+                        }
+                    }
+                });
+            } else {
+                console.error('Error checking availability:', data.message || 'Unknown error');
+                resetTimeSlotAvailability();
+            }
+        })
+        .catch(error => {
+            console.error('Error checking time slot availability:', error);
             resetTimeSlotAvailability();
-        }
-    })
-    .catch(error => {
-        console.error('Error checking time slot availability:', error);
-        resetTimeSlotAvailability();
-    });
+        });
 }
 
 // Reset time slots to default available state
@@ -1308,49 +1391,94 @@ window.previousStep = previousStep;
 // Validation functions for other steps
 function validateStep2() {
     const requiredFields = [
-        'brideName', 'brideAge', 'brideEmail', 'bridePhone',
-        'groomName', 'groomAge', 'groomEmail', 'groomPhone'
+        'brideName', 'brideDateOfBirth', 'brideAge', 'brideEmail', 'bridePhone',
+        'brideNationality', 'brideMaritalStatus', 'brideIdNumber', 'brideIdType',
+        'brideResCountry', 'brideResRegion', 'brideResDistrict', 'brideResSubCounty', 'brideResParish', 'brideResVillage',
+        'groomName', 'groomDateOfBirth', 'groomAge', 'groomEmail', 'groomPhone',
+        'groomNationality', 'groomMaritalStatus', 'groomIdNumber', 'groomIdType',
+        'groomResCountry', 'groomResRegion', 'groomResDistrict', 'groomResSubCounty', 'groomResParish', 'groomResVillage'
     ];
     
-    // Check if all required fields are filled
     const allFieldsFilled = requiredFields.every(fieldId => {
         const field = document.getElementById(fieldId);
-        return field && field.value.trim() !== '';
+        return field && String(field.value).trim() !== '';
     });
     
-    // Validate ages are at least 18
     let agesValid = true;
     if (window.validateStep2Ages) {
         agesValid = window.validateStep2Ages();
     }
     
-    // Check age values directly as well
     const brideAge = document.getElementById('brideAge');
     const groomAge = document.getElementById('groomAge');
     
-    if (brideAge && (parseInt(brideAge.value) < 18 || !brideAge.value)) {
+    if (brideAge && (parseInt(brideAge.value, 10) < 18 || !brideAge.value)) {
         agesValid = false;
     }
-    if (groomAge && (parseInt(groomAge.value) < 18 || !groomAge.value)) {
+    if (groomAge && (parseInt(groomAge.value, 10) < 18 || !groomAge.value)) {
         agesValid = false;
     }
     
-    return allFieldsFilled && agesValid;
+    function requireIfPresent(ids) {
+        return ids.every(function(id) {
+            const f = document.getElementById(id);
+            return f && String(f.value).trim() !== '';
+        });
+    }
+    
+    let churchOk = true;
+    const brideChurch = document.querySelector('input[name="bride_church_member"]:checked');
+    if (brideChurch && brideChurch.value === 'yes') {
+        churchOk = churchOk && requireIfPresent(['brideCellGroupNumber', 'brideCellLeaderName', 'brideCellLeaderPhone']);
+    } else if (brideChurch && brideChurch.value === 'other') {
+        churchOk = churchOk && requireIfPresent(['brideChurchName', 'brideSeniorPastor', 'bridePastorPhone']);
+    }
+    
+    const groomChurch = document.querySelector('input[name="groom_church_member"]:checked');
+    if (groomChurch && groomChurch.value === 'yes') {
+        churchOk = churchOk && requireIfPresent(['groomCellGroupNumber', 'groomCellLeaderName', 'groomCellLeaderPhone']);
+    } else if (groomChurch && groomChurch.value === 'other') {
+        churchOk = churchOk && requireIfPresent(['groomChurchName', 'groomSeniorPastor', 'groomPastorPhone']);
+    }
+    
+    return allFieldsFilled && agesValid && churchOk;
 }
 
 function validateStep3() {
-    // Check witness information (both witnesses required)
     const requiredWitnessFields = [
-        'witness1Name', 'witness1Phone', 'witness1IdNumber', 'witness1Relationship',
-        'witness2Name', 'witness2Phone', 'witness2IdNumber', 'witness2Relationship'
+        'witness1Name', 'witness1Phone', 'witness1IdNumber', 'witness1MaritalStatus',
+        'witness2Name', 'witness2Phone', 'witness2IdNumber', 'witness2MaritalStatus'
     ];
     
     const witnessFieldsValid = requiredWitnessFields.every(fieldId => {
         const field = document.getElementById(fieldId);
-        return field && field.value.trim() !== '';
+        return field && String(field.value).trim() !== '';
     });
     
-    return witnessFieldsValid;
+    const parentPairs = [
+        ['bride_father_status', 'brideFatherPhone'],
+        ['bride_mother_status', 'brideMotherPhone'],
+        ['groom_father_status', 'groomFatherPhone'],
+        ['groom_mother_status', 'groomMotherPhone']
+    ];
+    let parentsOk = true;
+    parentPairs.forEach(function(pair) {
+        const statusName = pair[0];
+        const phoneId = pair[1];
+        const sel = document.querySelector('input[name="' + statusName + '"]:checked');
+        if (!sel) {
+            parentsOk = false;
+            return;
+        }
+        if (sel.value === 'alive') {
+            const phone = document.getElementById(phoneId);
+            if (!phone || String(phone.value).trim() === '') {
+                parentsOk = false;
+            }
+        }
+    });
+    
+    return witnessFieldsValid && parentsOk;
 }
 
 function validateAllSteps() {
@@ -1475,9 +1603,9 @@ function submitApplication() {
             // Clean up any draft data since application is now submitted
             localStorage.removeItem('applicationDraft');
             
-            // Show success message and redirect
+            // Show success message and redirect (use server URL so subfolder installs work)
             alert('Application submitted successfully! You will be redirected to your dashboard.');
-            window.location.href = '/dashboard';
+            window.location.href = data.redirect || <?= json_encode(site_url('dashboard')) ?>;
         } else {
             throw new Error(data.message || 'Failed to submit application');
         }
@@ -1542,7 +1670,7 @@ function autoSaveProgress() {
             draftData.selectedCampus = selectedCampusId;
         }
         if (typeof selectedDate !== 'undefined' && selectedDate) {
-            draftData.selectedDate = selectedDate.toISOString().split('T')[0];
+            draftData.selectedDate = formatDateForAPI(selectedDate);
         }
         if (typeof selectedTime !== 'undefined' && selectedTime) {
             draftData.selectedTime = selectedTime;
@@ -1599,7 +1727,7 @@ function autoSaveProgress() {
                 const minimalDraft = {
                     current_step: typeof currentStep !== 'undefined' ? currentStep : 1,
                     selectedCampus: typeof selectedCampusId !== 'undefined' ? selectedCampusId : null,
-                    selectedDate: typeof selectedDate !== 'undefined' ? selectedDate.toISOString().split('T')[0] : null,
+                    selectedDate: typeof selectedDate !== 'undefined' && selectedDate ? formatDateForAPI(selectedDate) : null,
                     selectedTime: typeof selectedTime !== 'undefined' ? selectedTime : null
                 };
                 localStorage.setItem('applicationDraft', JSON.stringify(minimalDraft));

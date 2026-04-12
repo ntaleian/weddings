@@ -2,7 +2,7 @@
 
 /* Welcome Section */
 .welcome-section {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: var(--primary-color);
     color: var(--white);
     padding: 40px;
     border-radius: 16px;
@@ -71,12 +71,12 @@
 
 .progress-step.completed {
     border-color: var(--success-color);
-    background: rgba(46, 204, 113, 0.1);
+    background: rgba(0, 140, 21, 0.1);
 }
 
 .progress-step.current {
     border-color: var(--primary-color);
-    background: rgba(100, 1, 127, 0.1);
+    background: rgba(0, 140, 21, 0.1);
 }
 
 .step-icon {
@@ -121,7 +121,7 @@
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+    background: var(--primary-color);
     transition: width 0.3s ease;
 }
 
@@ -149,7 +149,7 @@
     width: 60px;
     height: 60px;
     border-radius: 12px;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: var(--primary-color);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -264,12 +264,12 @@
 .campus-card:hover {
     border-color: var(--primary-color);
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(100, 1, 127, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 140, 21, 0.1);
 }
 
 .campus-card.selected {
     border-color: var(--primary-color);
-    background: rgba(100, 1, 127, 0.05);
+    background: rgba(0, 140, 21, 0.05);
 }
 
 .campus-header {
@@ -322,7 +322,7 @@
 }
 
 .calendar-header button:hover {
-    background: rgba(100, 1, 127, 0.1);
+    background: rgba(0, 140, 21, 0.1);
 }
 
 .calendar-grid {
@@ -356,7 +356,7 @@
 }
 
 .day:hover {
-    background: rgba(100, 1, 127, 0.1);
+    background: rgba(0, 140, 21, 0.1);
 }
 
 .day.available {
@@ -408,7 +408,7 @@
 
 .time-slot:hover {
     border-color: var(--primary-color);
-    background: rgba(100, 1, 127, 0.05);
+    background: rgba(0, 140, 21, 0.05);
 }
 
 .time-slot.selected {

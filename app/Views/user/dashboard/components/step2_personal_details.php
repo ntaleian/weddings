@@ -1,3 +1,30 @@
+<?php
+helper('residential_address');
+
+$countries = $countries ?? [];
+$ba        = parse_residential_address($application['bride_address'] ?? null);
+$ga        = parse_residential_address($application['groom_address'] ?? null);
+
+$brideRes = [
+    'country'    => old('bride_res_country', $application['bride_res_country'] ?? $ba['country']),
+    'region'     => old('bride_res_region', $application['bride_res_region'] ?? $ba['region']),
+    'district'   => old('bride_res_district', $application['bride_res_district'] ?? $ba['district']),
+    'sub_county' => old('bride_res_sub_county', $application['bride_res_sub_county'] ?? $ba['sub_county']),
+    'parish'     => old('bride_res_parish', $application['bride_res_parish'] ?? $ba['parish']),
+    'village'    => old('bride_res_village', $application['bride_res_village'] ?? $ba['village']),
+];
+$groomRes = [
+    'country'    => old('groom_res_country', $application['groom_res_country'] ?? $ga['country']),
+    'region'     => old('groom_res_region', $application['groom_res_region'] ?? $ga['region']),
+    'district'   => old('groom_res_district', $application['groom_res_district'] ?? $ga['district']),
+    'sub_county' => old('groom_res_sub_county', $application['groom_res_sub_county'] ?? $ga['sub_county']),
+    'parish'     => old('groom_res_parish', $application['groom_res_parish'] ?? $ga['parish']),
+    'village'    => old('groom_res_village', $application['groom_res_village'] ?? $ga['village']),
+];
+
+$brideNat = old('bride_nationality', $application['bride_nationality'] ?? '');
+$groomNat = old('groom_nationality', $application['groom_nationality'] ?? '');
+?>
 <!-- Step 2: Personal Details -->
 <div class="form-section" data-step="2" style="display: none;">
     <div class="form-section-header">
@@ -30,10 +57,6 @@
                 <input type="number" id="brideAge" name="bride_age" min="18" max="100" value="<?= old('bride_age', $application['bride_age'] ?? '') ?>" required readonly>
             </div>
             <div class="form-group">
-                <label for="brideBirthPlace">Place of Birth</label>
-                <input type="text" id="brideBirthPlace" name="bride_birth_place" value="<?= old('bride_birth_place', $application['bride_birth_place'] ?? '') ?>">
-            </div>
-            <div class="form-group">
                 <label for="brideEmail">Email Address *</label>
                 <input type="email" id="brideEmail" name="bride_email" value="<?= old('bride_email', $application['bride_email'] ?? '') ?>" required>
             </div>
@@ -46,28 +69,16 @@
                 <input type="text" id="brideOccupation" name="bride_occupation" value="<?= old('bride_occupation', $application['bride_occupation'] ?? '') ?>">
             </div>
             <div class="form-group">
-                <label for="brideEmployer">Employer/Company</label>
-                <input type="text" id="brideEmployer" name="bride_employer" value="<?= old('bride_employer', $application['bride_employer'] ?? '') ?>">
-            </div>
-            <div class="form-group">
-                <label for="brideEducationLevel">Education Level</label>
-                <select id="brideEducationLevel" name="bride_education_level">
-                    <option value="">Select level</option>
-                    <option value="primary" <?= old('bride_education_level', $application['bride_education_level'] ?? '') === 'primary' ? 'selected' : '' ?>>Primary</option>
-                    <option value="secondary" <?= old('bride_education_level', $application['bride_education_level'] ?? '') === 'secondary' ? 'selected' : '' ?>>Secondary</option>
-                    <option value="diploma" <?= old('bride_education_level', $application['bride_education_level'] ?? '') === 'diploma' ? 'selected' : '' ?>>Diploma</option>
-                    <option value="degree" <?= old('bride_education_level', $application['bride_education_level'] ?? '') === 'degree' ? 'selected' : '' ?>>Bachelor's Degree</option>
-                    <option value="masters" <?= old('bride_education_level', $application['bride_education_level'] ?? '') === 'masters' ? 'selected' : '' ?>>Master's Degree</option>
-                    <option value="phd" <?= old('bride_education_level', $application['bride_education_level'] ?? '') === 'phd' ? 'selected' : '' ?>>PhD</option>
-                </select>
-            </div>
-            <div class="form-group">
                 <label for="brideNationality">Nationality *</label>
-                <input type="text" id="brideNationality" name="bride_nationality" value="<?= old('bride_nationality', $application['bride_nationality'] ?? '') ?>" required>
-            </div>
-            <div class="form-group">
-                <label for="brideReligion">Religion</label>
-                <input type="text" id="brideReligion" name="bride_religion" value="<?= old('bride_religion', $application['bride_religion'] ?? '') ?>">
+                <select id="brideNationality" name="bride_nationality" required>
+                    <option value="">Select country</option>
+                    <?php foreach ($countries as $cname) : ?>
+                        <option value="<?= esc($cname) ?>" <?= $brideNat === $cname ? 'selected' : '' ?>><?= esc($cname) ?></option>
+                    <?php endforeach; ?>
+                    <?php if ($brideNat !== '' && ! in_array($brideNat, $countries, true)) : ?>
+                        <option value="<?= esc($brideNat) ?>" selected><?= esc($brideNat) ?></option>
+                    <?php endif; ?>
+                </select>
             </div>
             <div class="form-group">
                 <label for="brideMaritalStatus">Marital Status *</label>
@@ -82,9 +93,46 @@
                 </select>
             </div>
             <div class="form-group full-width">
-                <label for="brideAddress">Current Address *</label>
-                <textarea id="brideAddress" name="bride_address" rows="3" required><?= old('bride_address', $application['bride_address'] ?? '') ?></textarea>
+                <h4 class="subsection-title" style="margin: 0.5rem 0 0.25rem; color: var(--primary-color); font-size: 1rem;">Residential address *</h4>
+                <p class="form-text text-muted" style="margin-bottom: 0.75rem;">Country, region, district, sub county, parish, and village</p>
             </div>
+            <div class="form-group">
+                <label for="brideResCountry">Country *</label>
+                <select id="brideResCountry" name="bride_res_country" required>
+                    <option value="">Select country</option>
+                    <?php foreach ($countries as $cname) : ?>
+                        <option value="<?= esc($cname) ?>" <?= $brideRes['country'] === $cname ? 'selected' : '' ?>><?= esc($cname) ?></option>
+                    <?php endforeach; ?>
+                    <?php if ($brideRes['country'] !== '' && ! in_array($brideRes['country'], $countries, true)) : ?>
+                        <option value="<?= esc($brideRes['country']) ?>" selected><?= esc($brideRes['country']) ?></option>
+                    <?php endif; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="brideResRegion">Region *</label>
+                <input type="text" id="brideResRegion" name="bride_res_region" value="<?= esc($brideRes['region']) ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="brideResDistrict">District *</label>
+                <input type="text" id="brideResDistrict" name="bride_res_district" value="<?= esc($brideRes['district']) ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="brideResSubCounty">Sub county *</label>
+                <input type="text" id="brideResSubCounty" name="bride_res_sub_county" value="<?= esc($brideRes['sub_county']) ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="brideResParish">Parish *</label>
+                <input type="text" id="brideResParish" name="bride_res_parish" value="<?= esc($brideRes['parish']) ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="brideResVillage">Village *</label>
+                <input type="text" id="brideResVillage" name="bride_res_village" value="<?= esc($brideRes['village']) ?>" required>
+            </div>
+            <?php if (! empty($ba['legacy_plain']) && $ba['raw'] !== '') : ?>
+            <div class="form-group full-width">
+                <p class="form-text text-muted"><strong>Previously saved address:</strong> <?= esc($ba['raw']) ?> — please re-enter using the fields above.</p>
+            </div>
+            <?php endif; ?>
             <div class="form-group">
                 <label for="brideIdNumber">ID/Passport Number *</label>
                 <input type="text" id="brideIdNumber" name="bride_id_number" value="<?= old('bride_id_number', $application['bride_id_number'] ?? '') ?>" required>
@@ -115,11 +163,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Watoto Church Member Fields -->
-            <div class="form-group" id="brideWatotoFields" style="display: none;">
-                <label for="brideMembershipDuration">Membership Duration at Watoto</label>
-                <input type="text" id="brideMembershipDuration" name="bride_membership_duration" placeholder="e.g., 2 years, 6 months" value="<?= old('bride_membership_duration', $application['bride_membership_duration'] ?? '') ?>">
-            </div>
             <div class="form-group" id="brideCellGroupField" style="display: none;">
                 <label for="brideCellGroupNumber">Cell Family Number *</label>
                 <input type="text" id="brideCellGroupNumber" name="bride_cell_group_number" value="<?= old('bride_cell_group_number', $application['bride_cell_group_number'] ?? '') ?>">
@@ -132,7 +175,6 @@
                 <label for="brideCellLeaderPhone">Cell Family Leader Phone *</label>
                 <input type="tel" id="brideCellLeaderPhone" name="bride_cell_leader_phone" value="<?= old('bride_cell_leader_phone', $application['bride_cell_leader_phone'] ?? '') ?>">
             </div>
-            <!-- Other Church Member Fields -->
             <div class="form-group" id="brideOtherChurchField" style="display: none;">
                 <label for="brideChurchName">Church Name *</label>
                 <input type="text" id="brideChurchName" name="bride_church_name" value="<?= old('bride_church_name', $application['bride_church_name'] ?? '') ?>">
@@ -173,10 +215,6 @@
                 <input type="number" id="groomAge" name="groom_age" min="18" max="100" value="<?= old('groom_age', $application['groom_age'] ?? '') ?>" required readonly>
             </div>
             <div class="form-group">
-                <label for="groomBirthPlace">Place of Birth</label>
-                <input type="text" id="groomBirthPlace" name="groom_birth_place" value="<?= old('groom_birth_place', $application['groom_birth_place'] ?? '') ?>">
-            </div>
-            <div class="form-group">
                 <label for="groomEmail">Email Address *</label>
                 <input type="email" id="groomEmail" name="groom_email" value="<?= old('groom_email', $application['groom_email'] ?? '') ?>" required>
             </div>
@@ -189,28 +227,16 @@
                 <input type="text" id="groomOccupation" name="groom_occupation" value="<?= old('groom_occupation', $application['groom_occupation'] ?? '') ?>">
             </div>
             <div class="form-group">
-                <label for="groomEmployer">Employer/Company</label>
-                <input type="text" id="groomEmployer" name="groom_employer" value="<?= old('groom_employer', $application['groom_employer'] ?? '') ?>">
-            </div>
-            <div class="form-group">
-                <label for="groomEducationLevel">Education Level</label>
-                <select id="groomEducationLevel" name="groom_education_level">
-                    <option value="">Select level</option>
-                    <option value="primary" <?= old('groom_education_level', $application['groom_education_level'] ?? '') === 'primary' ? 'selected' : '' ?>>Primary</option>
-                    <option value="secondary" <?= old('groom_education_level', $application['groom_education_level'] ?? '') === 'secondary' ? 'selected' : '' ?>>Secondary</option>
-                    <option value="diploma" <?= old('groom_education_level', $application['groom_education_level'] ?? '') === 'diploma' ? 'selected' : '' ?>>Diploma</option>
-                    <option value="degree" <?= old('groom_education_level', $application['groom_education_level'] ?? '') === 'degree' ? 'selected' : '' ?>>Bachelor's Degree</option>
-                    <option value="masters" <?= old('groom_education_level', $application['groom_education_level'] ?? '') === 'masters' ? 'selected' : '' ?>>Master's Degree</option>
-                    <option value="phd" <?= old('groom_education_level', $application['groom_education_level'] ?? '') === 'phd' ? 'selected' : '' ?>>PhD</option>
-                </select>
-            </div>
-            <div class="form-group">
                 <label for="groomNationality">Nationality *</label>
-                <input type="text" id="groomNationality" name="groom_nationality" value="<?= old('groom_nationality', $application['groom_nationality'] ?? '') ?>" required>
-            </div>
-            <div class="form-group">
-                <label for="groomReligion">Religion</label>
-                <input type="text" id="groomReligion" name="groom_religion" value="<?= old('groom_religion', $application['groom_religion'] ?? '') ?>">
+                <select id="groomNationality" name="groom_nationality" required>
+                    <option value="">Select country</option>
+                    <?php foreach ($countries as $cname) : ?>
+                        <option value="<?= esc($cname) ?>" <?= $groomNat === $cname ? 'selected' : '' ?>><?= esc($cname) ?></option>
+                    <?php endforeach; ?>
+                    <?php if ($groomNat !== '' && ! in_array($groomNat, $countries, true)) : ?>
+                        <option value="<?= esc($groomNat) ?>" selected><?= esc($groomNat) ?></option>
+                    <?php endif; ?>
+                </select>
             </div>
             <div class="form-group">
                 <label for="groomMaritalStatus">Marital Status *</label>
@@ -225,9 +251,46 @@
                 </select>
             </div>
             <div class="form-group full-width">
-                <label for="groomAddress">Current Address *</label>
-                <textarea id="groomAddress" name="groom_address" rows="3" required><?= old('groom_address', $application['groom_address'] ?? '') ?></textarea>
+                <h4 class="subsection-title" style="margin: 0.5rem 0 0.25rem; color: var(--primary-color); font-size: 1rem;">Residential address *</h4>
+                <p class="form-text text-muted" style="margin-bottom: 0.75rem;">Country, region, district, sub county, parish, and village</p>
             </div>
+            <div class="form-group">
+                <label for="groomResCountry">Country *</label>
+                <select id="groomResCountry" name="groom_res_country" required>
+                    <option value="">Select country</option>
+                    <?php foreach ($countries as $cname) : ?>
+                        <option value="<?= esc($cname) ?>" <?= $groomRes['country'] === $cname ? 'selected' : '' ?>><?= esc($cname) ?></option>
+                    <?php endforeach; ?>
+                    <?php if ($groomRes['country'] !== '' && ! in_array($groomRes['country'], $countries, true)) : ?>
+                        <option value="<?= esc($groomRes['country']) ?>" selected><?= esc($groomRes['country']) ?></option>
+                    <?php endif; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="groomResRegion">Region *</label>
+                <input type="text" id="groomResRegion" name="groom_res_region" value="<?= esc($groomRes['region']) ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="groomResDistrict">District *</label>
+                <input type="text" id="groomResDistrict" name="groom_res_district" value="<?= esc($groomRes['district']) ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="groomResSubCounty">Sub county *</label>
+                <input type="text" id="groomResSubCounty" name="groom_res_sub_county" value="<?= esc($groomRes['sub_county']) ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="groomResParish">Parish *</label>
+                <input type="text" id="groomResParish" name="groom_res_parish" value="<?= esc($groomRes['parish']) ?>" required>
+            </div>
+            <div class="form-group">
+                <label for="groomResVillage">Village *</label>
+                <input type="text" id="groomResVillage" name="groom_res_village" value="<?= esc($groomRes['village']) ?>" required>
+            </div>
+            <?php if (! empty($ga['legacy_plain']) && $ga['raw'] !== '') : ?>
+            <div class="form-group full-width">
+                <p class="form-text text-muted"><strong>Previously saved address:</strong> <?= esc($ga['raw']) ?> — please re-enter using the fields above.</p>
+            </div>
+            <?php endif; ?>
             <div class="form-group">
                 <label for="groomIdNumber">ID/Passport Number *</label>
                 <input type="text" id="groomIdNumber" name="groom_id_number" value="<?= old('groom_id_number', $application['groom_id_number'] ?? '') ?>" required>
@@ -258,11 +321,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Watoto Church Member Fields -->
-            <div class="form-group" id="groomWatotoFields" style="display: none;">
-                <label for="groomMembershipDuration">Membership Duration at Watoto</label>
-                <input type="text" id="groomMembershipDuration" name="groom_membership_duration" placeholder="e.g., 2 years, 6 months" value="<?= old('groom_membership_duration', $application['groom_membership_duration'] ?? '') ?>">
-            </div>
             <div class="form-group" id="groomCellGroupField" style="display: none;">
                 <label for="groomCellGroupNumber">Cell Family Number *</label>
                 <input type="text" id="groomCellGroupNumber" name="groom_cell_group_number" value="<?= old('groom_cell_group_number', $application['groom_cell_group_number'] ?? '') ?>">
@@ -275,7 +333,6 @@
                 <label for="groomCellLeaderPhone">Cell Family Leader Phone *</label>
                 <input type="tel" id="groomCellLeaderPhone" name="groom_cell_leader_phone" value="<?= old('groom_cell_leader_phone', $application['groom_cell_leader_phone'] ?? '') ?>">
             </div>
-            <!-- Other Church Member Fields -->
             <div class="form-group" id="groomOtherChurchField" style="display: none;">
                 <label for="groomChurchName">Church Name *</label>
                 <input type="text" id="groomChurchName" name="groom_church_name" value="<?= old('groom_church_name', $application['groom_church_name'] ?? '') ?>">
@@ -370,7 +427,7 @@ document.getElementById('groomDateOfBirth').addEventListener('change', function(
 // Handle bride church membership fields visibility
 function toggleBrideChurchFields() {
     const brideChurchMember = document.querySelector('input[name="bride_church_member"]:checked');
-    const watotoFields = ['brideWatotoFields', 'brideCellGroupField', 'brideCellLeaderField', 'brideCellLeaderPhoneField'];
+    const watotoFields = ['brideCellGroupField', 'brideCellLeaderField', 'brideCellLeaderPhoneField'];
     const otherFields = ['brideOtherChurchField', 'brideSeniorPastorField', 'bridePastorPhoneField'];
     
     // Hide all fields first
@@ -380,20 +437,17 @@ function toggleBrideChurchFields() {
     });
     
     if (brideChurchMember && brideChurchMember.value === 'yes') {
-        // Show Watoto church fields
         watotoFields.forEach(id => {
             const field = document.getElementById(id);
             if (field) field.style.display = 'flex';
         });
     } else if (brideChurchMember && brideChurchMember.value === 'other') {
-        // Show other church fields
         otherFields.forEach(id => {
             const field = document.getElementById(id);
             if (field) field.style.display = 'flex';
         });
     }
     
-    // Trigger auto-save when church membership changes
     if (window.scheduleAutoSave) {
         window.scheduleAutoSave(2);
     }
@@ -402,51 +456,43 @@ function toggleBrideChurchFields() {
 // Handle groom church membership fields visibility
 function toggleGroomChurchFields() {
     const groomChurchMember = document.querySelector('input[name="groom_church_member"]:checked');
-    const watotoFields = ['groomWatotoFields', 'groomCellGroupField', 'groomCellLeaderField', 'groomCellLeaderPhoneField'];
+    const watotoFields = ['groomCellGroupField', 'groomCellLeaderField', 'groomCellLeaderPhoneField'];
     const otherFields = ['groomOtherChurchField', 'groomSeniorPastorField', 'groomPastorPhoneField'];
     
-    // Hide all fields first
     [...watotoFields, ...otherFields].forEach(id => {
         const field = document.getElementById(id);
         if (field) field.style.display = 'none';
     });
     
     if (groomChurchMember && groomChurchMember.value === 'yes') {
-        // Show Watoto church fields
         watotoFields.forEach(id => {
             const field = document.getElementById(id);
             if (field) field.style.display = 'flex';
         });
     } else if (groomChurchMember && groomChurchMember.value === 'other') {
-        // Show other church fields
         otherFields.forEach(id => {
             const field = document.getElementById(id);
             if (field) field.style.display = 'flex';
         });
     }
     
-    // Trigger auto-save when church membership changes
     if (window.scheduleAutoSave) {
         window.scheduleAutoSave(2);
     }
 }
 
-// Add event listeners for bride church membership
 document.querySelectorAll('input[name="bride_church_member"]').forEach(radio => {
     radio.addEventListener('change', toggleBrideChurchFields);
 });
 
-// Add event listeners for groom church membership
 document.querySelectorAll('input[name="groom_church_member"]').forEach(radio => {
     radio.addEventListener('change', toggleGroomChurchFields);
 });
 
-// Auto-calculate ages on page load if dates exist and set initial field visibility
 window.addEventListener('DOMContentLoaded', function() {
     const brideDateField = document.getElementById('brideDateOfBirth');
     const groomDateField = document.getElementById('groomDateOfBirth');
     
-    // Set max date
     const maxDate = getMaxDateOfBirth();
     if (brideDateField) {
         brideDateField.setAttribute('max', maxDate);
@@ -462,12 +508,10 @@ window.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Set initial field visibility based on current selection
     toggleBrideChurchFields();
     toggleGroomChurchFields();
 });
 
-// Add validation function to global scope for form submission validation
 window.validateStep2Ages = function() {
     const brideDateField = document.getElementById('brideDateOfBirth');
     const groomDateField = document.getElementById('groomDateOfBirth');
@@ -493,7 +537,6 @@ window.validateStep2Ages = function() {
     return isValid;
 };
 
-// Make church toggle functions available globally for data loading
 window.toggleBrideChurchFields = toggleBrideChurchFields;
 window.toggleGroomChurchFields = toggleGroomChurchFields;
 </script>

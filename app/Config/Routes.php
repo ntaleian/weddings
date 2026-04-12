@@ -133,6 +133,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers'], function($routes) {
     // Settings
     $routes->get('settings', 'AdminDashboard::settings');
     $routes->post('settings', 'AdminDashboard::updateSettings');
+    $routes->post('settings/booking', 'AdminDashboard::saveBookingSettings');
     
     // Template Preview Routes
     $routes->get('template/dashboard', 'AdminDashboard::templateDashboard');

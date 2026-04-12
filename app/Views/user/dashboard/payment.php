@@ -27,7 +27,7 @@
 }
 
 .payment-header h2 {
-    color: #64017f;
+    color: #008C15;
     margin-bottom: 8px;
     font-size: 1.5rem;
     font-weight: 600;
@@ -45,7 +45,7 @@
 .payment-amount {
     font-size: 2.2rem;
     font-weight: 700;
-    color: #64017f;
+    color: #008C15;
     margin: 16px 0;
     text-align: center;
 }
@@ -82,14 +82,14 @@
 .payment-instructions {
     background: #f8f9fa;
     border: 1px solid #dee2e6;
-    border-left: 4px solid #64017f;
+    border-left: 4px solid #008C15;
     padding: 20px;
     border-radius: 6px;
     margin: 20px 0;
 }
 
 .payment-instructions h3 {
-    color: #64017f;
+    color: #008C15;
     margin-bottom: 12px;
     font-size: 1.1rem;
     font-weight: 600;
@@ -143,7 +143,7 @@
 }
 
 .payment-form h3 {
-    color: #64017f;
+    color: #008C15;
     margin-bottom: 16px;
     font-size: 1.1rem;
     font-weight: 600;
@@ -173,8 +173,8 @@
 
 .form-control:focus {
     outline: none;
-    border-color: #64017f;
-    box-shadow: 0 0 0 2px rgba(100, 1, 127, 0.1);
+    border-color: #008C15;
+    box-shadow: 0 0 0 2px rgba(0, 140, 21, 0.1);
 }
 
 .form-control[readonly] {
@@ -203,12 +203,12 @@
 }
 
 .btn-primary {
-    background: #64017f;
+    background: #008C15;
     color: white;
 }
 
 .btn-primary:hover {
-    background: #4a0159;
+    background: #006010;
 }
 
 .payment-history {
@@ -216,7 +216,7 @@
 }
 
 .payment-history h3 {
-    color: #64017f;
+    color: #008C15;
     margin-bottom: 16px;
     font-size: 1.1rem;
     font-weight: 600;
@@ -257,7 +257,7 @@
 .payment-item-amount {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #64017f;
+    color: #008C15;
     text-align: right;
 }
 

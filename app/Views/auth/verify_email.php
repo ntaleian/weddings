@@ -137,12 +137,12 @@ Verify Your Email - Watoto Church Wedding Booking
         width: 64px;
         height: 64px;
         margin: 0 auto 20px;
-        background: linear-gradient(135deg, #25802D, #1a5a20);
+        background: #008C15;
         border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 8px 20px rgba(37, 128, 45, 0.25);
+        box-shadow: 0 8px 20px rgba(0, 140, 21, 0.25);
     }
 
     .verify-icon i {
@@ -167,7 +167,7 @@ Verify Your Email - Watoto Church Wedding Booking
     }
 
     .verify-subtitle strong {
-        color: #25802D;
+        color: #008C15;
         font-weight: 600;
     }
 
@@ -215,8 +215,8 @@ Verify Your Email - Watoto Church Wedding Booking
     }
 
     .otp-digit:focus {
-        border-color: #25802D;
-        box-shadow: 0 0 0 3px rgba(37, 128, 45, 0.1);
+        border-color: #008C15;
+        box-shadow: 0 0 0 3px rgba(0, 140, 21, 0.1);
         transform: scale(1.05);
     }
 
@@ -236,7 +236,7 @@ Verify Your Email - Watoto Church Wedding Booking
     .submit-btn {
         width: 100%;
         padding: 16px 24px;
-        background: linear-gradient(135deg, #25802D 0%, #1a5a20 100%);
+        background: #008C15;
         color: white;
         border: none;
         border-radius: 10px;
@@ -251,13 +251,14 @@ Verify Your Email - Watoto Church Wedding Booking
         margin-top: 8px;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(37, 128, 45, 0.25);
+        box-shadow: 0 4px 12px rgba(0, 140, 21, 0.25);
         transition: all 0.2s ease;
     }
 
     .submit-btn:hover:not(:disabled) {
+        background: #006010;
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(37, 128, 45, 0.35);
+        box-shadow: 0 6px 20px rgba(0, 140, 21, 0.35);
     }
 
     .submit-btn:active:not(:disabled) {
@@ -338,7 +339,7 @@ Verify Your Email - Watoto Church Wedding Booking
     }
 
     .resend-btn {
-        background: linear-gradient(135deg, #25802D 0%, #1a5a20 100%);
+        background: #008C15;
         color: white;
         border: none;
         padding: 10px 20px;
@@ -351,12 +352,13 @@ Verify Your Email - Watoto Church Wedding Booking
         align-items: center;
         gap: 8px;
         transition: all 0.2s ease;
-        box-shadow: 0 2px 8px rgba(37, 128, 45, 0.2);
+        box-shadow: 0 2px 8px rgba(0, 140, 21, 0.2);
     }
 
     .resend-btn:hover {
+        background: #006010;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(37, 128, 45, 0.3);
+        box-shadow: 0 4px 12px rgba(0, 140, 21, 0.3);
     }
 
     .resend-btn:active {
@@ -372,7 +374,7 @@ Verify Your Email - Watoto Church Wedding Booking
     }
 
     .back-link-text {
-        color: #25802D;
+        color: #008C15;
         text-decoration: none;
         font-size: 14px;
         font-weight: 600;
@@ -383,7 +385,7 @@ Verify Your Email - Watoto Church Wedding Booking
     }
 
     .back-link-text:hover {
-        color: #1a5a20;
+        color: #006010;
         text-decoration: underline;
     }
 

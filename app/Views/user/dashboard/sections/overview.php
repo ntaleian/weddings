@@ -1,6 +1,6 @@
 <!-- Payment Pending Alert -->
 <?php if (isset($paymentInfo) && $paymentInfo && !$paymentInfo['isFullyPaid'] && ($hasSubmittedApplication ?? false)): ?>
-<div class="payment-alert" style="background: linear-gradient(135deg, #7c1a09, #e62c22); color: white; padding: 25px 30px; border-radius: 16px; margin-bottom: 30px; box-shadow: 0 4px 20px rgba(243, 156, 18, 0.3); display: flex; align-items: center; justify-content: space-between; gap: 20px; animation: pulse 2s infinite;">
+<div class="payment-alert" style="background: #c0392b; color: white; padding: 25px 30px; border-radius: 16px; margin-bottom: 30px; box-shadow: 0 4px 20px rgba(192, 57, 43, 0.35); display: flex; align-items: center; justify-content: space-between; gap: 20px; animation: pulse 2s infinite;">
     <div style="flex: 1;">
         <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
             <div style="width: 50px; height: 50px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
@@ -27,7 +27,7 @@
             <?php if ($paymentInfo['totalPaid'] > 0): ?>
             <div>
                 <span style="opacity: 0.9; font-size: 0.9rem;">Amount Paid:</span>
-                <strong style="font-size: 1.1rem; margin-left: 8px; color: #2ecc71;">UGX <?= number_format($paymentInfo['totalPaid'], 0) ?></strong>
+                <strong style="font-size: 1.1rem; margin-left: 8px; color: #78BE20;">UGX <?= number_format($paymentInfo['totalPaid'], 0) ?></strong>
             </div>
             <?php endif; ?>
             <?php if ($paymentInfo['pendingAmount'] > 0): ?>
@@ -43,7 +43,7 @@
         </div>
     </div>
     <div>
-        <a href="<?= site_url('dashboard/payment') ?>" class="btn" style="background: white; color: #f39c12; padding: 12px 30px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.3s ease; white-space: nowrap; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);">
+        <a href="<?= site_url('dashboard/payment') ?>" class="btn" style="background: white; color: #008C15; padding: 12px 30px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.3s ease; white-space: nowrap; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);">
             <i class="fas fa-credit-card" style="margin-right: 8px;"></i>
             <?= $paymentInfo['totalPaid'] > 0 ? 'Complete Payment' : 'Make Payment' ?>
         </a>
@@ -52,10 +52,10 @@
 <style>
 @keyframes pulse {
     0%, 100% {
-        box-shadow: 0 4px 20px rgba(243, 156, 18, 0.3);
+        box-shadow: 0 4px 20px rgba(192, 57, 43, 0.35);
     }
     50% {
-        box-shadow: 0 4px 30px rgba(243, 156, 18, 0.5);
+        box-shadow: 0 4px 28px rgba(192, 57, 43, 0.5);
     }
 }
 .payment-alert .btn:hover {
@@ -96,10 +96,6 @@
                 <i class="fas fa-eye"></i>
                 View Application
             </a>
-            <button class="btn btn-primary" onclick="window.print()">
-                <i class="fas fa-print"></i>
-                Print Application
-            </button>
         <?php elseif(empty($bookings)): ?>
             <a href="<?= site_url('dashboard/application') ?>" class="btn btn-primary">
                 <i class="fas fa-play"></i>
@@ -129,12 +125,12 @@
 }
 
 .status-pending {
-    background-color: #f39c12;
-    color: white;
+    background-color: #FBD110;
+    color: #1a1a1a;
 }
 
 .status-approved {
-    background-color: #27ae60;
+    background-color: #008C15;
     color: white;
 }
 
@@ -175,14 +171,14 @@
 }
 
 .progress-step.completed {
-    border-color: #27ae60;
-    background: rgba(39, 174, 96, 0.05);
+    border-color: #008C15;
+    background: rgba(0, 140, 21, 0.06);
 }
 
 .progress-step.current {
     border-color: var(--primary-color);
-    background: rgba(100, 1, 127, 0.05);
-    box-shadow: 0 2px 8px rgba(100, 1, 127, 0.15);
+    background: rgba(0, 140, 21, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 140, 21, 0.15);
 }
 
 .step-icon {
@@ -200,7 +196,7 @@
 }
 
 .progress-step.completed .step-icon {
-    background: #27ae60;
+    background: #008C15;
     color: white;
 }
 
@@ -231,7 +227,7 @@
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    background: var(--primary-color);
     transition: width 0.3s ease;
 }
 
@@ -259,7 +255,7 @@
 
 .action-card:hover {
     border-color: var(--primary-color);
-    box-shadow: 0 2px 8px rgba(100, 1, 127, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 140, 21, 0.12);
     transform: translateY(-1px);
 }
 
@@ -267,7 +263,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: rgba(100, 1, 127, 0.1);
+    background: rgba(0, 140, 21, 0.1);
     color: var(--primary-color);
     display: flex;
     align-items: center;
@@ -526,7 +522,7 @@ $progress = isset($progress) ? $progress : 0;
 
 <style>
 .progress-percentage.submitted {
-    background: #27ae60;
+    background: #008C15;
     color: white;
     padding: 8px 16px;
     border-radius: 20px;
@@ -534,17 +530,17 @@ $progress = isset($progress) ? $progress : 0;
 }
 
 .submitted-step {
-    border-color: #27ae60 !important;
+    border-color: #008C15 !important;
     background: rgba(39, 174, 96, 0.1) !important;
 }
 
 .submitted-step .step-icon {
-    background: #27ae60 !important;
+    background: #008C15 !important;
     color: white !important;
 }
 
 .submitted-step .step-content h4 {
-    color: #27ae60 !important;
+    color: #008C15 !important;
 }
 </style>
 
@@ -569,16 +565,6 @@ $progress = isset($progress) ? $progress : 0;
             <h4>Contact Coordinator</h4>
             <p>Get help with your status</p>
             <a href="<?= site_url('dashboard/messages') ?>" class="btn btn-outline btn-sm">Message</a>
-        </div>
-    </div>
-    <div class="action-card">
-        <div class="card-icon">
-            <i class="fas fa-print"></i>
-        </div>
-        <div class="card-content">
-            <h4>Print Application</h4>
-            <p>Download your copy</p>
-            <button class="btn btn-outline btn-sm" onclick="window.print()">Print Now</button>
         </div>
     </div>
 </div>

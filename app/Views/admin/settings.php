@@ -190,74 +190,24 @@ $pageActions = '
                         <div class="card-body">
                             <div class="form-grid">
                                 <div class="form-group">
-                                    <label for="min_booking_advance_days">Minimum Advance Days *</label>
-                                    <input type="number" 
-                                           id="min_booking_advance_days" 
-                                           name="min_booking_advance_days" 
-                                           value="<?= $bookingSettings['min_booking_advance_days'] ?? 30 ?>" 
+                                    <label for="advance_booking_days">Minimum advance (days) *</label>
+                                    <input type="number"
+                                           id="advance_booking_days"
+                                           name="advance_booking_days"
+                                           value="<?= esc($bookingSettings['advance_booking_days'] ?? 180) ?>"
                                            required
-                                           min="1"
-                                           placeholder="30">
-                                    <small class="form-help">Minimum days in advance for wedding bookings</small>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="max_booking_advance_days">Maximum Advance Days</label>
-                                    <input type="number" 
-                                           id="max_booking_advance_days" 
-                                           name="max_booking_advance_days" 
-                                           value="<?= $bookingSettings['max_booking_advance_days'] ?? 365 ?>" 
-                                           min="1"
-                                           placeholder="365">
-                                    <small class="form-help">Maximum days in advance for wedding bookings</small>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="booking_confirmation_required">Booking Confirmation</label>
-                                    <select id="booking_confirmation_required" name="booking_confirmation_required" required>
-                                        <option value="1" <?= ($bookingSettings['booking_confirmation_required'] ?? true) ? 'selected' : '' ?>>
-                                            Require Admin Confirmation
-                                        </option>
-                                        <option value="0" <?= !($bookingSettings['booking_confirmation_required'] ?? true) ? 'selected' : '' ?>>
-                                            Auto-approve Bookings
-                                        </option>
-                                    </select>
-                                    <small class="form-help">Whether bookings need admin approval</small>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="allow_weekend_bookings">Weekend Bookings</label>
-                                    <select id="allow_weekend_bookings" name="allow_weekend_bookings">
-                                        <option value="1" <?= ($bookingSettings['allow_weekend_bookings'] ?? true) ? 'selected' : '' ?>>
-                                            Allow
-                                        </option>
-                                        <option value="0" <?= !($bookingSettings['allow_weekend_bookings'] ?? true) ? 'selected' : '' ?>>
-                                            Restrict
-                                        </option>
-                                    </select>
-                                    <small class="form-help">Allow bookings on weekends</small>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="max_guests_per_booking">Maximum Guests per Booking</label>
-                                    <input type="number" 
-                                           id="max_guests_per_booking" 
-                                           name="max_guests_per_booking" 
-                                           value="<?= $bookingSettings['max_guests_per_booking'] ?? 500 ?>" 
-                                           min="1"
-                                           placeholder="500">
-                                    <small class="form-help">Maximum number of guests allowed per booking</small>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="cancellation_deadline_days">Cancellation Deadline</label>
-                                    <input type="number" 
-                                           id="cancellation_deadline_days" 
-                                           name="cancellation_deadline_days" 
-                                           value="<?= $bookingSettings['cancellation_deadline_days'] ?? 7 ?>" 
                                            min="0"
-                                           placeholder="7">
-                                    <small class="form-help">Days before wedding when cancellation is no longer allowed</small>
+                                           placeholder="180">
+                                    <small class="form-help">Couples cannot pick a wedding date sooner than this many days from today.</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="earliest_selectable_date">Earliest selectable date</label>
+                                    <input type="date"
+                                           id="earliest_selectable_date"
+                                           name="earliest_selectable_date"
+                                           value="<?= esc($bookingSettings['earliest_selectable_date'] ?? '') ?>">
+                                    <small class="form-help">Optional. The first calendar day users may choose (e.g. start of next season). Leave empty to use only “minimum advance” above. If both apply, the <strong>later</strong> date is used.</small>
                                 </div>
                             </div>
                         </div>
@@ -405,7 +355,7 @@ $pageActions = '
 
 .nav-tab.active {
     background: var(--primary-color);
-    color: white;
+    color: #3d2929;
     box-shadow: 0 2px 8px rgba(100, 1, 127, 0.3);
 }
 
@@ -448,7 +398,7 @@ $pageActions = '
 .form-group textarea,
 .form-group select {
     padding: 12px 15px;
-    border: 2px solid var(--border-color);
+    border: 2px solid #cccccc;
     border-radius: 8px;
     font-size: 1rem;
     transition: all 0.3s ease;
@@ -509,12 +459,12 @@ $pageActions = '
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color), #8b4a9c);
+    background:  #00BC15;
     color: white;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #5a0168, var(--primary-color));
+    background: #00BC15;
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(100, 1, 127, 0.3);
 }

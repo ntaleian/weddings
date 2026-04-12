@@ -8,6 +8,7 @@ use App\Models\PastorModel;
 use App\Models\PaymentModel;
 use App\Models\UserModel;
 use App\Models\BlockedDatesModel;
+use App\Models\SettingsModel;
 use CodeIgniter\Controller;
 use CodeIgniter\Database\Exceptions\DatabaseException;
 use CodeIgniter\HTTP\RedirectResponse;
@@ -1500,11 +1501,95 @@ class AdminDashboard extends Controller
             return redirect()->to('/admin/login');
         }
 
+        $settingsModel = new SettingsModel();
+
         $data = [
-            'title' => 'Settings - Admin Dashboard'
+            'title'               => 'Settings - Admin Dashboard',
+            'weddingFees'         => [
+                'base_wedding_fee'       => $settingsModel->getSetting('base_wedding_fee', 500000),
+                'overtime_fee_per_hour'  => $settingsModel->getSetting('overtime_fee_per_hour', 50000),
+            ],
+            'generalSettings'     => [
+                'site_name'         => $settingsModel->getSetting('site_name', 'Wedding Management System'),
+                'site_email'        => $settingsModel->getSetting('site_email', ''),
+                'site_phone'        => $settingsModel->getSetting('site_phone', ''),
+                'currency_symbol'   => $settingsModel->getSetting('currency_symbol', 'UGX'),
+                'site_address'      => $settingsModel->getSetting('site_address', ''),
+            ],
+            'bookingSettings'     => [
+                'advance_booking_days'       => (int) $settingsModel->getSetting('advance_booking_days', 180),
+                'earliest_selectable_date'   => (string) ($settingsModel->getSetting('earliest_selectable_date', '') ?? ''),
+                'max_booking_advance_days'   => (int) $settingsModel->getSetting('max_booking_advance_days', 365),
+                'booking_confirmation_required' => (bool) $settingsModel->getSetting('pastor_approval_required', true),
+                'allow_weekend_bookings'     => true,
+                'max_guests_per_booking'     => (int) $settingsModel->getSetting('max_guests_default', 500),
+                'cancellation_deadline_days' => (int) $settingsModel->getSetting('cancellation_deadline_days', 7),
+            ],
+            'notificationSettings' => [
+                'send_booking_confirmations'   => (bool) $settingsModel->getSetting('send_booking_confirmations', true),
+                'send_reminder_notifications'  => (bool) $settingsModel->getSetting('send_reminder_notifications', true),
+                'reminder_days_before'         => (int) $settingsModel->getSetting('reminder_days_before', 7),
+                'admin_notification_email'     => (string) ($settingsModel->getSetting('admin_notification_email', '') ?? ''),
+            ],
         ];
 
         return view('admin/settings', $this->addTemplateData($data, 'Settings'));
+    }
+
+    /**
+     * Save booking window: minimum advance days and optional earliest selectable calendar date.
+     */
+    public function saveBookingSettings(): RedirectResponse
+    {
+        if (! $this->session->get('user_id') || $this->session->get('user_role') !== 'admin') {
+            return redirect()->to('/admin/login');
+        }
+
+        $settingsModel = new SettingsModel();
+
+        $advance = (int) $this->request->getPost('advance_booking_days');
+        if ($advance < 0) {
+            $advance = 0;
+        }
+
+        $settingsModel->setSetting(
+            'advance_booking_days',
+            $advance,
+            'number',
+            'Minimum days from today before a wedding date can be chosen (combined with earliest selectable date)',
+            'wedding'
+        );
+
+        $earliest = $this->request->getPost('earliest_selectable_date');
+        $earliest = $earliest !== null ? trim((string) $earliest) : '';
+
+        if ($earliest !== '' && ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $earliest)) {
+            return redirect()->back()->withInput()->with('error', 'Earliest selectable date must be empty or a valid YYYY-MM-DD date.');
+        }
+
+        if ($earliest !== '') {
+            $d = \DateTime::createFromFormat('Y-m-d', $earliest);
+            if (! $d || $d->format('Y-m-d') !== $earliest) {
+                return redirect()->back()->withInput()->with('error', 'Earliest selectable date is not a valid calendar date.');
+            }
+        }
+
+        $existingEarliest = $settingsModel->where('setting_key', 'earliest_selectable_date')->first();
+        if ($earliest === '') {
+            if ($existingEarliest) {
+                $settingsModel->delete($existingEarliest['id']);
+            }
+        } else {
+            $settingsModel->setSetting(
+                'earliest_selectable_date',
+                $earliest,
+                'string',
+                'First calendar date users may select for a wedding. Combined with advance_booking_days as the later of the two.',
+                'wedding'
+            );
+        }
+
+        return redirect()->to(site_url('admin/settings'))->with('success', 'Booking date rules saved.');
     }
 
     // Helper methods for dashboard sections

@@ -7,7 +7,7 @@
     <style>
         /* Welcome Section - Compact & Modern */
         .welcome-section {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: var(--primary-color);
             color: var(--white);
             padding: 24px 30px;
             border-radius: 12px;
@@ -15,7 +15,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 12px rgba(100, 1, 127, 0.15);
+            box-shadow: 0 2px 12px rgba(0, 140, 21, 0.15);
         }
 
         .welcome-content h1 {
@@ -97,18 +97,18 @@
 
         .progress-step:hover {
             border-color: var(--primary-color);
-            background: rgba(100, 1, 127, 0.05);
+            background: rgba(0, 140, 21, 0.05);
         }
 
         .progress-step.completed {
             border-color: var(--success-color);
-            background: rgba(46, 204, 113, 0.08);
+            background: rgba(0, 140, 21, 0.08);
         }
 
         .progress-step.current {
             border-color: var(--primary-color);
-            background: rgba(100, 1, 127, 0.1);
-            box-shadow: 0 2px 8px rgba(100, 1, 127, 0.15);
+            background: rgba(0, 140, 21, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 140, 21, 0.15);
         }
 
         .step-icon {
@@ -163,7 +163,7 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            background: var(--primary-color);
             transition: width 0.3s ease;
         }
 
@@ -194,7 +194,7 @@
             width: 50px;
             height: 50px;
             border-radius: 10px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: var(--primary-color);
             display: flex;
             align-items: center;
             justify-content: center;

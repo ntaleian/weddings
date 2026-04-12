@@ -11,10 +11,11 @@
     <style>
         /* Enhanced Dashboard Styles */
         :root {
-            --primary-color: #64017f;
-            --secondary-color: #8e44ad;
-            --accent-color: #f39c12;
-            --success-color: #2ecc71;
+            --primary-color: #008C15;
+            --primary-dark: #006010;
+            --secondary-color: #007041;
+            --accent-color: #FBD110;
+            --success-color: #008C15;
             --error-color: #e74c3c;
             --warning-color: #f1c40f;
             --info-color: #3498db;
@@ -344,7 +345,7 @@
                 <style>
                     /* Welcome Section */
                     .welcome-section {
-                        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                        background: var(--primary-color);
                         color: var(--white);
                         padding: 40px;
                         border-radius: 16px;
@@ -418,7 +419,7 @@
 
                     .progress-step.current {
                         border-color: var(--primary-color);
-                        background: rgba(100, 1, 127, 0.1);
+                        background: rgba(0, 140, 21, 0.1);
                     }
 
                     .step-icon {
@@ -463,7 +464,7 @@
 
                     .progress-fill {
                         height: 100%;
-                        background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+                        background: var(--primary-color);
                         transition: width 0.3s ease;
                     }
 
@@ -491,7 +492,7 @@
                         width: 60px;
                         height: 60px;
                         border-radius: 12px;
-                        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                        background: var(--primary-color);
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -754,7 +755,7 @@
                     .form-group select:focus {
                         outline: none;
                         border-color: var(--primary-color);
-                        box-shadow: 0 0 0 3px rgba(100, 1, 127, 0.1);
+                        box-shadow: 0 0 0 3px rgba(0, 140, 21, 0.1);
                     }
 
                     /* Radio Options */
@@ -778,7 +779,7 @@
 
                     .radio-option:hover {
                         border-color: var(--primary-color);
-                        background: rgba(100, 1, 127, 0.05);
+                        background: rgba(0, 140, 21, 0.05);
                     }
 
                     .radio-option input[type="radio"] {
@@ -823,7 +824,7 @@
                     }
                 </style>
                 <div class="application-header">
-                    <h1>Wedding Venue Application</h1>
+                    <h1>Wedding Application</h1>
                     <p>Complete all sections to submit your application. Your progress is automatically saved.</p>
                 </div>
 
@@ -1354,7 +1355,7 @@
 
                             /* Terms Section */
                             .terms-section {
-                                background: rgba(100, 1, 127, 0.05);
+                                background: rgba(0, 140, 21, 0.05);
                                 border: 2px solid var(--primary-color);
                                 border-radius: 12px;
                                 padding: 25px;
@@ -1447,12 +1448,12 @@
                             .campus-card:hover {
                                 border-color: var(--primary-color);
                                 transform: translateY(-5px);
-                                box-shadow: 0 10px 30px rgba(100, 1, 127, 0.1);
+                                box-shadow: 0 10px 30px rgba(0, 140, 21, 0.1);
                             }
 
                             .campus-card.selected {
                                 border-color: var(--primary-color);
-                                background: rgba(100, 1, 127, 0.05);
+                                background: rgba(0, 140, 21, 0.05);
                             }
 
                             .campus-card.selected .campus-select-indicator {
@@ -1577,7 +1578,7 @@
                             }
 
                             .calendar-day:hover {
-                                background: rgba(100, 1, 127, 0.1);
+                                background: rgba(0, 140, 21, 0.1);
                             }
 
                             .calendar-day.available {
@@ -1623,12 +1624,12 @@
 
                             .time-slot:hover {
                                 border-color: var(--primary-color);
-                                background: rgba(100, 1, 127, 0.05);
+                                background: rgba(0, 140, 21, 0.05);
                             }
 
                             .time-slot.selected {
                                 border-color: var(--primary-color);
-                                background: rgba(100, 1, 127, 0.1);
+                                background: rgba(0, 140, 21, 0.1);
                             }
 
                             .time-slot i {
@@ -1659,7 +1660,7 @@
 
                             /* Selection Summary Styles */
                             .summary-card {
-                                background: rgba(100, 1, 127, 0.05);
+                                background: rgba(0, 140, 21, 0.05);
                                 border: 2px solid var(--primary-color);
                                 border-radius: 12px;
                                 padding: 25px;
@@ -1740,7 +1741,7 @@
                         width: 50px;
                         height: 50px;
                         border-radius: 12px;
-                        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                        background: var(--primary-color);
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -1772,7 +1773,7 @@
 
                     .status-pending {
                         background: rgba(255, 193, 7, 0.1);
-                        color: #f39c12;
+                        color: #FBD110;
                     }
 
                     .upload-area {
@@ -1787,12 +1788,12 @@
 
                     .upload-area:hover {
                         border-color: var(--primary-color);
-                        background: rgba(100, 1, 127, 0.05);
+                        background: rgba(0, 140, 21, 0.05);
                     }
 
                     .upload-area.dragover {
                         border-color: var(--primary-color);
-                        background: rgba(100, 1, 127, 0.1);
+                        background: rgba(0, 140, 21, 0.1);
                     }
 
                     .document-list {
@@ -2065,7 +2066,7 @@
 
                     .quick-action-btn:hover {
                         border-color: var(--primary-color);
-                        background: rgba(100, 1, 127, 0.05);
+                        background: rgba(0, 140, 21, 0.05);
                     }
 
                     @media (max-width: 768px) {
@@ -2091,7 +2092,7 @@
                         <div class="messages-header">
                             <h3>Chat with Pastor Sarah Nakamya</h3>
                             <span class="status-indicator">
-                                <i class="fas fa-circle" style="color: #2ecc71; font-size: 0.8rem;"></i>
+                                <i class="fas fa-circle" style="color: #008C15; font-size: 0.8rem;"></i>
                                 Online
                             </span>
                         </div>
@@ -2294,7 +2295,7 @@
                     }
 
                     .status-in-progress {
-                        background: rgba(100, 1, 127, 0.1);
+                        background: rgba(0, 140, 21, 0.1);
                         color: var(--primary-color);
                     }
 

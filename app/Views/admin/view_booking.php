@@ -2,6 +2,8 @@
 
 <?= $this->section('content') ?>
 <?php
+helper('residential_address');
+helper('marital_status');
 ob_start();
 
 if ($booking['status'] === 'pending'):
@@ -162,24 +164,12 @@ $this->setData([
                                 <span class="value"><?= esc($booking['bride_age'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Birth Place:</span>
-                                <span class="value"><?= esc($booking['bride_birth_place'] ?? 'Not provided') ?></span>
-                            </div>
-                            <div class="detail-row">
                                 <span class="label">Nationality:</span>
                                 <span class="value"><?= esc($booking['bride_nationality'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
                                 <span class="label">Occupation:</span>
                                 <span class="value"><?= esc($booking['bride_occupation'] ?? 'Not provided') ?></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Employer:</span>
-                                <span class="value"><?= esc($booking['bride_employer'] ?? 'Not provided') ?></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Education Level:</span>
-                                <span class="value"><?= esc($booking['bride_education_level'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
                                 <span class="label">ID Number:</span>
@@ -190,8 +180,8 @@ $this->setData([
                                 <span class="value"><?= esc($booking['bride_id_type'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Address:</span>
-                                <span class="value"><?= esc($booking['bride_address'] ?? 'Not provided') ?></span>
+                                <span class="label">Residential address:</span>
+                                <span class="value"><?= format_residential_address_html($booking['bride_address'] ?? null) ?></span>
                             </div>
                         </div>
                         <div class="groom-info">
@@ -217,24 +207,12 @@ $this->setData([
                                 <span class="value"><?= esc($booking['groom_age'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Birth Place:</span>
-                                <span class="value"><?= esc($booking['groom_birth_place'] ?? 'Not provided') ?></span>
-                            </div>
-                            <div class="detail-row">
                                 <span class="label">Nationality:</span>
                                 <span class="value"><?= esc($booking['groom_nationality'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
                                 <span class="label">Occupation:</span>
                                 <span class="value"><?= esc($booking['groom_occupation'] ?? 'Not provided') ?></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Employer:</span>
-                                <span class="value"><?= esc($booking['groom_employer'] ?? 'Not provided') ?></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Education Level:</span>
-                                <span class="value"><?= esc($booking['groom_education_level'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
                                 <span class="label">ID Number:</span>
@@ -245,8 +223,8 @@ $this->setData([
                                 <span class="value"><?= esc($booking['groom_id_type'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Address:</span>
-                                <span class="value"><?= esc($booking['groom_address'] ?? 'Not provided') ?></span>
+                                <span class="label">Residential address:</span>
+                                <span class="value"><?= format_residential_address_html($booking['groom_address'] ?? null) ?></span>
                             </div>
                         </div>
                     </div>
@@ -263,47 +241,119 @@ $this->setData([
                         <div class="bride-family">
                             <h4><i class="fas fa-home"></i> Bride's Family</h4>
                             <div class="detail-row">
-                                <span class="label">Father's Name:</span>
+                                <span class="label">Father's name:</span>
                                 <span class="value"><?= esc($booking['bride_father'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Father's Occupation:</span>
+                                <span class="label">Father's occupation:</span>
                                 <span class="value"><?= esc($booking['bride_father_occupation'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Mother's Name:</span>
+                                <span class="label">Father's status:</span>
+                                <span class="value"><?= esc(parent_living_label($booking['bride_father_status'] ?? null)) ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Father's contact:</span>
+                                <span class="value"><?php
+                                    $s = $booking['bride_father_status'] ?? '';
+                                    $p = trim((string) ($booking['bride_father_phone'] ?? ''));
+                                    if ($s === 'deceased') {
+                                        echo 'N/A';
+                                    } elseif ($p !== '') {
+                                        echo esc($p);
+                                    } elseif (! empty($booking['bride_family_phone'])) {
+                                        echo esc($booking['bride_family_phone']);
+                                    } else {
+                                        echo 'Not provided';
+                                    }
+                                ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Mother's name:</span>
                                 <span class="value"><?= esc($booking['bride_mother'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Mother's Occupation:</span>
+                                <span class="label">Mother's occupation:</span>
                                 <span class="value"><?= esc($booking['bride_mother_occupation'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Family Contact:</span>
-                                <span class="value"><?= esc($booking['bride_family_phone'] ?? 'Not provided') ?></span>
+                                <span class="label">Mother's status:</span>
+                                <span class="value"><?= esc(parent_living_label($booking['bride_mother_status'] ?? null)) ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Mother's contact:</span>
+                                <span class="value"><?php
+                                    $s = $booking['bride_mother_status'] ?? '';
+                                    $p = trim((string) ($booking['bride_mother_phone'] ?? ''));
+                                    if ($s === 'deceased') {
+                                        echo 'N/A';
+                                    } elseif ($p !== '') {
+                                        echo esc($p);
+                                    } elseif (! empty($booking['bride_family_phone'])) {
+                                        echo esc($booking['bride_family_phone']);
+                                    } else {
+                                        echo 'Not provided';
+                                    }
+                                ?></span>
                             </div>
                         </div>
                         <div class="groom-family">
                             <h4><i class="fas fa-home"></i> Groom's Family</h4>
                             <div class="detail-row">
-                                <span class="label">Father's Name:</span>
+                                <span class="label">Father's name:</span>
                                 <span class="value"><?= esc($booking['groom_father'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Father's Occupation:</span>
+                                <span class="label">Father's occupation:</span>
                                 <span class="value"><?= esc($booking['groom_father_occupation'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Mother's Name:</span>
+                                <span class="label">Father's status:</span>
+                                <span class="value"><?= esc(parent_living_label($booking['groom_father_status'] ?? null)) ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Father's contact:</span>
+                                <span class="value"><?php
+                                    $s = $booking['groom_father_status'] ?? '';
+                                    $p = trim((string) ($booking['groom_father_phone'] ?? ''));
+                                    if ($s === 'deceased') {
+                                        echo 'N/A';
+                                    } elseif ($p !== '') {
+                                        echo esc($p);
+                                    } elseif (! empty($booking['groom_family_phone'])) {
+                                        echo esc($booking['groom_family_phone']);
+                                    } else {
+                                        echo 'Not provided';
+                                    }
+                                ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Mother's name:</span>
                                 <span class="value"><?= esc($booking['groom_mother'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Mother's Occupation:</span>
+                                <span class="label">Mother's occupation:</span>
                                 <span class="value"><?= esc($booking['groom_mother_occupation'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Family Contact:</span>
-                                <span class="value"><?= esc($booking['groom_family_phone'] ?? 'Not provided') ?></span>
+                                <span class="label">Mother's status:</span>
+                                <span class="value"><?= esc(parent_living_label($booking['groom_mother_status'] ?? null)) ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Mother's contact:</span>
+                                <span class="value"><?php
+                                    $s = $booking['groom_mother_status'] ?? '';
+                                    $p = trim((string) ($booking['groom_mother_phone'] ?? ''));
+                                    if ($s === 'deceased') {
+                                        echo 'N/A';
+                                    } elseif ($p !== '') {
+                                        echo esc($p);
+                                    } elseif (! empty($booking['groom_family_phone'])) {
+                                        echo esc($booking['groom_family_phone']);
+                                    } else {
+                                        echo 'Not provided';
+                                    }
+                                ?></span>
                             </div>
                         </div>
                     </div>
@@ -322,10 +372,6 @@ $this->setData([
                             <div class="detail-row">
                                 <span class="label">Church Member:</span>
                                 <span class="value"><?= isset($booking['bride_church_member']) ? ($booking['bride_church_member'] ? 'Yes' : 'No') : 'Not specified' ?></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Membership Duration:</span>
-                                <span class="value"><?= esc($booking['bride_membership_duration'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
                                 <span class="label">Cell Family Number:</span>
@@ -351,20 +397,12 @@ $this->setData([
                                 <span class="label">Pastor Phone:</span>
                                 <span class="value"><?= esc($booking['bride_pastor_phone'] ?? 'Not provided') ?></span>
                             </div>
-                            <div class="detail-row">
-                                <span class="label">Religion:</span>
-                                <span class="value"><?= esc($booking['bride_religion'] ?? 'Not specified') ?></span>
-                            </div>
                         </div>
                         <div class="groom-membership">
                             <h4><i class="fas fa-cross"></i> Groom's Membership</h4>
                             <div class="detail-row">
                                 <span class="label">Church Member:</span>
                                 <span class="value"><?= isset($booking['groom_church_member']) ? ($booking['groom_church_member'] ? 'Yes' : 'No') : 'Not specified' ?></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Membership Duration:</span>
-                                <span class="value"><?= esc($booking['groom_membership_duration'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
                                 <span class="label">Cell Family Number:</span>
@@ -389,10 +427,6 @@ $this->setData([
                             <div class="detail-row">
                                 <span class="label">Pastor Phone:</span>
                                 <span class="value"><?= esc($booking['groom_pastor_phone'] ?? 'Not provided') ?></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Religion:</span>
-                                <span class="value"><?= esc($booking['groom_religion'] ?? 'Not specified') ?></span>
                             </div>
                         </div>
                     </div>
@@ -421,8 +455,8 @@ $this->setData([
                                 <span class="value"><?= esc($booking['witness1_id_number'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Relationship:</span>
-                                <span class="value"><?= esc($booking['witness1_relationship'] ?? 'Not provided') ?></span>
+                                <span class="label">Marital status:</span>
+                                <span class="value"><?= esc(witness_marital_status_label($booking['witness1_marital_status'] ?? $booking['witness1_relationship'] ?? null)) ?></span>
                             </div>
                         </div>
                         <div class="witness2-info">
@@ -440,8 +474,8 @@ $this->setData([
                                 <span class="value"><?= esc($booking['witness2_id_number'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
-                                <span class="label">Relationship:</span>
-                                <span class="value"><?= esc($booking['witness2_relationship'] ?? 'Not provided') ?></span>
+                                <span class="label">Marital status:</span>
+                                <span class="value"><?= esc(witness_marital_status_label($booking['witness2_marital_status'] ?? $booking['witness2_relationship'] ?? null)) ?></span>
                             </div>
                         </div>
                     </div>
@@ -1566,9 +1600,7 @@ function generatePDF() {
     brideY = addLabelValue('Email', '<?= esc($booking["bride_email"] ?? "Not provided") ?>', 20, brideY, 150);
     brideY = addLabelValue('Date of Birth', '<?= isset($booking["bride_date_of_birth"]) ? date("F j, Y", strtotime($booking["bride_date_of_birth"])) : "Not provided" ?>', 20, brideY, 150);
     brideY = addLabelValue('Age', '<?= esc($booking["bride_age"] ?? "Not provided") ?>', 20, brideY, 150);
-    brideY = addLabelValue('Birth Place', '<?= esc($booking["bride_birth_place"] ?? "Not provided") ?>', 20, brideY, 150);
     brideY = addLabelValue('Nationality', '<?= esc($booking["bride_nationality"] ?? "Not provided") ?>', 20, brideY, 150);
-    brideY = addLabelValue('Religion', '<?= esc($booking["bride_religion"] ?? "Not provided") ?>', 20, brideY, 150);
     brideY = addLabelValue('Marital Status', '<?php
         $brideStatus = $booking["bride_marital_status"] ?? "";
         $brideStatusLabels = [
@@ -1582,11 +1614,9 @@ function generatePDF() {
         echo esc($brideStatusLabels[$brideStatus] ?? ucfirst(str_replace("-", " ", $brideStatus)) ?: "Not provided");
     ?>', 20, brideY, 150);
     brideY = addLabelValue('Occupation', '<?= esc($booking["bride_occupation"] ?? "Not provided") ?>', 20, brideY, 150);
-    brideY = addLabelValue('Employer', '<?= esc($booking["bride_employer"] ?? "Not provided") ?>', 20, brideY, 150);
-    brideY = addLabelValue('Education Level', '<?= esc($booking["bride_education_level"] ?? "Not provided") ?>', 20, brideY, 150);
     brideY = addLabelValue('ID Type', '<?= esc($booking["bride_id_type"] ?? "Not provided") ?>', 20, brideY, 150);
     brideY = addLabelValue('ID Number', '<?= esc($booking["bride_id_number"] ?? "Not provided") ?>', 20, brideY, 150);
-    brideY = addLabelValue('Address', '<?= esc($booking["bride_address"] ?? "Not provided") ?>', 20, brideY, 150);
+    brideY = addLabelValue('Residential address', <?= json_encode(format_residential_address_plain($booking['bride_address'] ?? null), JSON_UNESCAPED_UNICODE) ?>, 20, brideY, 150);
     yPos = brideY + 5;
     
     // ========== GROOM INFORMATION ==========
@@ -1605,9 +1635,7 @@ function generatePDF() {
     groomY = addLabelValue('Email', '<?= esc($booking["groom_email"] ?? "Not provided") ?>', 20, groomY, 150);
     groomY = addLabelValue('Date of Birth', '<?= isset($booking["groom_date_of_birth"]) ? date("F j, Y", strtotime($booking["groom_date_of_birth"])) : "Not provided" ?>', 20, groomY, 150);
     groomY = addLabelValue('Age', '<?= esc($booking["groom_age"] ?? "Not provided") ?>', 20, groomY, 150);
-    groomY = addLabelValue('Birth Place', '<?= esc($booking["groom_birth_place"] ?? "Not provided") ?>', 20, groomY, 150);
     groomY = addLabelValue('Nationality', '<?= esc($booking["groom_nationality"] ?? "Not provided") ?>', 20, groomY, 150);
-    groomY = addLabelValue('Religion', '<?= esc($booking["groom_religion"] ?? "Not provided") ?>', 20, groomY, 150);
     groomY = addLabelValue('Marital Status', '<?php
         $groomStatus = $booking["groom_marital_status"] ?? "";
         $groomStatusLabels = [
@@ -1621,22 +1649,20 @@ function generatePDF() {
         echo esc($groomStatusLabels[$groomStatus] ?? ucfirst(str_replace("-", " ", $groomStatus)) ?: "Not provided");
     ?>', 20, groomY, 150);
     groomY = addLabelValue('Occupation', '<?= esc($booking["groom_occupation"] ?? "Not provided") ?>', 20, groomY, 150);
-    groomY = addLabelValue('Employer', '<?= esc($booking["groom_employer"] ?? "Not provided") ?>', 20, groomY, 150);
-    groomY = addLabelValue('Education Level', '<?= esc($booking["groom_education_level"] ?? "Not provided") ?>', 20, groomY, 150);
     groomY = addLabelValue('ID Type', '<?= esc($booking["groom_id_type"] ?? "Not provided") ?>', 20, groomY, 150);
     groomY = addLabelValue('ID Number', '<?= esc($booking["groom_id_number"] ?? "Not provided") ?>', 20, groomY, 150);
-    groomY = addLabelValue('Address', '<?= esc($booking["groom_address"] ?? "Not provided") ?>', 20, groomY, 150);
+    groomY = addLabelValue('Residential address', <?= json_encode(format_residential_address_plain($booking['groom_address'] ?? null), JSON_UNESCAPED_UNICODE) ?>, 20, groomY, 150);
     yPos = groomY + 5;
     
     // ========== FAMILY INFORMATION ==========
     yPos = addSectionHeader('FAMILY INFORMATION', yPos);
-    checkNewPage(50);
+    checkNewPage(90);
     
     doc.setFillColor(248, 255, 248);
-    doc.roundedRect(15, yPos - 3, 180, 50, 2, 2, 'F');
+    doc.roundedRect(15, yPos - 3, 180, 90, 2, 2, 'F');
     doc.setDrawColor(200, 230, 200);
     doc.setLineWidth(0.3);
-    doc.roundedRect(15, yPos - 3, 180, 50, 2, 2, 'D');
+    doc.roundedRect(15, yPos - 3, 180, 90, 2, 2, 'D');
     
     let familyY = yPos;
     doc.setTextColor(100, 1, 127);
@@ -1646,9 +1672,24 @@ function generatePDF() {
     familyY += 6;
     familyY = addLabelValue('Father\'s Name', '<?= esc($booking["bride_father"] ?? "Not provided") ?>', 20, familyY, 150);
     familyY = addLabelValue('Father\'s Occupation', '<?= esc($booking["bride_father_occupation"] ?? "Not provided") ?>', 20, familyY, 150);
+    familyY = addLabelValue('Father\'s Status', <?= json_encode(parent_living_label($booking['bride_father_status'] ?? null)) ?>, 20, familyY, 150);
+    familyY = addLabelValue('Father\'s Contact', <?= json_encode(
+        ($booking['bride_father_status'] ?? '') === 'deceased'
+            ? 'N/A'
+            : (trim((string) ($booking['bride_father_phone'] ?? '')) !== ''
+                ? $booking['bride_father_phone']
+                : ($booking['bride_family_phone'] ?? 'Not provided'))
+    , JSON_UNESCAPED_UNICODE) ?>, 20, familyY, 150);
     familyY = addLabelValue('Mother\'s Name', '<?= esc($booking["bride_mother"] ?? "Not provided") ?>', 20, familyY, 150);
     familyY = addLabelValue('Mother\'s Occupation', '<?= esc($booking["bride_mother_occupation"] ?? "Not provided") ?>', 20, familyY, 150);
-    familyY = addLabelValue('Family Contact', '<?= esc($booking["bride_family_phone"] ?? "Not provided") ?>', 20, familyY, 150);
+    familyY = addLabelValue('Mother\'s Status', <?= json_encode(parent_living_label($booking['bride_mother_status'] ?? null)) ?>, 20, familyY, 150);
+    familyY = addLabelValue('Mother\'s Contact', <?= json_encode(
+        ($booking['bride_mother_status'] ?? '') === 'deceased'
+            ? 'N/A'
+            : (trim((string) ($booking['bride_mother_phone'] ?? '')) !== ''
+                ? $booking['bride_mother_phone']
+                : ($booking['bride_family_phone'] ?? 'Not provided'))
+    , JSON_UNESCAPED_UNICODE) ?>, 20, familyY, 150);
     familyY += 3;
     doc.setTextColor(100, 1, 127);
     doc.setFontSize(10);
@@ -1657,9 +1698,24 @@ function generatePDF() {
     familyY += 6;
     familyY = addLabelValue('Father\'s Name', '<?= esc($booking["groom_father"] ?? "Not provided") ?>', 20, familyY, 150);
     familyY = addLabelValue('Father\'s Occupation', '<?= esc($booking["groom_father_occupation"] ?? "Not provided") ?>', 20, familyY, 150);
+    familyY = addLabelValue('Father\'s Status', <?= json_encode(parent_living_label($booking['groom_father_status'] ?? null)) ?>, 20, familyY, 150);
+    familyY = addLabelValue('Father\'s Contact', <?= json_encode(
+        ($booking['groom_father_status'] ?? '') === 'deceased'
+            ? 'N/A'
+            : (trim((string) ($booking['groom_father_phone'] ?? '')) !== ''
+                ? $booking['groom_father_phone']
+                : ($booking['groom_family_phone'] ?? 'Not provided'))
+    , JSON_UNESCAPED_UNICODE) ?>, 20, familyY, 150);
     familyY = addLabelValue('Mother\'s Name', '<?= esc($booking["groom_mother"] ?? "Not provided") ?>', 20, familyY, 150);
     familyY = addLabelValue('Mother\'s Occupation', '<?= esc($booking["groom_mother_occupation"] ?? "Not provided") ?>', 20, familyY, 150);
-    familyY = addLabelValue('Family Contact', '<?= esc($booking["groom_family_phone"] ?? "Not provided") ?>', 20, familyY, 150);
+    familyY = addLabelValue('Mother\'s Status', <?= json_encode(parent_living_label($booking['groom_mother_status'] ?? null)) ?>, 20, familyY, 150);
+    familyY = addLabelValue('Mother\'s Contact', <?= json_encode(
+        ($booking['groom_mother_status'] ?? '') === 'deceased'
+            ? 'N/A'
+            : (trim((string) ($booking['groom_mother_phone'] ?? '')) !== ''
+                ? $booking['groom_mother_phone']
+                : ($booking['groom_family_phone'] ?? 'Not provided'))
+    , JSON_UNESCAPED_UNICODE) ?>, 20, familyY, 150);
     yPos = familyY + 5;
     
     // ========== CHURCH MEMBERSHIP ==========
@@ -1679,7 +1735,6 @@ function generatePDF() {
     doc.text('Bride\'s Membership:', 20, churchY);
     churchY += 6;
     churchY = addLabelValue('Church Member', '<?= isset($booking["bride_church_member"]) ? ($booking["bride_church_member"] ? "Yes" : "No") : "Not specified" ?>', 20, churchY, 150);
-    churchY = addLabelValue('Membership Duration', '<?= esc($booking["bride_membership_duration"] ?? "Not provided") ?>', 20, churchY, 150);
     churchY = addLabelValue('Cell Family Number', '<?= esc($booking["bride_cell_group_number"] ?? "Not provided") ?>', 20, churchY, 150);
     churchY = addLabelValue('Cell Family Leader', '<?= esc($booking["bride_cell_leader_name"] ?? "Not provided") ?>', 20, churchY, 150);
     churchY = addLabelValue('Leader Phone', '<?= esc($booking["bride_cell_leader_phone"] ?? "Not provided") ?>', 20, churchY, 150);
@@ -1695,7 +1750,6 @@ function generatePDF() {
     doc.text('Groom\'s Membership:', 20, churchY);
     churchY += 6;
     churchY = addLabelValue('Church Member', '<?= isset($booking["groom_church_member"]) ? ($booking["groom_church_member"] ? "Yes" : "No") : "Not specified" ?>', 20, churchY, 150);
-    churchY = addLabelValue('Membership Duration', '<?= esc($booking["groom_membership_duration"] ?? "Not provided") ?>', 20, churchY, 150);
     churchY = addLabelValue('Cell Family Number', '<?= esc($booking["groom_cell_group_number"] ?? "Not provided") ?>', 20, churchY, 150);
     churchY = addLabelValue('Cell Family Leader', '<?= esc($booking["groom_cell_leader_name"] ?? "Not provided") ?>', 20, churchY, 150);
     churchY = addLabelValue('Leader Phone', '<?= esc($booking["groom_cell_leader_phone"] ?? "Not provided") ?>', 20, churchY, 150);
@@ -1725,7 +1779,7 @@ function generatePDF() {
     witnessY = addLabelValue('Full Name', '<?= esc($booking["witness1_name"] ?? "Not provided") ?>', 20, witnessY, 150);
     witnessY = addLabelValue('Phone', '<?= esc($booking["witness1_phone"] ?? "Not provided") ?>', 20, witnessY, 150);
     witnessY = addLabelValue('ID Number', '<?= esc($booking["witness1_id_number"] ?? "Not provided") ?>', 20, witnessY, 150);
-    witnessY = addLabelValue('Relationship', '<?= esc($booking["witness1_relationship"] ?? "Not provided") ?>', 20, witnessY, 150);
+    witnessY = addLabelValue('Marital status', <?= json_encode(witness_marital_status_label($booking['witness1_marital_status'] ?? $booking['witness1_relationship'] ?? null), JSON_UNESCAPED_UNICODE) ?>, 20, witnessY, 150);
     witnessY += 3;
     doc.setTextColor(100, 1, 127);
     doc.setFontSize(10);
@@ -1735,7 +1789,7 @@ function generatePDF() {
     witnessY = addLabelValue('Full Name', '<?= esc($booking["witness2_name"] ?? "Not provided") ?>', 20, witnessY, 150);
     witnessY = addLabelValue('Phone', '<?= esc($booking["witness2_phone"] ?? "Not provided") ?>', 20, witnessY, 150);
     witnessY = addLabelValue('ID Number', '<?= esc($booking["witness2_id_number"] ?? "Not provided") ?>', 20, witnessY, 150);
-    witnessY = addLabelValue('Relationship', '<?= esc($booking["witness2_relationship"] ?? "Not provided") ?>', 20, witnessY, 150);
+    witnessY = addLabelValue('Marital status', <?= json_encode(witness_marital_status_label($booking['witness2_marital_status'] ?? $booking['witness2_relationship'] ?? null), JSON_UNESCAPED_UNICODE) ?>, 20, witnessY, 150);
     yPos = witnessY + 5;
     
     // ========== PAYMENT INFORMATION ==========

@@ -195,12 +195,12 @@
         width: 64px;
         height: 64px;
         margin: 0 auto 20px;
-        background: linear-gradient(135deg, #25802D, #1a5a20);
+        background: #008C15;
         border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 8px 20px rgba(37, 128, 45, 0.25);
+        box-shadow: 0 8px 20px rgba(0, 140, 21, 0.25);
     }
 
     .register-icon i {
@@ -282,8 +282,8 @@
     }
 
     .input-wrapper input:focus {
-        border-color: #25802D;
-        box-shadow: 0 0 0 3px rgba(37, 128, 45, 0.1);
+        border-color: #008C15;
+        box-shadow: 0 0 0 3px rgba(0, 140, 21, 0.1);
         background: #ffffff;
     }
 
@@ -309,8 +309,8 @@
     }
 
     .password-toggle-btn:hover {
-        color: #25802D;
-        background: rgba(37, 128, 45, 0.08);
+        color: #008C15;
+        background: rgba(0, 140, 21, 0.08);
     }
 
     .field-error {
@@ -365,8 +365,8 @@
     .captcha-icon {
         width: 36px;
         height: 36px;
-        background: rgba(37, 128, 45, 0.1);
-        color: #25802D;
+        background: rgba(0, 140, 21, 0.1);
+        color: #008C15;
         border-radius: 8px;
         display: flex;
         align-items: center;
@@ -385,7 +385,7 @@
     .captcha-refresh-btn {
         width: 38px;
         height: 38px;
-        background: #25802D;
+        background: #008C15;
         color: white;
         border: none;
         border-radius: 8px;
@@ -399,7 +399,7 @@
     }
 
     .captcha-refresh-btn:hover {
-        background: #1a5a20;
+        background: #006010;
         transform: scale(1.05);
     }
 
@@ -453,8 +453,8 @@
     }
 
     .custom-checkbox input[type="checkbox"]:checked + .checkbox-indicator {
-        background: #25802D;
-        border-color: #25802D;
+        background: #008C15;
+        border-color: #008C15;
     }
 
     .custom-checkbox input[type="checkbox"]:checked + .checkbox-indicator::after {
@@ -473,13 +473,13 @@
     }
 
     .link-primary {
-        color: #25802D;
+        color: #008C15;
         text-decoration: none;
         font-weight: 600;
     }
 
     .link-primary:hover {
-        color: #1a5a20;
+        color: #006010;
         text-decoration: underline;
     }
 
@@ -487,7 +487,7 @@
     .submit-btn {
         width: 100%;
         padding: 16px 24px;
-        background: linear-gradient(135deg, #25802D 0%, #1a5a20 100%);
+        background: #008C15;
         color: white;
         border: none;
         border-radius: 10px;
@@ -502,13 +502,14 @@
         margin-top: 8px;
         position: relative;
         overflow: hidden;
-        box-shadow: 0 4px 12px rgba(37, 128, 45, 0.25);
+        box-shadow: 0 4px 12px rgba(0, 140, 21, 0.25);
         transition: all 0.2s ease;
     }
 
     .submit-btn:hover:not(:disabled) {
+        background: #006010;
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(37, 128, 45, 0.35);
+        box-shadow: 0 6px 20px rgba(0, 140, 21, 0.35);
     }
 
     .submit-btn:active:not(:disabled) {
@@ -552,14 +553,14 @@
     }
 
     .login-link {
-        color: #25802D;
+        color: #008C15;
         text-decoration: none;
         font-weight: 600;
         margin-left: 4px;
     }
 
     .login-link:hover {
-        color: #1a5a20;
+        color: #006010;
         text-decoration: underline;
     }
 

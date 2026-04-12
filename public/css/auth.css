@@ -60,8 +60,8 @@
 }
 
 .auth-nav-link:hover {
-    background: rgba(37, 128, 45, 0.08);
-    color: #25802D;
+    background: rgba(0, 140, 21, 0.08);
+    color: #008C15;
 }
 
 .auth-nav-link i {
@@ -88,15 +88,15 @@
 }
 
 .auth-btn-primary {
-    background: linear-gradient(135deg, #25802D 0%, #1a5a20 100%);
+    background: var(--primary-color);
     color: white;
-    box-shadow: 0 3px 12px rgba(37, 128, 45, 0.25);
+    box-shadow: 0 3px 12px rgba(0, 140, 21, 0.25);
 }
 
 .auth-btn-primary:hover {
-    background: linear-gradient(135deg, #1a5a20 0%, #25802D 100%);
+    background: var(--primary-dark);
     transform: translateY(-1px);
-    box-shadow: 0 5px 18px rgba(37, 128, 45, 0.35);
+    box-shadow: 0 5px 18px rgba(0, 140, 21, 0.35);
     color: white;
 }
 
@@ -114,8 +114,8 @@
 }
 
 .auth-nav-icon:hover {
-    background: rgba(37, 128, 45, 0.1);
-    color: #25802D;
+    background: rgba(0, 140, 21, 0.1);
+    color: #008C15;
     transform: scale(1.05);
 }
 
@@ -181,12 +181,12 @@
 
 .auth-bottom-item.active i,
 .auth-bottom-item:hover i {
-    color: #25802D;
+    color: #008C15;
 }
 
 .auth-bottom-item.active .auth-bottom-label,
 .auth-bottom-item:hover .auth-bottom-label {
-    color: #25802D;
+    color: #008C15;
     font-weight: 600;
 }
 
@@ -198,27 +198,20 @@
     transform: translateX(-50%);
     width: 32px;
     height: 3px;
-    background: #25802D;
+    background: #008C15;
     border-radius: 0 0 3px 3px;
 }
 
 .auth-section {
     min-height: 100vh;
     padding: 50px 0 50px;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: var(--primary-color);
     position: relative;
     margin-top: 70px;
 }
 
 .auth-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:rgba(255,255,255,0.1);stop-opacity:1" /><stop offset="100%" style="stop-color:rgba(255,255,255,0.05);stop-opacity:1" /></linearGradient></defs><polygon fill="url(%23grad1)" points="0,0 1000,200 1000,1000 0,800"/></svg>');
-    background-size: cover;
+    display: none;
 }
 
 .auth-container {
@@ -488,7 +481,7 @@
 .form-group select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(37, 128, 45, 0.1);
+    box-shadow: 0 0 0 4px rgba(0, 140, 21, 0.1);
     transform: translateY(-1px);
 }
 

@@ -11,10 +11,12 @@ Options -Indexes
 	Options +FollowSymlinks
 	RewriteEngine On
 
+	# Subfolder install (WAMP: www/weddings/public). If you serve /public as the vhost root, comment this out.
+	RewriteBase /weddings/public/
+
 	# If you installed CodeIgniter in a subfolder, you will need to
 	# change the following line to match the subfolder you need.
 	# http://httpd.apache.org/docs/current/mod/mod_rewrite.html#rewritebase
-	# RewriteBase /
 
 	# Redirect Trailing Slashes...
 	RewriteCond %{REQUEST_FILENAME} !-d

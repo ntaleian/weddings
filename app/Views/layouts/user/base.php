@@ -17,13 +17,16 @@
         }
         /* Enhanced Dashboard Styles */
         :root {
-            --primary-color: #64017f;
-            --secondary-color: #8e44ad;
-            --accent-color: #f39c12;
-            --success-color: #2ecc71;
+            /* Watoto official — coated green + palette */
+            --primary-color: #008C15;
+            --primary-dark: #006010;
+            --secondary-color: #007041;
+            --accent-color: #FBD110;
+            --success-color: #008C15;
             --error-color: #e74c3c;
             --warning-color: #f1c40f;
             --info-color: #3498db;
+            --danger-color: #e74c3c;
             --white: #ffffff;
             --light-gray: #ecf0f1;
             --gray: #95a5a6;
@@ -150,6 +153,45 @@
             background: var(--light-gray);
         }
 
+        .dropdown-menu-section {
+            padding: 4px 0 0;
+            border-top: 1px solid var(--light-gray);
+            margin-top: 4px;
+        }
+
+        .dropdown-menu-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--gray);
+            pointer-events: none;
+        }
+
+        .dropdown-menu a.dropdown-sublink {
+            padding: 10px 16px 10px 28px;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+
+        .dropdown-menu a.dropdown-sublink i {
+            width: 1.1rem;
+            text-align: center;
+            opacity: 0.85;
+        }
+
+        .dropdown-menu a.logout {
+            color: var(--error-color);
+        }
+
+        .dropdown-menu a.logout:hover {
+            color: #c0392b;
+        }
+
         /* Dashboard Container */
         .dashboard-container {
             display: flex;
@@ -210,7 +252,7 @@
 
         .nav-badge {
             background: var(--accent-color);
-            color: var(--white);
+            color: #1a1a1a;
             font-size: 0.7rem;
             padding: 2px 6px;
             border-radius: 10px;
@@ -253,7 +295,7 @@
         }
 
         .btn-primary:hover {
-            background: var(--secondary-color);
+            background: var(--primary-dark);
             transform: translateY(-2px);
         }
 

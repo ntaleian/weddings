@@ -374,7 +374,7 @@
 
         /* Modern Profile Header */
         .section-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: var(--primary-color);
             color: white;
             padding: 24px 30px;
             border-radius: 12px;
@@ -384,7 +384,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
-            box-shadow: 0 2px 12px rgba(100, 1, 127, 0.15);
+            box-shadow: 0 2px 12px rgba(0, 140, 21, 0.15);
         }
 
         .header-content {
@@ -540,7 +540,7 @@
         .form-control:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(100, 1, 127, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 140, 21, 0.1);
         }
 
         .form-control[readonly] {
@@ -577,9 +577,9 @@
         }
 
         .btn-primary:hover {
-            background: #4a0159;
+            background: var(--primary-dark, #006010);
             transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(100, 1, 127, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 140, 21, 0.25);
         }
 
         .btn-secondary {
@@ -779,7 +779,7 @@
         }
 
         .verify-btn:hover {
-            color: #4a0159;
+            color: var(--primary-dark, #006010);
         }
 
         /* Mobile Responsive Styles */

@@ -19,7 +19,7 @@
     left: 30px;
     height: 100%;
     width: 4px;
-    background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+    background: var(--primary-color);
     border-radius: 2px;
 }
 
@@ -51,7 +51,7 @@
 
 .timeline-marker.current {
     background: var(--primary-color);
-    box-shadow: 0 0 20px rgba(100, 1, 127, 0.4);
+    box-shadow: 0 0 20px rgba(0, 140, 21, 0.35);
 }
 
 .timeline-marker.pending {
@@ -72,13 +72,13 @@
 
 .timeline-item.completed .timeline-content {
     border-color: var(--success-color);
-    background: rgba(46, 204, 113, 0.05);
+    background: rgba(0, 140, 21, 0.06);
 }
 
 .timeline-item.current .timeline-content {
     border-color: var(--primary-color);
-    background: rgba(100, 1, 127, 0.05);
-    box-shadow: 0 4px 15px rgba(100, 1, 127, 0.1);
+    background: rgba(0, 140, 21, 0.05);
+    box-shadow: 0 4px 15px rgba(0, 140, 21, 0.12);
 }
 
 .timeline-item.overdue .timeline-content {
@@ -157,7 +157,7 @@
 }
 
 .timeline-btn.primary:hover {
-    background: var(--secondary-color);
+    background: var(--primary-dark, #006010);
 }
 
 .timeline-btn.secondary {
@@ -191,7 +191,7 @@
 .status-overdue { color: var(--danger-color); }
 
 .timeline-summary {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: var(--primary-color);
     color: var(--white);
     border-radius: 16px;
     padding: 25px;
@@ -293,7 +293,7 @@
 
 .timeline-item.current .timeline-details {
     border-left-color: var(--primary-color);
-    background: rgba(100, 1, 127, 0.03);
+    background: rgba(0, 140, 21, 0.03);
 }
 
 .timeline-item.overdue .timeline-details {
@@ -322,7 +322,7 @@
 
 .info-card:hover {
     border-color: var(--primary-color);
-    box-shadow: 0 4px 15px rgba(100, 1, 127, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 140, 21, 0.1);
 }
 
 .info-header {

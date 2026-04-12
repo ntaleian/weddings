@@ -24,7 +24,7 @@ class Dashboard extends Controller
         $this->campusModel = new CampusModel();
         $this->paymentModel = new PaymentModel();
         $this->messageModel = new MessageModel();
-        helper(['form', 'url']);
+        helper(['form', 'url', 'residential_address', 'marital_status']);
     }
 
     public function index()
@@ -136,7 +136,14 @@ class Dashboard extends Controller
             if ($existingDraft) {
                 // Update existing draft
                 $currentData = json_decode($existingDraft->form_data, true) ?: [];
-                $currentData = array_merge($currentData, $formData);
+                $preserveIfEmpty = ['selectedCampus', 'selectedDate', 'selectedTime'];
+                foreach ($formData as $key => $value) {
+                    if ($value === '' && in_array($key, $preserveIfEmpty, true)
+                        && isset($currentData[$key]) && $currentData[$key] !== '' && $currentData[$key] !== null) {
+                        continue;
+                    }
+                    $currentData[$key] = $value;
+                }
                 
                 $db->table('application_drafts')->where('user_id', $userId)->update([
                     'form_data' => json_encode($currentData),
@@ -217,13 +224,17 @@ class Dashboard extends Controller
         
         // If application is already submitted, show view-only mode
         if ($submittedBooking) {
+            $pdfContext = $this->getApplicationViewPdfContext($submittedBooking);
             $data = [
                 'title' => 'Wedding Application - Submitted - Watoto Church Wedding Booking',
                 'user' => $user,
                 'campuses' => $campuses,
                 'booking' => $submittedBooking,
                 'isSubmitted' => true,
-                'applicationStatus' => $submittedBooking['status']
+                'applicationStatus' => $submittedBooking['status'],
+                'payments' => $pdfContext['payments'],
+                'uploadedDocuments' => $pdfContext['uploadedDocuments'],
+                'paymentSummary' => $pdfContext['paymentSummary'],
             ];
             
             return view('user/dashboard/application_view', $data);
@@ -240,6 +251,7 @@ class Dashboard extends Controller
             'user' => $user,
             'campuses' => $campuses,
             'saved_data' => $savedApplication,
+            'countries' => $this->getWorldCountryNames(),
             'isSubmitted' => false,
             'minBookingDate' => $minBookingDate,
             'unreadMessagesCount' => $this->getUnreadMessagesCount($userId),
@@ -449,7 +461,7 @@ class Dashboard extends Controller
         $weddingDate = $this->request->getPost('wedding_date');
         $weddingTime = $this->request->getPost('wedding_time');
 
-        // Validate booking date and time according to guidelines (6 months, Saturday-only, time slots)
+        // Validate booking date and time according to guidelines (advance days, Fri/Sat, time slots)
         $dateTimeValidation = $this->bookingModel->validateBookingDateTime($weddingDate, $weddingTime);
         if (!$dateTimeValidation['valid']) {
             $errorMessage = implode(' ', $dateTimeValidation['errors']);
@@ -674,6 +686,20 @@ class Dashboard extends Controller
         return $typeMap[$status] ?? 'info';
     }
 
+    /**
+     * @return list<string>
+     */
+    private function getWorldCountryNames(): array
+    {
+        $path = APPPATH . 'Config/Data/world_country_names.json';
+        if (! is_file($path)) {
+            return [];
+        }
+        $data = json_decode((string) file_get_contents($path), true);
+
+        return is_array($data) ? $data : [];
+    }
+
     private function getSavedApplicationData($userId)
     {
         // Get saved application data from database
@@ -683,6 +709,69 @@ class Dashboard extends Controller
             return json_decode($draft->form_data, true);
         }
         return [];
+    }
+
+    /**
+     * Payments, document list, and totals for the submitted-application PDF (user view).
+     *
+     * @return array{payments: list<array>, uploadedDocuments: list<array>, paymentSummary: array<string, float|bool>}
+     */
+    private function getApplicationViewPdfContext(array $booking): array
+    {
+        $bookingId = (int) ($booking['id'] ?? 0);
+        $payments = [];
+        if ($bookingId > 0) {
+            $payments = $this->paymentModel->where('booking_id', $bookingId)
+                ->orderBy('created_at', 'DESC')
+                ->findAll();
+        }
+
+        $totalPaid = 0.0;
+        $pendingAmount = 0.0;
+        foreach ($payments as $payment) {
+            $st = $payment['status'] ?? '';
+            if ($st === 'completed') {
+                $totalPaid += (float) $payment['amount'];
+            } elseif ($st === 'pending') {
+                $pendingAmount += (float) $payment['amount'];
+            }
+        }
+
+        $settingsModel = new \App\Models\SettingsModel();
+        $weddingFeeSetting = $settingsModel->getSetting('base_wedding_fee');
+        $weddingFee = (float) ($booking['total_cost'] ?? ($weddingFeeSetting ? (float) $weddingFeeSetting : 600000));
+        $remainingBalance = max(0.0, $weddingFee - $totalPaid - $pendingAmount);
+
+        $uploadedDocuments = [];
+        if (! empty($booking['admin_documents_checklist'])) {
+            $documents = json_decode($booking['admin_documents_checklist'], true);
+            if (is_array($documents)) {
+                foreach ($documents as $docId => $docData) {
+                    if (is_array($docData) && isset($docData['status']) && $docData['status'] === 'submitted') {
+                        $uploadedDocuments[] = [
+                            'id' => $docId,
+                            'name' => ucwords(str_replace('_', ' ', (string) $docId)),
+                            'filename' => $docData['filename'] ?? '',
+                            'original_name' => $docData['original_name'] ?? '',
+                            'file_path' => $docData['file_path'] ?? '',
+                            'uploaded_at' => $docData['uploaded_at'] ?? '',
+                        ];
+                    }
+                }
+            }
+        }
+
+        return [
+            'payments' => $payments,
+            'uploadedDocuments' => $uploadedDocuments,
+            'paymentSummary' => [
+                'total_required' => $weddingFee,
+                'total_paid' => $totalPaid,
+                'pending_amount' => $pendingAmount,
+                'remaining_balance' => $remainingBalance,
+                'is_fully_paid' => ($totalPaid + $pendingAmount) >= $weddingFee,
+            ],
+        ];
     }
 
     private function getUploadedDocuments($userId)
@@ -1026,9 +1115,37 @@ class Dashboard extends Controller
             'witness2_phone' => 'required|max_length[20]',
             'witness1_id_number' => 'required|max_length[100]',
             'witness2_id_number' => 'required|max_length[100]',
-            'witness1_relationship' => 'required|max_length[100]',
-            'witness2_relationship' => 'required|max_length[100]',
-            'accept_terms' => 'required'
+            'witness1_marital_status' => 'required|in_list[bachelor,spinster,divorced-separated,married-traditionally,widowed,civil-marriage,cohabiting]',
+            'witness2_marital_status' => 'required|in_list[bachelor,spinster,divorced-separated,married-traditionally,widowed,civil-marriage,cohabiting]',
+            'bride_father_status' => 'required|in_list[alive,deceased]',
+            'bride_mother_status' => 'required|in_list[alive,deceased]',
+            'groom_father_status' => 'required|in_list[alive,deceased]',
+            'groom_mother_status' => 'required|in_list[alive,deceased]',
+            'accept_terms' => 'required',
+            'bride_date_of_birth' => 'required|valid_date',
+            'groom_date_of_birth' => 'required|valid_date',
+            'bride_nationality' => 'required|max_length[120]',
+            'groom_nationality' => 'required|max_length[120]',
+            'bride_marital_status' => 'required|max_length[50]',
+            'groom_marital_status' => 'required|max_length[50]',
+            'bride_id_number' => 'required|max_length[100]',
+            'groom_id_number' => 'required|max_length[100]',
+            'bride_id_type' => 'required|max_length[50]',
+            'groom_id_type' => 'required|max_length[50]',
+            'bride_church_member' => 'required|in_list[yes,other,no]',
+            'groom_church_member' => 'required|in_list[yes,other,no]',
+            'bride_res_country' => 'required|max_length[120]',
+            'bride_res_region' => 'required|max_length[120]',
+            'bride_res_district' => 'required|max_length[120]',
+            'bride_res_sub_county' => 'required|max_length[120]',
+            'bride_res_parish' => 'required|max_length[120]',
+            'bride_res_village' => 'required|max_length[120]',
+            'groom_res_country' => 'required|max_length[120]',
+            'groom_res_region' => 'required|max_length[120]',
+            'groom_res_district' => 'required|max_length[120]',
+            'groom_res_sub_county' => 'required|max_length[120]',
+            'groom_res_parish' => 'required|max_length[120]',
+            'groom_res_village' => 'required|max_length[120]',
         ];
 
         if (!$this->validate($validationRules)) {
@@ -1039,7 +1156,51 @@ class Dashboard extends Controller
             ]);
         }
 
-        // Validate booking date and time according to guidelines (6 months, Saturday-only, time slots)
+        $conditionalErrors = [];
+        $churchRules = [
+            'yes' => [
+                'bride' => ['bride_cell_group_number', 'bride_cell_leader_name', 'bride_cell_leader_phone'],
+                'groom' => ['groom_cell_group_number', 'groom_cell_leader_name', 'groom_cell_leader_phone'],
+            ],
+            'other' => [
+                'bride' => ['bride_church_name', 'bride_senior_pastor', 'bride_pastor_phone'],
+                'groom' => ['groom_church_name', 'groom_senior_pastor', 'groom_pastor_phone'],
+            ],
+        ];
+        foreach (['bride', 'groom'] as $who) {
+            $member = (string) $this->request->getPost($who . '_church_member');
+            if (! isset($churchRules[$member][$who])) {
+                continue;
+            }
+            foreach ($churchRules[$member][$who] as $field) {
+                if (trim((string) $this->request->getPost($field)) === '') {
+                    $conditionalErrors[$field] = 'This field is required for your church membership selection.';
+                }
+            }
+        }
+
+        $parentPhones = [
+            ['bride_father_status', 'bride_father_phone', "Bride's father"],
+            ['bride_mother_status', 'bride_mother_phone', "Bride's mother"],
+            ['groom_father_status', 'groom_father_phone', "Groom's father"],
+            ['groom_mother_status', 'groom_mother_phone', "Groom's mother"],
+        ];
+        foreach ($parentPhones as [$statusField, $phoneField, $label]) {
+            if ($this->request->getPost($statusField) === 'alive'
+                && trim((string) $this->request->getPost($phoneField)) === '') {
+                $conditionalErrors[$phoneField] = 'Contact phone is required when this parent is alive.';
+            }
+        }
+
+        if ($conditionalErrors !== []) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $conditionalErrors,
+            ]);
+        }
+
+        // Validate booking date and time according to guidelines (advance days, Fri/Sat, time slots)
         $weddingDate = $this->request->getPost('selectedDate');
         $weddingTime = $this->request->getPost('selectedTime');
         $campusId = $this->request->getPost('selectedCampus');
@@ -1075,22 +1236,22 @@ class Dashboard extends Controller
                 'bride_name' => $this->request->getPost('bride_name'),
                 'bride_date_of_birth' => $this->request->getPost('bride_date_of_birth'),
                 'bride_age' => $this->request->getPost('bride_age'),
-                'bride_birth_place' => $this->request->getPost('bride_birth_place'),
+                'bride_birth_place' => null,
                 'bride_email' => $this->request->getPost('bride_email'),
                 'bride_phone' => $this->request->getPost('bride_phone'),
                 'bride_occupation' => $this->request->getPost('bride_occupation'),
-                'bride_employer' => $this->request->getPost('bride_employer'),
-                'bride_education_level' => $this->request->getPost('bride_education_level'),
+                'bride_employer' => null,
+                'bride_education_level' => null,
                 'bride_nationality' => $this->request->getPost('bride_nationality'),
-                'bride_religion' => $this->request->getPost('bride_religion'),
+                'bride_religion' => null,
                 'bride_marital_status' => $this->request->getPost('bride_marital_status'),
-                'bride_address' => $this->request->getPost('bride_address'),
+                'bride_address' => encode_residential_address_from_post($this->request, 'bride'),
                 'bride_id_number' => $this->request->getPost('bride_id_number'),
                 'bride_id_type' => $this->request->getPost('bride_id_type'),
                 
                 // Bride church information
                 'bride_church_member' => $this->request->getPost('bride_church_member'),
-                'bride_membership_duration' => $this->request->getPost('bride_membership_duration'),
+                'bride_membership_duration' => null,
                 'bride_cell_group_number' => $this->request->getPost('bride_cell_group_number'),
                 'bride_cell_leader_name' => $this->request->getPost('bride_cell_leader_name'),
                 'bride_cell_leader_phone' => $this->request->getPost('bride_cell_leader_phone'),
@@ -1102,22 +1263,22 @@ class Dashboard extends Controller
                 'groom_name' => $this->request->getPost('groom_name'),
                 'groom_date_of_birth' => $this->request->getPost('groom_date_of_birth'),
                 'groom_age' => $this->request->getPost('groom_age'),
-                'groom_birth_place' => $this->request->getPost('groom_birth_place'),
+                'groom_birth_place' => null,
                 'groom_email' => $this->request->getPost('groom_email'),
                 'groom_phone' => $this->request->getPost('groom_phone'),
                 'groom_occupation' => $this->request->getPost('groom_occupation'),
-                'groom_employer' => $this->request->getPost('groom_employer'),
-                'groom_education_level' => $this->request->getPost('groom_education_level'),
+                'groom_employer' => null,
+                'groom_education_level' => null,
                 'groom_nationality' => $this->request->getPost('groom_nationality'),
-                'groom_religion' => $this->request->getPost('groom_religion'),
+                'groom_religion' => null,
                 'groom_marital_status' => $this->request->getPost('groom_marital_status'),
-                'groom_address' => $this->request->getPost('groom_address'),
+                'groom_address' => encode_residential_address_from_post($this->request, 'groom'),
                 'groom_id_number' => $this->request->getPost('groom_id_number'),
                 'groom_id_type' => $this->request->getPost('groom_id_type'),
                 
                 // Groom church information
                 'groom_church_member' => $this->request->getPost('groom_church_member'),
-                'groom_membership_duration' => $this->request->getPost('groom_membership_duration'),
+                'groom_membership_duration' => null,
                 'groom_cell_group_number' => $this->request->getPost('groom_cell_group_number'),
                 'groom_cell_leader_name' => $this->request->getPost('groom_cell_leader_name'),
                 'groom_cell_leader_phone' => $this->request->getPost('groom_cell_leader_phone'),
@@ -1141,24 +1302,36 @@ class Dashboard extends Controller
                 // Family information
                 'bride_father' => $this->request->getPost('bride_father'),
                 'bride_father_occupation' => $this->request->getPost('bride_father_occupation'),
+                'bride_father_status' => $this->request->getPost('bride_father_status'),
                 'bride_mother' => $this->request->getPost('bride_mother'),
                 'bride_mother_occupation' => $this->request->getPost('bride_mother_occupation'),
-                'bride_family_phone' => $this->request->getPost('bride_family_phone'),
+                'bride_mother_status' => $this->request->getPost('bride_mother_status'),
+                'bride_family_phone' => null,
+                'bride_father_phone' => $this->request->getPost('bride_father_status') === 'alive'
+                    ? $this->request->getPost('bride_father_phone') : null,
+                'bride_mother_phone' => $this->request->getPost('bride_mother_status') === 'alive'
+                    ? $this->request->getPost('bride_mother_phone') : null,
                 'groom_father' => $this->request->getPost('groom_father'),
                 'groom_father_occupation' => $this->request->getPost('groom_father_occupation'),
+                'groom_father_status' => $this->request->getPost('groom_father_status'),
                 'groom_mother' => $this->request->getPost('groom_mother'),
                 'groom_mother_occupation' => $this->request->getPost('groom_mother_occupation'),
-                'groom_family_phone' => $this->request->getPost('groom_family_phone'),
+                'groom_mother_status' => $this->request->getPost('groom_mother_status'),
+                'groom_family_phone' => null,
+                'groom_father_phone' => $this->request->getPost('groom_father_status') === 'alive'
+                    ? $this->request->getPost('groom_father_phone') : null,
+                'groom_mother_phone' => $this->request->getPost('groom_mother_status') === 'alive'
+                    ? $this->request->getPost('groom_mother_phone') : null,
                 
                 // Witnesses
                 'witness1_name' => $this->request->getPost('witness1_name'),
                 'witness1_phone' => $this->request->getPost('witness1_phone'),
                 'witness1_id_number' => $this->request->getPost('witness1_id_number'),
-                'witness1_relationship' => $this->request->getPost('witness1_relationship'),
+                'witness1_marital_status' => $this->request->getPost('witness1_marital_status'),
                 'witness2_name' => $this->request->getPost('witness2_name'),
                 'witness2_phone' => $this->request->getPost('witness2_phone'),
                 'witness2_id_number' => $this->request->getPost('witness2_id_number'),
-                'witness2_relationship' => $this->request->getPost('witness2_relationship'),
+                'witness2_marital_status' => $this->request->getPost('witness2_marital_status'),
                 
                 // Marriage preparation
                 'premarital_counseling' => $this->request->getPost('premarital_counseling'),
@@ -1198,7 +1371,8 @@ class Dashboard extends Controller
                 return $this->response->setJSON([
                     'success' => true,
                     'message' => 'Application submitted successfully!',
-                    'booking_id' => $bookingId
+                    'booking_id' => $bookingId,
+                    'redirect' => site_url('dashboard'),
                 ]);
             }
             
