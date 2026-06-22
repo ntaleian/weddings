@@ -199,4 +199,9 @@ class App extends BaseConfig
      * @see http://www.w3.org/TR/CSP/
      */
     public bool $CSPEnabled = false;
+
+    /**
+     * Fallback cache-busting value for static assets.
+     */
+    public string $assetVersion = '1.0.0';
 }
