@@ -52,6 +52,7 @@ node_modules/
 package-lock.json
 
 # Build files
+/build/
 /builds/
 
 # Sensitive files
@@ -68,4 +69,3 @@ config.php
 .Trashes
 ehthumbs.db
 Desktop.ini
-

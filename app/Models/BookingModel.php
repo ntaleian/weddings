@@ -33,7 +33,7 @@ class BookingModel extends Model
         'witness1_name', 'witness1_phone', 'witness1_id_number', 'witness1_marital_status',
         'witness2_name', 'witness2_phone', 'witness2_id_number', 'witness2_marital_status',
         'premarital_counseling', 'counseling_pastor', 'pastor_recommendation',
-        'accept_terms', 'application_step', 'is_draft', 'status', 'total_cost', 'admin_notes',
+        'accept_terms', 'application_step', 'is_draft', 'status', 'total_cost', 'payment_status', 'admin_notes',
         // Admin-managed fields
         'admin_counseling_status', 'admin_counseling_pastor_id', 'admin_counseling_sessions',
         'admin_counseling_completion_date', 'admin_counseling_notes', 'admin_documents_checklist',
