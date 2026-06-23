@@ -16,10 +16,12 @@ class WeddingAppTestSchema extends Migration
         $this->createPaymentsTable();
         $this->createSettingsTable();
         $this->createBlockedDatesTable();
+        $this->createEmailVerificationsTable();
     }
 
     public function down(): void
     {
+        $this->forge->dropTable('email_verifications', true);
         $this->forge->dropTable('blocked_dates', true);
         $this->forge->dropTable('payments', true);
         $this->forge->dropTable('bookings', true);
@@ -150,5 +152,21 @@ class WeddingAppTestSchema extends Migration
         $this->forge->addKey('campus_id');
         $this->forge->addKey('blocked_date');
         $this->forge->createTable('blocked_dates');
+    }
+
+    private function createEmailVerificationsTable(): void
+    {
+        $this->forge->addField('id');
+        $this->forge->addField([
+            'email'      => ['type' => 'varchar', 'constraint' => 255],
+            'otp_code'   => ['type' => 'varchar', 'constraint' => 6],
+            'expires_at' => ['type' => 'datetime'],
+            'is_used'    => ['type' => 'integer', 'constraint' => 1, 'default' => 0],
+            'created_at' => ['type' => 'datetime', 'null' => true],
+            'updated_at' => ['type' => 'datetime', 'null' => true],
+        ]);
+        $this->forge->addKey('email');
+        $this->forge->addKey('otp_code');
+        $this->forge->createTable('email_verifications');
     }
 }

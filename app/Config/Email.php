@@ -6,8 +6,8 @@ use CodeIgniter\Config\BaseConfig;
 
 class Email extends BaseConfig
 {
-    public string $fromEmail  = '';
-    public string $fromName   = '';
+    public string $fromEmail  = 'noreply@watotochurch.test';
+    public string $fromName   = 'Watoto Church';
     public string $recipients = '';
 
     /**
@@ -28,7 +28,7 @@ class Email extends BaseConfig
     /**
      * SMTP Server Hostname
      */
-    public string $SMTPHost = '';
+    public string $SMTPHost = '127.0.0.1';
 
     /**
      * SMTP Username
@@ -43,7 +43,7 @@ class Email extends BaseConfig
     /**
      * SMTP Port
      */
-    public int $SMTPPort = 587;
+    public int $SMTPPort = 1025;
 
     /**
      * SMTP Timeout (in seconds)
@@ -62,7 +62,7 @@ class Email extends BaseConfig
      *             to the server. 'ssl' means implicit SSL. Connection on port
      *             465 should set this to ''.
      */
-    public string $SMTPCrypto = 'tls';
+    public string $SMTPCrypto = '';
 
     /**
      * Enable word-wrap
@@ -83,16 +83,16 @@ class Email extends BaseConfig
     {
         parent::__construct();
 
-        // Load email settings from environment variables
-        $this->fromEmail = $_ENV['email.fromEmail'] ?? $this->fromEmail;
-        $this->fromName = $_ENV['email.fromName'] ?? $this->fromName;
-        $this->protocol = $_ENV['email.protocol'] ?? $this->protocol;
-        $this->SMTPHost = $_ENV['email.SMTPHost'] ?? $this->SMTPHost;
-        $this->SMTPUser = $_ENV['email.SMTPUser'] ?? $this->SMTPUser;
-        $this->SMTPPass = $_ENV['email.SMTPPass'] ?? $this->SMTPPass;
-        $this->SMTPPort = (int)($_ENV['email.SMTPPort'] ?? $this->SMTPPort);
-        $this->SMTPCrypto = $_ENV['email.SMTPCrypto'] ?? $this->SMTPCrypto;
-        $this->mailType = $_ENV['email.mailType'] ?? $this->mailType;
+        // Load email settings from .env/environment variables.
+        $this->fromEmail = (string) env('email.fromEmail', $this->fromEmail);
+        $this->fromName = (string) env('email.fromName', $this->fromName);
+        $this->protocol = (string) env('email.protocol', $this->protocol);
+        $this->SMTPHost = (string) env('email.SMTPHost', $this->SMTPHost);
+        $this->SMTPUser = (string) env('email.SMTPUser', $this->SMTPUser);
+        $this->SMTPPass = (string) env('email.SMTPPass', $this->SMTPPass);
+        $this->SMTPPort = (int) env('email.SMTPPort', $this->SMTPPort);
+        $this->SMTPCrypto = (string) env('email.SMTPCrypto', $this->SMTPCrypto);
+        $this->mailType = (string) env('email.mailType', $this->mailType);
     }
 
     /**

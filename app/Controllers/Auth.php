@@ -6,18 +6,21 @@ use App\Models\UserModel;
 use App\Libraries\OtpLibrary;
 use App\Libraries\MathCaptchaLibrary;
 use CodeIgniter\Controller;
+use Config\WeddingAuth;
 
 class Auth extends Controller
 {
     protected $userModel;
     protected $otpLibrary;
     protected $mathCaptchaLibrary;
+    protected WeddingAuth $authConfig;
 
     public function __construct()
     {
         $this->userModel = new UserModel();
         $this->otpLibrary = new OtpLibrary();
         $this->mathCaptchaLibrary = new MathCaptchaLibrary();
+        $this->authConfig = new WeddingAuth();
         helper(['form', 'url']);
         $this->session = \Config\Services::session();
     }
@@ -58,15 +61,14 @@ class Auth extends Controller
                 return redirect()->back()->with('error', 'Your account is deactivated. Please contact support.');
             }
 
-            $sessionData = [
-                'user_id' => $user['id'],
-                'user_name' => $user['first_name'] . ' ' . $user['last_name'],
-                'user_email' => $user['email'],
-                'user_role' => $user['role'],
-                'isLoggedIn' => true
-            ];
+            if ($this->requiresEmailVerification($user)) {
+                $this->setPendingVerificationSession($user['email'], $user['first_name'] . ' ' . $user['last_name']);
 
-            session()->set($sessionData);
+                return redirect()->to('/verify-email')
+                    ->with('error', 'Please verify your email address before signing in.');
+            }
+
+            $this->signInUser($user);
 
             if ($user['role'] === 'admin') {
                 return redirect()->to(site_url('admin/dashboard'));
@@ -135,28 +137,41 @@ class Auth extends Controller
             'is_email_verified' => false
         ];
 
-        if ($this->userModel->insert($userData)) {
-            // Generate and send OTP
-            $otp = $this->otpLibrary->generateOtp();
+        $userId = $this->userModel->insert($userData);
+
+        if ($userId) {
             $email = $userData['email'];
             $userName = $userData['first_name'] . ' ' . $userData['last_name'];
+
+            if (!$this->authConfig->requireEmailVerification) {
+                $user = $this->userModel->find($userId);
+
+                if ($this->authConfig->autoLoginAfterRegistration && $user) {
+                    $this->signInUser($user);
+
+                    return redirect()->to(site_url('dashboard'))
+                        ->with('success', 'Account created successfully. You are now signed in.');
+                }
+
+                return redirect()->to('/login')
+                    ->with('success', 'Account created successfully. Please sign in.');
+            }
+
+            $this->setPendingVerificationSession($email, $userName);
+
+            // Generate and send OTP
+            $otp = $this->otpLibrary->generateOtp();
             
             // Store OTP in database
             if ($this->otpLibrary->storeOtp($email, $otp, 15)) {
                 // Send OTP email
                 if ($this->sendOtpEmail($email, $userName, $otp, 15)) {
-                    // Store user data in session for verification
-                    session()->set([
-                        'pending_verification_email' => $email,
-                        'pending_verification_name' => $userName
-                    ]);
-                    
                     return redirect()->to('/verify-email')->with('success', 'Registration successful! Please check your email for the verification code.');
                 } else {
-                    return redirect()->back()->with('error', 'Registration successful but failed to send verification email. Please try again.');
+                    return redirect()->to('/verify-email')->with('error', 'Account created, but we could not send the verification email. Please try resending the code or contact support.');
                 }
             } else {
-                return redirect()->back()->with('error', 'Registration failed. Please try again.');
+                return redirect()->to('/login')->with('error', 'Account created, but verification could not be started. Please contact support.');
             }
         }
 
@@ -242,15 +257,7 @@ class Auth extends Controller
             // Get user and create session
             $user = $this->userModel->getUserByEmail($email);
             
-            $sessionData = [
-                'user_id' => $user['id'],
-                'user_name' => $user['first_name'] . ' ' . $user['last_name'],
-                'user_email' => $user['email'],
-                'user_role' => $user['role'],
-                'isLoggedIn' => true
-            ];
-
-            session()->set($sessionData);
+            $this->signInUser($user);
             
             // Clear verification session data
             session()->remove(['pending_verification_email', 'pending_verification_name']);
@@ -345,7 +352,15 @@ class Auth extends Controller
         $emailService->setMessage($htmlMessage);
         $emailService->setAltMessage($textMessage);
         
-        return $emailService->send();
+        $sent = $emailService->send();
+        if (!$sent) {
+            log_message('error', 'OTP email failed for {email}: {debug}', [
+                'email' => $email,
+                'debug' => $emailService->printDebugger(['headers', 'subject']),
+            ]);
+        }
+
+        return $sent;
     }
 
     public function logout()
@@ -387,20 +402,52 @@ class Auth extends Controller
                 return redirect()->back()->with('error', 'Your account is deactivated. Please contact support.');
             }
 
-            $sessionData = [
-                'user_id' => $user['id'],
-                'user_name' => $user['first_name'] . ' ' . $user['last_name'],
-                'user_email' => $user['email'],
-                'user_role' => $user['role'],
-                'isLoggedIn' => true
-            ];
+            if ($this->requiresEmailVerification($user)) {
+                $this->setPendingVerificationSession($user['email'], $user['first_name'] . ' ' . $user['last_name']);
 
-            session()->set($sessionData);
+                return redirect()->to('/verify-email')
+                    ->with('error', 'Please verify your email address before signing in.');
+            }
+
+            $this->signInUser($user);
 
             return redirect()->to(site_url('admin/dashboard'));
         }
 
         return redirect()->back()->with('error', 'Invalid admin credentials.');
+    }
+
+    private function signInUser(array $user): void
+    {
+        session()->set([
+            'user_id' => $user['id'],
+            'user_name' => $user['first_name'] . ' ' . $user['last_name'],
+            'user_email' => $user['email'],
+            'user_role' => $user['role'],
+            'isLoggedIn' => true
+        ]);
+    }
+
+    private function setPendingVerificationSession(string $email, string $name): void
+    {
+        session()->set([
+            'pending_verification_email' => $email,
+            'pending_verification_name' => $name
+        ]);
+    }
+
+    private function requiresEmailVerification(array $user): bool
+    {
+        if (!$this->authConfig->requireEmailVerification) {
+            return false;
+        }
+
+        return !$this->isEmailVerified($user);
+    }
+
+    private function isEmailVerified(array $user): bool
+    {
+        return !empty($user['is_email_verified']) || !empty($user['email_verified_at']);
     }
 
     function view_email_template()
