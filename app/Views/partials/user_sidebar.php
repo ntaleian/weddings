@@ -1,19 +1,27 @@
 <!-- Sidebar -->
         <?php
             $paymentStatusValue = $paymentStatus ?? 'no_booking';
-            $hasSubmittedBooking = $paymentStatusValue !== 'no_booking';
-            $request = service('request');
-            $stepQuery = (string) ($request->getGet('step') ?? '');
-            $documentsUrl = $hasSubmittedBooking
-                ? site_url('dashboard/documents')
-                : site_url('dashboard/application') . '?step=4';
-            $paymentUrl = $hasSubmittedBooking
-                ? site_url('dashboard/payment')
-                : site_url('dashboard/application') . '?step=5';
-            $documentsActive = uri_string() === 'dashboard/documents'
-                || (uri_string() === 'dashboard/application' && $stepQuery === '4');
-            $paymentActive = uri_string() === 'dashboard/payment'
-                || (uri_string() === 'dashboard/application' && $stepQuery === '5');
+            $documentsUrl = site_url('dashboard/documents');
+            $paymentUrl = site_url('dashboard/payment');
+            $documentSummary = $documentSummary ?? [];
+            $documentsUploaded = (int) ($documentSummary['uploaded'] ?? 0);
+            $documentsTotal = (int) ($documentSummary['total'] ?? 0);
+            $documentsBadgeText = $documentsTotal > 0
+                ? $documentsUploaded . '/' . $documentsTotal
+                : 'Pending';
+            $documentsBadgeClass = ! empty($documentSummary['isComplete'])
+                ? 'nav-badge-success'
+                : ($documentsUploaded > 0 ? 'nav-badge-info' : 'nav-badge-warning');
+            $paymentBadgeMap = [
+                'no_booking' => ['text' => 'Not started', 'class' => 'nav-badge-warning'],
+                'required' => ['text' => 'Required', 'class' => 'nav-badge-danger'],
+                'pending_verification' => ['text' => 'Pending', 'class' => 'nav-badge-warning'],
+                'partial' => ['text' => 'Partial', 'class' => 'nav-badge-info'],
+                'completed' => ['text' => 'Complete', 'class' => 'nav-badge-success'],
+            ];
+            $paymentBadge = $paymentBadgeMap[$paymentStatusValue] ?? $paymentBadgeMap['no_booking'];
+            $documentsActive = uri_string() === 'dashboard/documents';
+            $paymentActive = uri_string() === 'dashboard/payment';
         ?>
         <aside class="dashboard-sidebar">
             <div class="sidebar-header">
@@ -24,31 +32,20 @@
                     <i class="fas fa-home"></i>
                     <span>Overview</span>
                 </a>
-                <a href="<?= site_url('dashboard/application') ?>" class="nav-item <?= (uri_string() === 'dashboard/application' && ! in_array($stepQuery, ['4', '5'], true)) ? 'active' : '' ?>">
+                <a href="<?= site_url('dashboard/application') ?>" class="nav-item <?= uri_string() === 'dashboard/application' ? 'active' : '' ?>">
                     <i class="fas fa-file-contract"></i>
                     <span>Application</span>
                     <!-- <span class="nav-badge">In Progress</span> -->
                 </a>
                 <a href="<?= esc($documentsUrl) ?>" class="nav-item <?= $documentsActive ? 'active' : '' ?>">
                     <i class="fas fa-file-alt"></i>
-                    <span>Step 4: Documents</span>
+                    <span>Documents uploaded</span>
+                    <span class="nav-badge <?= esc($documentsBadgeClass) ?>"><?= esc($documentsBadgeText) ?></span>
                 </a>
                 <a href="<?= esc($paymentUrl) ?>" class="nav-item <?= $paymentActive ? 'active' : '' ?>">
                     <i class="fas fa-credit-card"></i>
-                    <span>Step 5: Payment</span>
-                    <?php if (isset($paymentStatus)): ?>
-                        <?php if ($paymentStatus === 'required'): ?>
-                            <span class="nav-badge nav-badge-danger">Required</span>
-                        <?php elseif ($paymentStatus === 'pending_verification'): ?>
-                            <span class="nav-badge nav-badge-warning">Pending</span>
-                        <?php elseif ($paymentStatus === 'partial'): ?>
-                            <span class="nav-badge nav-badge-info">Partial</span>
-                        <?php elseif ($paymentStatus === 'completed'): ?>
-                            <span class="nav-badge nav-badge-success">Complete</span>
-                        <?php endif; ?>
-                    <?php elseif (isset($hasUnpaidFees) && $hasUnpaidFees): ?>
-                        <span class="nav-badge nav-badge-danger">Required</span>
-                    <?php endif; ?>
+                    <span>Payment status</span>
+                    <span class="nav-badge <?= esc($paymentBadge['class']) ?>"><?= esc($paymentBadge['text']) ?></span>
                 </a>
                 <a href="<?= site_url('dashboard/profile') ?>" class="nav-item <?= (uri_string() === 'dashboard/profile') ? 'active' : '' ?>">
                     <i class="fas fa-user"></i>

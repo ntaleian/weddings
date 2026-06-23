@@ -90,7 +90,8 @@ class Dashboard extends Controller
             'resumeApplicationUrl' => site_url('dashboard/application') . ($hasDraftApplication ? '?resume=1&step=' . $currentStep : ''),
             'unreadMessagesCount' => $this->getUnreadMessagesCount($userId),
             'paymentStatus' => $this->getPaymentStatus($userId),
-            'paymentInfo' => $paymentInfo
+            'paymentInfo' => $paymentInfo,
+            'documentSummary' => $this->getDocumentUploadSummary($userId),
         ];
         
         return view('user/dashboard/overview', $data);
@@ -244,6 +245,8 @@ class Dashboard extends Controller
                 'payments' => $pdfContext['payments'],
                 'uploadedDocuments' => $pdfContext['uploadedDocuments'],
                 'paymentSummary' => $pdfContext['paymentSummary'],
+                'documentSummary' => $this->getDocumentUploadSummary($userId),
+                'paymentStatus' => $this->getPaymentStatus($userId),
             ];
             
             return view('user/dashboard/application_view', $data);
@@ -271,7 +274,8 @@ class Dashboard extends Controller
             'requiredDocuments' => $this->getRequiredDocuments(),
             'weddingFee' => $this->calculateWeddingCost(null, 100),
             'unreadMessagesCount' => $this->getUnreadMessagesCount($userId),
-            'paymentStatus' => $this->getPaymentStatus($userId)
+            'paymentStatus' => $this->getPaymentStatus($userId),
+            'documentSummary' => $this->getDocumentUploadSummary($userId),
         ];
 
         return view('user/dashboard/application', $data);
@@ -290,12 +294,14 @@ class Dashboard extends Controller
         $documents = $this->getUploadedDocuments($userId);
         
         $data = [
-            'title' => 'Step 4: Documents - Watoto Church Wedding Booking',
+            'title' => 'Documents Uploaded - Watoto Church Wedding Booking',
             'user' => $user,
             'documents' => $documents,
             'required_documents' => $this->getRequiredDocuments(),
+            'hasActiveBooking' => $this->getPaymentStatus($userId) !== 'no_booking',
             'unreadMessagesCount' => $this->getUnreadMessagesCount($userId),
-            'paymentStatus' => $this->getPaymentStatus($userId)
+            'paymentStatus' => $this->getPaymentStatus($userId),
+            'documentSummary' => $this->getDocumentUploadSummary($userId),
         ];
 
         return view('user/dashboard/documents', $data);
@@ -330,7 +336,8 @@ class Dashboard extends Controller
             'messages' => $messages,
             'coordinator' => $coordinator,
             'unreadMessagesCount' => 0, // Set to 0 since we just marked them as read
-            'paymentStatus' => $this->getPaymentStatus($userId)
+            'paymentStatus' => $this->getPaymentStatus($userId),
+            'documentSummary' => $this->getDocumentUploadSummary($userId),
         ];
 
         return view('user/dashboard/messages', $data);
@@ -355,7 +362,8 @@ class Dashboard extends Controller
             'timeline' => $timeline,
             'stats' => $stats,
             'unreadMessagesCount' => $this->getUnreadMessagesCount($userId),
-            'paymentStatus' => $this->getPaymentStatus($userId)
+            'paymentStatus' => $this->getPaymentStatus($userId),
+            'documentSummary' => $this->getDocumentUploadSummary($userId),
         ];
 
         return view('user/dashboard/timeline', $data);
@@ -372,7 +380,9 @@ class Dashboard extends Controller
         
         $data = [
             'title' => 'Profile - Watoto Church Wedding Booking',
-            'user' => $user
+            'user' => $user,
+            'paymentStatus' => $this->getPaymentStatus($userId),
+            'documentSummary' => $this->getDocumentUploadSummary($userId),
         ];
 
         return view('user/dashboard/profile', $data);
@@ -737,8 +747,8 @@ class Dashboard extends Controller
             1 => 'Venue & Date',
             2 => 'Personal Details',
             3 => 'Witnesses',
-            4 => 'Documents',
-            5 => 'Payment',
+            4 => 'Document Checklist',
+            5 => 'Payment Information',
             6 => 'Review & Submit',
         ];
     }
@@ -931,6 +941,24 @@ class Dashboard extends Controller
         }
         
         return $uploaded;
+    }
+
+    private function getDocumentUploadSummary($userId): array
+    {
+        $requiredDocuments = $this->getRequiredDocuments();
+        $requiredCount = count(array_filter($requiredDocuments, static function ($document) {
+            return ($document['required'] ?? true) === true;
+        }));
+        $uploadedCount = count($this->getUploadedDocuments($userId));
+
+        return [
+            'uploaded' => $uploadedCount,
+            'total' => $requiredCount,
+            'isComplete' => $requiredCount > 0 && $uploadedCount >= $requiredCount,
+            'label' => $requiredCount > 0
+                ? $uploadedCount . ' of ' . $requiredCount . ' uploaded'
+                : 'Documents uploaded',
+        ];
     }
 
     private function getRequiredDocuments()
@@ -1967,28 +1995,28 @@ class Dashboard extends Controller
                                      ->orderBy('created_at', 'DESC')
                                      ->first();
 
-        if (!$booking) {
-            return redirect()->to('/dashboard')->with('error', 'No active booking found. Please complete your application first.');
-        }
-
         // Get wedding fee from settings
         $settingsModel = new \App\Models\SettingsModel();
         $weddingFeeSetting = $settingsModel->getSetting('base_wedding_fee');
         $weddingFee = $weddingFeeSetting ? (float)$weddingFeeSetting : 600000;
 
-        // Get user's payments
-        $payments = $this->paymentModel->where('booking_id', $booking['id'])
-                                      ->orderBy('created_at', 'DESC')
-                                      ->findAll();
-
-        // Calculate total paid (completed payments only for display)
+        $payments = [];
         $totalPaid = 0;
         $pendingAmount = 0;
-        foreach ($payments as $payment) {
-            if ($payment['status'] === 'completed') {
-                $totalPaid += $payment['amount'];
-            } elseif ($payment['status'] === 'pending') {
-                $pendingAmount += $payment['amount'];
+
+        if ($booking) {
+            // Get user's payments
+            $payments = $this->paymentModel->where('booking_id', $booking['id'])
+                                          ->orderBy('created_at', 'DESC')
+                                          ->findAll();
+
+            // Calculate total paid (completed payments only for display)
+            foreach ($payments as $payment) {
+                if ($payment['status'] === 'completed') {
+                    $totalPaid += $payment['amount'];
+                } elseif ($payment['status'] === 'pending') {
+                    $pendingAmount += $payment['amount'];
+                }
             }
         }
 
@@ -2002,9 +2030,10 @@ class Dashboard extends Controller
         $hasUnpaidFees = ($totalPaid + $pendingAmount) < $weddingFee;
 
         $data = [
-            'title' => 'Step 5: Payment',
+            'title' => 'Payment Status',
             'user' => $this->userModel->find($userId),
             'booking' => $booking,
+            'hasActiveBooking' => (bool) $booking,
             'weddingFee' => $weddingFee,
             'payments' => $payments,
             'totalPaid' => $totalPaid,
@@ -2012,7 +2041,8 @@ class Dashboard extends Controller
             'remainingBalance' => $remainingBalance,
             'hasUnpaidFees' => $hasUnpaidFees,
             'unreadMessagesCount' => $unreadMessagesCount,
-            'paymentStatus' => $this->getPaymentStatus($userId)
+            'paymentStatus' => $this->getPaymentStatus($userId),
+            'documentSummary' => $this->getDocumentUploadSummary($userId),
         ];
 
         return view('user/dashboard/payment', $data);

@@ -86,7 +86,7 @@ $paymentAcknowledged = old(
 <!-- Step 5: Payment -->
 <div class="form-section" data-step="5" style="display: none;">
     <div class="form-section-header">
-        <h2>Payment</h2>
+        <h2>Payment information</h2>
         <p>Understand the wedding fee and how payment will be recorded after submission.</p>
     </div>
 
@@ -96,7 +96,7 @@ $paymentAcknowledged = old(
             Wedding fee
         </h3>
         <div class="payment-step-amount">UGX <?= number_format($weddingFee, 0) ?></div>
-        <p>This fee is recorded against your submitted application. You will be able to add payment details from the Payment section once the application is submitted.</p>
+        <p>This fee is recorded against your submitted application. You will be able to add payment details from the Payment status section once the application is submitted.</p>
 
         <div class="payment-details-grid">
             <div class="payment-detail">

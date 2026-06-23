@@ -1,9 +1,16 @@
 <div class="payment-container">
+    <?php $hasActiveBooking = (bool) ($hasActiveBooking ?? ! empty($booking)); ?>
     <!-- Payment Overview -->
     <div class="payment-card">
         <div class="payment-header">
-            <h2><i class="fas fa-money-bill-wave"></i> Step 5: Payment</h2>
-            <p>Complete your payment to confirm your wedding booking</p>
+            <h2><i class="fas fa-money-bill-wave"></i> Payment status</h2>
+            <p>
+                <?php if ($hasActiveBooking): ?>
+                    Complete your payment to confirm your wedding booking.
+                <?php else: ?>
+                    Payment becomes available after your application has been submitted.
+                <?php endif; ?>
+            </p>
         </div>
 
         <!-- Payment Amount -->
@@ -15,7 +22,12 @@
         <div class="text-center">
             <?php 
             $totalWithPending = $totalPaid + ($pendingAmount ?? 0);
-            if ($totalPaid >= $weddingFee): ?>
+            if (! $hasActiveBooking): ?>
+                <span class="payment-status status-unpaid">
+                    <i class="fas fa-info-circle"></i>
+                    Not started
+                </span>
+            <?php elseif ($totalPaid >= $weddingFee): ?>
                 <span class="payment-status status-paid">
                     <i class="fas fa-check-circle"></i>
                     Payment Complete
@@ -33,7 +45,16 @@
             <?php endif; ?>
         </div>
 
-        <?php if ($totalWithPending < $weddingFee): ?>
+        <?php if (! $hasActiveBooking): ?>
+            <div class="alert alert-info flash-alert" style="margin-top: 20px;">
+                <div class="alert-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="alert-content">
+                    Finish and submit your application first. This page is only showing the payment status right now, so it will not change your current application progress.
+                </div>
+            </div>
+        <?php elseif ($totalWithPending < $weddingFee): ?>
             <!-- Two Column Layout for Payment Instructions and Form -->
             <div class="row g-4">
                 <!-- Left Column: Payment Instructions -->

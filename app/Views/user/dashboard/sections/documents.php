@@ -367,8 +367,14 @@
 </style>
 
 <div class="section-header">
-    <h1>Step 4: Documents</h1>
-    <p>Upload all required documents for your wedding application. Each document must be 1MB or less.</p>
+    <h1>Documents uploaded</h1>
+    <p>
+        <?php if (! empty($hasActiveBooking)): ?>
+            Upload all required documents for your wedding application. Each document must be 1MB or less.
+        <?php else: ?>
+            Review the required documents here. Uploads become available after your application has been submitted.
+        <?php endif; ?>
+    </p>
 </div>
 
 <?php
@@ -390,6 +396,8 @@ if ($userBooking && !empty($userBooking['admin_documents_checklist'])) {
         $checklistDocs = [];
     }
 }
+
+$canUploadDocuments = ! empty($hasActiveBooking) && $userBooking !== null;
 
 // Calculate document upload progress
 $totalDocs = count($requiredDocs);
@@ -459,7 +467,12 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
     <div style="padding: 10px; background: rgba(251, 209, 16, 0.15); border-left: 3px solid #FBD110; border-radius: 4px;">
         <p style="margin: 0; color: #856404; font-size: 0.8rem; line-height: 1.4;">
             <i class="fas fa-info-circle" style="margin-right: 6px;"></i>
-            <strong>Note:</strong> You can upload documents one at a time. Your progress is saved automatically.
+            <strong>Note:</strong>
+            <?php if ($canUploadDocuments): ?>
+                You can upload documents one at a time. Your progress is saved automatically.
+            <?php else: ?>
+                This page is only showing document status right now, so it will not change your current application progress.
+            <?php endif; ?>
         </p>
     </div>
     <?php else: ?>
@@ -551,7 +564,7 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
         </div>
         <?php if (!$isUploaded): ?>
         <p class="document-description"><?= esc($doc['description'] ?? '') ?></p>
-        
+        <?php if ($canUploadDocuments): ?>
         <form action="<?= site_url('dashboard/upload-document') ?>" method="POST" enctype="multipart/form-data" class="upload-form" id="form-<?= $docId ?>">
             <?= csrf_field() ?>
             <input type="hidden" name="document_type" value="<?= $docId ?>">
@@ -579,6 +592,16 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
             
             <div class="error-message" id="error-<?= $docId ?>"></div>
         </form>
+        <?php else: ?>
+        <div class="alert alert-info flash-alert" style="margin-top: 12px;">
+            <div class="alert-icon">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <div class="alert-content">
+                Uploads unlock after your application has been submitted.
+            </div>
+        </div>
+        <?php endif; ?>
         <?php endif; ?>
         
         <?php if ($isUploaded && $uploadedFile): ?>
@@ -601,6 +624,7 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
                     <?php endif; ?>
                 </div>
             </div>
+            <?php if ($canUploadDocuments): ?>
             <form action="<?= site_url('dashboard/upload-document') ?>" method="POST" enctype="multipart/form-data" class="upload-form" id="form-<?= $docId ?>" style="margin-top: 6px;">
                 <?= csrf_field() ?>
                 <input type="hidden" name="document_type" value="<?= $docId ?>">
@@ -623,6 +647,7 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
                 </div>
                 <div class="error-message" id="error-<?= $docId ?>"></div>
             </form>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
     </div>
@@ -652,7 +677,7 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
                     </div>
                 </div>
                 <p class="document-description"><?= esc($doc['description'] ?? '') ?></p>
-                
+                <?php if ($canUploadDocuments): ?>
                 <form action="<?= site_url('dashboard/upload-document') ?>" method="POST" enctype="multipart/form-data" class="upload-form" id="form-<?= $docId ?>">
                     <?= csrf_field() ?>
                     <input type="hidden" name="document_type" value="<?= $docId ?>">
@@ -680,6 +705,16 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
                     
                     <div class="error-message" id="error-<?= $docId ?>"></div>
                 </form>
+                <?php else: ?>
+                <div class="alert alert-info flash-alert" style="margin-top: 12px;">
+                    <div class="alert-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="alert-content">
+                        Uploads unlock after your application has been submitted.
+                    </div>
+                </div>
+                <?php endif; ?>
             </div>
             <?php endforeach; ?>
             </div>

@@ -302,11 +302,11 @@
         </div>
         <div class="step" data-step="4">
             <div class="step-circle">4</div>
-            <span class="step-label">Documents</span>
+            <span class="step-label">Document Checklist</span>
         </div>
         <div class="step" data-step="5">
             <div class="step-circle">5</div>
-            <span class="step-label">Payment</span>
+            <span class="step-label">Payment Information</span>
         </div>
         <div class="step" data-step="6">
             <div class="step-circle">6</div>

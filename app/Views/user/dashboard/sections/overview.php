@@ -87,14 +87,23 @@ $applicationStepLabels = $applicationStepLabels ?? [
     1 => 'Venue & Date',
     2 => 'Personal Details',
     3 => 'Witnesses',
-    4 => 'Documents',
-    5 => 'Payment',
+    4 => 'Document Checklist',
+    5 => 'Payment Information',
     6 => 'Review & Submit',
 ];
 $applicationTotalSteps = count($applicationStepLabels);
 $currentStepLabel = $applicationStepLabels[$currentStep] ?? $applicationStepLabels[1];
 $resumeApplicationUrl = $resumeApplicationUrl ?? site_url('dashboard/application');
 $draftSummary = $draftSummary ?? [];
+$documentSummary = $documentSummary ?? [];
+$documentSummaryLabel = $documentSummary['label'] ?? 'Documents uploaded';
+$paymentStatusLabel = [
+    'no_booking' => 'Not started',
+    'required' => 'Required',
+    'pending_verification' => 'Pending verification',
+    'partial' => 'Partially paid',
+    'completed' => 'Complete',
+][$paymentStatus ?? 'no_booking'] ?? 'Not started';
 ?>
 
 <!-- Welcome Section -->
@@ -744,8 +753,8 @@ $progress = isset($progress) ? $progress : 0;
             <i class="fas fa-credit-card"></i>
         </div>
         <div class="card-content">
-            <h4>Step 5: Payment</h4>
-            <p>Track payments and balances</p>
+            <h4>Payment status</h4>
+            <p><?= esc($paymentStatusLabel) ?></p>
             <a href="<?= site_url('dashboard/payment') ?>" class="btn btn-outline btn-sm">Open Payments</a>
         </div>
     </div>
@@ -777,9 +786,9 @@ $progress = isset($progress) ? $progress : 0;
             <i class="fas fa-tasks"></i>
         </div>
         <div class="card-content">
-            <h4>Step 4: Documents</h4>
-            <p>Review what you will need</p>
-            <a href="<?= site_url('dashboard/application') ?>?step=4" class="btn btn-outline btn-sm">Open Step 4</a>
+            <h4>Documents uploaded</h4>
+            <p><?= esc($documentSummaryLabel) ?></p>
+            <a href="<?= esc($resumeApplicationUrl) ?>" class="btn btn-outline btn-sm">Resume</a>
         </div>
     </div>
     <div class="action-card">

@@ -74,7 +74,7 @@ $documentsAcknowledged = old(
 <!-- Step 4: Documents -->
 <div class="form-section" data-step="4" style="display: none;">
     <div class="form-section-header">
-        <h2>Documents</h2>
+        <h2>Document checklist</h2>
         <p>Review the documents you will need after your application is submitted.</p>
     </div>
 
@@ -104,7 +104,7 @@ $documentsAcknowledged = old(
                 value="1"
                 <?= (string) $documentsAcknowledged === '1' ? 'checked' : '' ?>
             >
-            <span>I understand which documents are required and will upload them from the Documents section after submitting this application.</span>
+            <span>I understand which documents are required and will upload them from the Documents uploaded section after submitting this application.</span>
         </label>
     </div>
 </div>

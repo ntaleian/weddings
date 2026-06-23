@@ -32,14 +32,44 @@ final class DashboardResumeTest extends CIUnitTestCase
         $this->assertStringContainsString('Resume Application', $body);
         $this->assertStringContainsString('Continue from Witnesses', $body);
         $this->assertStringContainsString('Step 3 of 6', $body);
-        $this->assertStringContainsString('Step 4: Documents', $body);
-        $this->assertStringContainsString('Step 5: Payment', $body);
+        $this->assertStringContainsString('Documents uploaded', $body);
+        $this->assertStringContainsString('Payment status', $body);
+        $this->assertStringNotContainsString('Step 4: Documents', $body);
+        $this->assertStringNotContainsString('Step 5: Payment', $body);
         $this->assertStringContainsString('Watoto Central', $body);
         $this->assertStringContainsString('Sat, Dec 12, 2026', $body);
         $this->assertStringContainsString('11:00 AM', $body);
         $this->assertStringContainsString('/dashboard/application?resume=1&amp;step=3', $body);
-        $this->assertStringContainsString('/dashboard/application?step=4', $body);
-        $this->assertStringContainsString('/dashboard/application?step=5', $body);
+        $this->assertStringContainsString('/dashboard/documents', $body);
+        $this->assertStringContainsString('/dashboard/payment', $body);
+        $this->assertStringNotContainsString('/dashboard/application?step=4', $body);
+        $this->assertStringNotContainsString('/dashboard/application?step=5', $body);
+    }
+
+    public function testSidebarStatusPagesDoNotMutateDraftApplicationFlow(): void
+    {
+        $this->insertDraft([
+            'selectedCampus' => '1',
+            'selectedDate'   => '2026-12-12',
+            'selectedTime'   => '11:00',
+        ], 2);
+
+        $documentsResponse = $this->withSession($this->userSession())->get('/dashboard/documents');
+        $documentsResponse->assertOK();
+        $documentsBody = (string) $documentsResponse->response()->getBody();
+        $this->assertStringContainsString('Documents uploaded', $documentsBody);
+        $this->assertStringContainsString('Uploads unlock after your application has been submitted.', $documentsBody);
+        $this->assertStringNotContainsString('Click to upload', $documentsBody);
+
+        $paymentResponse = $this->withSession($this->userSession())->get('/dashboard/payment');
+        $paymentResponse->assertOK();
+        $paymentBody = (string) $paymentResponse->response()->getBody();
+        $this->assertStringContainsString('Payment status', $paymentBody);
+        $this->assertStringContainsString('Not started', $paymentBody);
+        $this->assertStringNotContainsString('Submit Payment Record', $paymentBody);
+
+        $draft = $this->db->table('application_drafts')->where('user_id', 1)->get()->getRowArray();
+        $this->assertSame(2, (int) $draft['current_step']);
     }
 
     public function testApplicationPageReceivesSavedDraftStep(): void
