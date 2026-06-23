@@ -2,6 +2,7 @@
 /* Tabs Styles */
 .documents-tabs {
     margin-bottom: 20px;
+    width: 100%;
 }
 
 .tab-buttons {
@@ -9,6 +10,8 @@
     gap: 8px;
     border-bottom: 2px solid var(--light-gray);
     margin-bottom: 20px;
+    overflow-x: auto;
+    width: 100%;
 }
 
 .tab-button {
@@ -25,6 +28,8 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 
 .tab-button:hover {
@@ -75,31 +80,33 @@
 
 .tab-content.active {
     display: block;
+    width: 100%;
+}
+
+.document-readonly-note {
+    align-items: center;
+    background: #edf9fc;
+    border-left: 3px solid #17a2b8;
+    border-radius: 6px;
+    color: #0c5460;
+    display: flex;
+    font-size: 0.86rem;
+    gap: 8px;
+    line-height: 1.4;
+    margin: -4px 0 14px;
+    padding: 9px 12px;
+}
+
+.document-readonly-note i {
+    flex-shrink: 0;
 }
 
 .documents-container {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
     gap: 12px;
     margin-bottom: 20px;
-}
-
-@media (max-width: 1400px) {
-    .documents-container {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (max-width: 992px) {
-    .documents-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 576px) {
-    .documents-container {
-        grid-template-columns: 1fr;
-    }
+    width: 100%;
 }
 
 .document-card {
@@ -109,6 +116,9 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     border: 2px solid var(--light-gray);
     transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
 .document-card:hover {
@@ -544,6 +554,12 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
         
         <?php if (count($uploadedDocsList) > 0): ?>
         <div id="tab-uploaded" class="tab-content <?= count($requiredDocsList) > 0 ? 'active' : '' ?>">
+            <?php if (! $canUploadDocuments): ?>
+            <div class="document-readonly-note">
+                <i class="fas fa-info-circle"></i>
+                <span>Uploads unlock after your application has been submitted.</span>
+            </div>
+            <?php endif; ?>
             <div class="documents-container">
             <?php foreach ($uploadedDocsList as $doc): 
                 $docId = $doc['docId'];
@@ -592,15 +608,6 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
             
             <div class="error-message" id="error-<?= $docId ?>"></div>
         </form>
-        <?php else: ?>
-        <div class="alert alert-info flash-alert" style="margin-top: 12px;">
-            <div class="alert-icon">
-                <i class="fas fa-info-circle"></i>
-            </div>
-            <div class="alert-content">
-                Uploads unlock after your application has been submitted.
-            </div>
-        </div>
         <?php endif; ?>
         <?php endif; ?>
         
@@ -658,6 +665,12 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
         
         <?php if (count($requiredDocsList) > 0): ?>
         <div id="tab-required" class="tab-content <?= count($uploadedDocsList) == 0 ? 'active' : '' ?>">
+            <?php if (! $canUploadDocuments): ?>
+            <div class="document-readonly-note">
+                <i class="fas fa-info-circle"></i>
+                <span>Uploads unlock after your application has been submitted.</span>
+            </div>
+            <?php endif; ?>
             <div class="documents-container">
             <?php foreach ($requiredDocsList as $doc): 
                 $docId = $doc['docId'];
@@ -705,15 +718,6 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
                     
                     <div class="error-message" id="error-<?= $docId ?>"></div>
                 </form>
-                <?php else: ?>
-                <div class="alert alert-info flash-alert" style="margin-top: 12px;">
-                    <div class="alert-icon">
-                        <i class="fas fa-info-circle"></i>
-                    </div>
-                    <div class="alert-content">
-                        Uploads unlock after your application has been submitted.
-                    </div>
-                </div>
                 <?php endif; ?>
             </div>
             <?php endforeach; ?>

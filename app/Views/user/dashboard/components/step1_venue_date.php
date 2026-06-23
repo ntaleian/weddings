@@ -622,6 +622,10 @@ function selectCampus(campusId) {
         
         // Update hidden input
         document.getElementById('selectedCampus').value = campusId;
+        const campusGrid = document.querySelector('.campus-grid');
+        if (campusGrid) {
+            campusGrid.classList.remove('field-error-block');
+        }
         
         // Show date/time selection section
         document.getElementById('datetimeSection').style.display = 'block';
@@ -803,6 +807,10 @@ function applyDateSelection(date, dayElement, opts) {
     selectedDate = date;
     const formattedDate = formatDateForAPI(date);
     document.getElementById('selectedDate').value = formattedDate;
+    const calendar = document.querySelector('.calendar-container');
+    if (calendar) {
+        calendar.classList.remove('field-error-block');
+    }
 
     document.getElementById('timeSelection').style.display = 'block';
 
@@ -871,6 +879,10 @@ function selectTime(time, options) {
     
     selectedTime = timeNorm;
     document.getElementById('selectedTime').value = timeNorm;
+    const timeSlotsContainer = document.querySelector('.time-slots');
+    if (timeSlotsContainer) {
+        timeSlotsContainer.classList.remove('field-error-block');
+    }
 
     const timeSlots = {
         '09:00': '9:00 AM',
@@ -1319,47 +1331,117 @@ function resetTimeSlotAvailability() {
 
 // ─── Field Error Helpers ─────────────────────────────────────────────────────
 
+function getFieldGroup(el) {
+    return el.closest('.form-group, .step3-field, .checkbox-group, .document-acknowledgement, .payment-acknowledgement') || el.parentElement;
+}
+
+function getFieldErrorTargets(el) {
+    const targets = [el];
+    const group = getFieldGroup(el);
+
+    if (group && el.type === 'hidden') {
+        group.querySelectorAll('input, select, textarea').forEach(function(candidate) {
+            if (candidate.type !== 'hidden') {
+                targets.push(candidate);
+            }
+        });
+    }
+
+    return targets.filter(function(target, index, list) {
+        return target && list.indexOf(target) === index;
+    });
+}
+
 function markFieldError(fieldId, message) {
     const el = document.getElementById(fieldId);
     if (!el) return;
-    const group = el.closest('.form-group') || el.parentElement;
-    group.classList.add('field-error');
-    el.classList.add('error');
-    // Remove existing error message if any
-    const existing = group.querySelector('.field-error-msg');
-    if (existing) existing.remove();
-    const msg = document.createElement('span');
-    msg.className = 'field-error-msg';
-    msg.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + message;
-    group.appendChild(msg);
-    // Clear error when user interacts
-    const clear = function() {
-        group.classList.remove('field-error');
-        el.classList.remove('error');
-        const m = group.querySelector('.field-error-msg');
-        if (m) m.remove();
-        el.removeEventListener('input', clear);
-        el.removeEventListener('change', clear);
-    };
-    el.addEventListener('input', clear);
-    el.addEventListener('change', clear);
+    const group = getFieldGroup(el);
+    if (group) {
+        group.classList.add('field-error');
+        const existing = group.querySelector('.field-error-msg');
+        if (existing) existing.remove();
+    }
+
+    getFieldErrorTargets(el).forEach(function(target) {
+        target.classList.add('error');
+        target.setAttribute('aria-invalid', 'true');
+        if (message) {
+            target.setAttribute('title', message);
+        }
+
+        if (!target.dataset.fieldErrorBound) {
+            const clear = function() {
+                clearFieldError(fieldId);
+            };
+            target.addEventListener('input', clear);
+            target.addEventListener('change', clear);
+            target.dataset.fieldErrorBound = '1';
+        }
+    });
 }
 
 function clearFieldError(fieldId) {
     const el = document.getElementById(fieldId);
     if (!el) return;
-    const group = el.closest('.form-group') || el.parentElement;
-    group.classList.remove('field-error');
-    el.classList.remove('error');
-    const msg = group.querySelector('.field-error-msg');
-    if (msg) msg.remove();
+    const group = getFieldGroup(el);
+    if (group) {
+        group.classList.remove('field-error');
+        const msg = group.querySelector('.field-error-msg');
+        if (msg) msg.remove();
+    }
+
+    getFieldErrorTargets(el).forEach(function(target) {
+        target.classList.remove('error');
+        target.removeAttribute('aria-invalid');
+        target.removeAttribute('title');
+    });
+}
+
+function markRadioGroupError(groupName, message) {
+    const inputs = document.querySelectorAll('input[name="' + groupName + '"]');
+    if (!inputs.length) return;
+
+    const group = getFieldGroup(inputs[0]);
+    if (group) {
+        group.classList.add('field-error');
+    }
+
+    inputs.forEach(function(input) {
+        input.setAttribute('aria-invalid', 'true');
+        if (message) {
+            input.setAttribute('title', message);
+        }
+        if (!input.dataset.radioErrorBound) {
+            input.addEventListener('change', function() {
+                clearRadioGroupError(groupName);
+            });
+            input.dataset.radioErrorBound = '1';
+        }
+    });
+}
+
+function clearRadioGroupError(groupName) {
+    const inputs = document.querySelectorAll('input[name="' + groupName + '"]');
+    if (!inputs.length) return;
+
+    const group = getFieldGroup(inputs[0]);
+    if (group) {
+        group.classList.remove('field-error');
+    }
+
+    inputs.forEach(function(input) {
+        input.removeAttribute('aria-invalid');
+        input.removeAttribute('title');
+    });
 }
 
 function scrollToFirstError(containerSelector) {
     const container = containerSelector
         ? document.querySelector(containerSelector)
         : document;
-    const first = container ? container.querySelector('.field-error') : document.querySelector('.field-error');
+    const first = container
+        ? container.querySelector('.field-error, .field-error-block')
+        : document.querySelector('.field-error, .field-error-block');
     if (first) {
         first.scrollIntoView({ behavior: 'smooth', block: 'center' });
         const input = first.querySelector('input, select, textarea');
@@ -1394,18 +1476,35 @@ function validateStep1() {
         const grid = document.querySelector('.campus-grid');
         if (grid) {
             grid.classList.add('field-error-block');
-            setTimeout(function() { grid.classList.remove('field-error-block'); }, 3000);
         }
         showStepError('Please select a campus.');
         valid = false;
     }
     if (!date) {
+        const calendar = document.querySelector('.calendar-container');
+        if (calendar) {
+            calendar.classList.add('field-error-block');
+        }
         showStepError('Please select a wedding date.');
         valid = false;
+    } else {
+        const calendar = document.querySelector('.calendar-container');
+        if (calendar) {
+            calendar.classList.remove('field-error-block');
+        }
     }
     if (!time) {
+        const timeSlots = document.querySelector('.time-slots');
+        if (timeSlots) {
+            timeSlots.classList.add('field-error-block');
+        }
         showStepError('Please select a time slot.');
         valid = false;
+    } else {
+        const timeSlots = document.querySelector('.time-slots');
+        if (timeSlots) {
+            timeSlots.classList.remove('field-error-block');
+        }
     }
     return valid;
 }
@@ -1418,17 +1517,15 @@ function checkStep1Completion() {
     const nextButton = document.getElementById('nextButton');
     
     if (nextButton) {
-        if (campus && date && time) {
-            nextButton.disabled = false;
-            nextButton.classList.remove('disabled');
-            // Store data globally for the main navigation system
-            window.selectedCampusData = campus;
-            window.selectedDateData = date;
-            window.selectedTimeData = time;
-        } else {
-            nextButton.disabled = true;
-            nextButton.classList.add('disabled');
-        }
+        nextButton.disabled = false;
+        nextButton.classList.remove('disabled');
+    }
+
+    if (campus && date && time) {
+        // Store data globally for the main navigation system
+        window.selectedCampusData = campus;
+        window.selectedDateData = date;
+        window.selectedTimeData = time;
     }
 }
 
@@ -1619,15 +1716,16 @@ function updateNavigationButtons() {
     
     // Next button
     if (nextButton) {
+        nextButton.disabled = false;
+        nextButton.classList.remove('disabled');
+
         if (currentStep < totalSteps) {
             nextButton.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
-            nextButton.disabled = !isCurrentStepValid();
             // Remove any custom onclick handler
             nextButton.onclick = null;
             nextButton.setAttribute('onclick', 'nextStep()');
         } else {
             nextButton.innerHTML = 'Submit Application <i class="fas fa-paper-plane"></i>';
-            nextButton.disabled = !validateAllSteps();
             // Set custom onclick for submission
             nextButton.onclick = function() { submitApplication(); };
         }
@@ -1734,41 +1832,46 @@ function validateStep2() {
 
     const brideChurch = document.querySelector('input[name="bride_church_member"]:checked');
     if (!brideChurch) {
-        // highlight the radio group container
-        const radioGroup = document.getElementById('brideChurchMemberYes')?.closest('.form-group');
-        if (radioGroup) { radioGroup.classList.add('field-error'); }
+        markRadioGroupError('bride_church_member', 'Bride church membership is required.');
         valid = false;
     } else if (brideChurch.value === 'yes') {
+        clearRadioGroupError('bride_church_member');
         requireConditional([
             { id: 'brideCellGroupNumber',  label: 'Cell family number' },
             { id: 'brideCellLeaderName',   label: 'Cell family leader name' },
             { id: 'brideCellLeaderPhone',  label: 'Cell family leader phone' },
         ]);
     } else if (brideChurch.value === 'other') {
+        clearRadioGroupError('bride_church_member');
         requireConditional([
             { id: 'brideChurchName',    label: 'Church name' },
             { id: 'brideSeniorPastor',  label: 'Senior pastor name' },
             { id: 'bridePastorPhone',   label: 'Senior pastor phone' },
         ]);
+    } else {
+        clearRadioGroupError('bride_church_member');
     }
 
     const groomChurch = document.querySelector('input[name="groom_church_member"]:checked');
     if (!groomChurch) {
-        const radioGroup = document.getElementById('groomChurchMemberYes')?.closest('.form-group');
-        if (radioGroup) { radioGroup.classList.add('field-error'); }
+        markRadioGroupError('groom_church_member', 'Groom church membership is required.');
         valid = false;
     } else if (groomChurch.value === 'yes') {
+        clearRadioGroupError('groom_church_member');
         requireConditional([
             { id: 'groomCellGroupNumber',  label: 'Cell family number' },
             { id: 'groomCellLeaderName',   label: 'Cell family leader name' },
             { id: 'groomCellLeaderPhone',  label: 'Cell family leader phone' },
         ]);
     } else if (groomChurch.value === 'other') {
+        clearRadioGroupError('groom_church_member');
         requireConditional([
             { id: 'groomChurchName',    label: 'Church name' },
             { id: 'groomSeniorPastor',  label: 'Senior pastor name' },
             { id: 'groomPastorPhone',   label: 'Senior pastor phone' },
         ]);
+    } else {
+        clearRadioGroupError('groom_church_member');
     }
 
     return valid;
@@ -1808,10 +1911,10 @@ function validateStep3() {
     parentPairs.forEach(function(p) {
         const sel = document.querySelector('input[name="' + p.name + '"]:checked');
         if (!sel) {
-            const radioGroup = document.querySelector('input[name="' + p.name + '"]')?.closest('.form-group');
-            if (radioGroup) radioGroup.classList.add('field-error');
+            markRadioGroupError(p.name, 'Living status is required.');
             valid = false;
         } else if (sel.value === 'alive') {
+            clearRadioGroupError(p.name);
             const phone = document.getElementById(p.phoneId);
             if (!phone || String(phone.value).trim() === '') {
                 markFieldError(p.phoneId, p.label + ' is required.');
@@ -1819,6 +1922,9 @@ function validateStep3() {
             } else {
                 clearFieldError(p.phoneId);
             }
+        } else {
+            clearRadioGroupError(p.name);
+            clearFieldError(p.phoneId);
         }
     });
 
@@ -1827,31 +1933,74 @@ function validateStep3() {
 
 function validateStep4() {
     const documentsAcknowledged = document.getElementById('documentsAcknowledged');
-    return !documentsAcknowledged || documentsAcknowledged.checked;
+    if (documentsAcknowledged && !documentsAcknowledged.checked) {
+        markFieldError('documentsAcknowledged', 'Please acknowledge the required documents.');
+        return false;
+    }
+    clearFieldError('documentsAcknowledged');
+    return true;
 }
 
 function validateStep5() {
     const paymentAcknowledged = document.getElementById('paymentAcknowledged');
-    return !paymentAcknowledged || paymentAcknowledged.checked;
+    if (paymentAcknowledged && !paymentAcknowledged.checked) {
+        markFieldError('paymentAcknowledged', 'Please acknowledge the payment information.');
+        return false;
+    }
+    clearFieldError('paymentAcknowledged');
+    return true;
+}
+
+function validateFinalTerms() {
+    const acceptTerms = document.getElementById('acceptTerms');
+    if (acceptTerms && acceptTerms.checked) {
+        clearFieldError('acceptTerms');
+        return true;
+    }
+    markFieldError('acceptTerms', 'Please accept the terms and conditions.');
+    return false;
+}
+
+function validationMessageForStep(step) {
+    switch (step) {
+        case 1:
+            return 'Please select a campus, date, and time slot.';
+        case 2:
+            return 'Please complete all required personal details for both bride and groom.';
+        case 3:
+            return 'Please provide the required witness and family information.';
+        case 4:
+            return 'Please acknowledge the required documents.';
+        case 5:
+            return 'Please acknowledge the payment information.';
+        case 6:
+            return 'Please accept the terms and conditions.';
+        default:
+            return 'Please complete the required fields before continuing.';
+    }
+}
+
+function firstInvalidApplicationStep() {
+    const validators = {
+        1: validateStep1,
+        2: validateStep2,
+        3: validateStep3,
+        4: validateStep4,
+        5: validateStep5,
+        6: validateFinalTerms
+    };
+
+    for (let step = 1; step <= totalSteps; step++) {
+        if (!validators[step]()) {
+            return step;
+        }
+    }
+
+    return null;
 }
 
 function validateAllSteps() {
-    const acceptTerms = document.getElementById('acceptTerms');
-    // Ensure age validation is also checked on final submission
-    let agesValid = true;
-    if (window.validateStep2Ages) {
-        agesValid = window.validateStep2Ages();
-    }
-    
-    // Double-check age values
-    const brideAge = document.getElementById('brideAge');
-    const groomAge = document.getElementById('groomAge');
-    if (brideAge && parseInt(brideAge.value) < 18) agesValid = false;
-    if (groomAge && parseInt(groomAge.value) < 18) agesValid = false;
-    
-    return validateStep1() && validateStep2() && validateStep3() &&
-           validateStep4() && validateStep5() &&
-           acceptTerms && acceptTerms.checked;
+    return firstInvalidApplicationStep() === null;
 }
 
 // Populate review summary for the final review step
@@ -1899,8 +2048,11 @@ function populateReviewSummary() {
 
 // Submit application function
 function submitApplication() {
-    if (!validateAllSteps()) {
-        alert('Please complete all required fields, review the documents and payment steps, and accept the terms and conditions.');
+    const invalidStep = firstInvalidApplicationStep();
+    if (invalidStep !== null) {
+        goToApplicationStep(invalidStep, { autoSave: false, scroll: false });
+        showStepError(validationMessageForStep(invalidStep));
+        scrollToFirstError('.form-section[data-step="' + currentStep + '"]');
         return;
     }
     

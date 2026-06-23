@@ -186,6 +186,51 @@
     box-shadow: 0 0 0 3px rgba(0, 140, 21, 0.1);
 }
 
+.form-group input.error:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]),
+.form-group select.error,
+.form-group textarea.error,
+.step3-field input.error:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]),
+.step3-field select.error,
+.step3-field textarea.error,
+.form-group.field-error input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]),
+.form-group.field-error select,
+.form-group.field-error textarea,
+.step3-field.field-error input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]),
+.step3-field.field-error select,
+.step3-field.field-error textarea {
+    border-color: #dc3545 !important;
+    background: #fff8f8 !important;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12) !important;
+}
+
+.form-group.field-error label,
+.step3-field.field-error label,
+.step3-field.field-error .label-block {
+    color: #dc3545 !important;
+}
+
+.form-group.field-error .radio-grid,
+.step3-field.field-error .radio-grid {
+    border: 1px solid rgba(220, 53, 69, 0.45);
+    border-radius: 8px;
+    background: #fff8f8;
+    padding: 8px;
+}
+
+.checkbox-group.field-error,
+.document-acknowledgement.field-error,
+.payment-acknowledgement.field-error {
+    border: 1px solid rgba(220, 53, 69, 0.45);
+    border-radius: 8px;
+    background: #fff8f8;
+    padding: 10px;
+}
+
+.field-error-block {
+    border: 2px solid #dc3545 !important;
+    border-radius: 10px;
+}
+
 /* Radio Options */
 .radio-grid {
     display: grid;
