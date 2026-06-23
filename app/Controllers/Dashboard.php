@@ -39,9 +39,11 @@ class Dashboard extends Controller
         
         // Check if user has a submitted/completed application
         $hasSubmittedApplication = false;
+        $hasDraftApplication = false;
         $applicationStatus = null;
         $currentStep = 1;
         $progress = 0;
+        $draftSummary = null;
         
         if (!empty($userBookings)) {
             foreach ($userBookings as $booking) {
@@ -60,8 +62,10 @@ class Dashboard extends Controller
             $db = \Config\Database::connect();
             $draft = $db->table('application_drafts')->where('user_id', $userId)->get()->getRow();
             if ($draft) {
-                $currentStep = $draft->current_step ?? 1;
+                $hasDraftApplication = true;
+                $currentStep = $this->normalizeApplicationStep($draft->current_step ?? 1);
                 $progress = ($currentStep / 4) * 100;
+                $draftSummary = $this->buildApplicationDraftSummary($draft);
             }
         }
         
@@ -75,10 +79,15 @@ class Dashboard extends Controller
             'title' => 'Dashboard',
             'user' => $user,
             'userBookings' => $userBookings,
+            'bookings' => $userBookings,
             'hasSubmittedApplication' => $hasSubmittedApplication,
+            'hasDraftApplication' => $hasDraftApplication,
             'applicationStatus' => $applicationStatus,
             'currentStep' => $currentStep,
             'progress' => $progress,
+            'applicationStepLabels' => $this->getApplicationStepLabels(),
+            'draftSummary' => $draftSummary,
+            'resumeApplicationUrl' => site_url('dashboard/application') . ($hasDraftApplication ? '?resume=1&step=' . $currentStep : ''),
             'unreadMessagesCount' => $this->getUnreadMessagesCount($userId),
             'paymentStatus' => $this->getPaymentStatus($userId),
             'paymentInfo' => $paymentInfo
@@ -703,12 +712,104 @@ class Dashboard extends Controller
     private function getSavedApplicationData($userId)
     {
         // Get saved application data from database
-        // TODO: Implement actual database retrieval
         $draft = \Config\Database::connect()->table('application_drafts')->where('user_id', $userId)->get()->getRow();
         if ($draft) {
-            return json_decode($draft->form_data, true);
+            $data = json_decode($draft->form_data, true);
+            $data = is_array($data) ? $data : [];
+            $data['current_step'] = $this->normalizeApplicationStep($draft->current_step ?? ($data['current_step'] ?? 1));
+            $data['last_updated'] = $draft->last_updated;
+
+            return $data;
         }
         return [];
+    }
+
+    private function getApplicationStepLabels(): array
+    {
+        return [
+            1 => 'Venue & Date',
+            2 => 'Personal Details',
+            3 => 'Additional Info',
+            4 => 'Review & Submit',
+        ];
+    }
+
+    private function getApplicationStepLabel(int $step): string
+    {
+        $labels = $this->getApplicationStepLabels();
+
+        return $labels[$this->normalizeApplicationStep($step)] ?? $labels[1];
+    }
+
+    private function normalizeApplicationStep($step): int
+    {
+        $step = (int) $step;
+
+        return max(1, min(4, $step));
+    }
+
+    private function buildApplicationDraftSummary(object $draft): array
+    {
+        $data = json_decode($draft->form_data, true);
+        $data = is_array($data) ? $data : [];
+        $step = $this->normalizeApplicationStep($draft->current_step ?? ($data['current_step'] ?? 1));
+        $campusName = null;
+        $campusId = $data['selectedCampus'] ?? null;
+
+        if ($campusId) {
+            $campus = $this->campusModel->find((int) $campusId);
+            $campusName = $campus['name'] ?? null;
+        }
+
+        return [
+            'current_step' => $step,
+            'step_label' => $this->getApplicationStepLabel($step),
+            'campus_name' => $campusName,
+            'wedding_date' => $this->formatDraftDate($data['selectedDate'] ?? null),
+            'wedding_time' => $this->formatDraftTime($data['selectedTime'] ?? null),
+            'last_updated' => $this->formatDraftDateTime($draft->last_updated ?? null),
+        ];
+    }
+
+    private function formatDraftDate($date): ?string
+    {
+        if (empty($date)) {
+            return null;
+        }
+
+        try {
+            return (new \DateTime((string) $date))->format('D, M j, Y');
+        } catch (\Exception $e) {
+            return (string) $date;
+        }
+    }
+
+    private function formatDraftTime($time): ?string
+    {
+        if (empty($time)) {
+            return null;
+        }
+
+        $time = (string) $time;
+
+        try {
+            return (new \DateTime($time))->format('g:i A');
+        } catch (\Exception $e) {
+            return $time;
+        }
+    }
+
+    private function formatDraftDateTime($dateTime): ?string
+    {
+        if (empty($dateTime)) {
+            return null;
+        }
+
+        try {
+            return (new \DateTime((string) $dateTime))->format('M j, Y g:i A');
+        } catch (\Exception $e) {
+            return (string) $dateTime;
+        }
     }
 
     /**

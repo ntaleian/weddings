@@ -546,11 +546,8 @@ async function loadApplicationDraft() {
         
         // Set current step if saved
         if (savedData.current_step && savedData.current_step > 1) {
-            // Navigate to saved step
-            for (let i = 1; i < savedData.current_step; i++) {
-                if (window.nextStep) {
-                    window.nextStep();
-                }
+            if (window.goToApplicationStep) {
+                window.goToApplicationStep(savedData.current_step, { scroll: false, autoSave: false });
             }
         }
         return;
@@ -573,11 +570,8 @@ async function loadApplicationDraft() {
             
             // Set current step if saved
             if (result.current_step && result.current_step > 1) {
-                // Navigate to saved step
-                for (let i = 1; i < result.current_step; i++) {
-                    if (window.nextStep) {
-                        window.nextStep();
-                    }
+                if (window.goToApplicationStep) {
+                    window.goToApplicationStep(result.current_step, { scroll: false, autoSave: false });
                 }
             }
         }

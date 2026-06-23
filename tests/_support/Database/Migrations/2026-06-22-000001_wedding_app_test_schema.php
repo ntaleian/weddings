@@ -12,19 +12,23 @@ class WeddingAppTestSchema extends Migration
     {
         $this->createUsersTable();
         $this->createCampusesTable();
+        $this->createPastorsTable();
         $this->createBookingsTable();
         $this->createPaymentsTable();
         $this->createSettingsTable();
         $this->createBlockedDatesTable();
+        $this->createApplicationDraftsTable();
         $this->createEmailVerificationsTable();
     }
 
     public function down(): void
     {
         $this->forge->dropTable('email_verifications', true);
+        $this->forge->dropTable('application_drafts', true);
         $this->forge->dropTable('blocked_dates', true);
         $this->forge->dropTable('payments', true);
         $this->forge->dropTable('bookings', true);
+        $this->forge->dropTable('pastors', true);
         $this->forge->dropTable('settings', true);
         $this->forge->dropTable('campuses', true);
         $this->forge->dropTable('users', true);
@@ -74,6 +78,23 @@ class WeddingAppTestSchema extends Migration
             'updated_at'       => ['type' => 'datetime', 'null' => true],
         ]);
         $this->forge->createTable('campuses');
+    }
+
+    private function createPastorsTable(): void
+    {
+        $this->forge->addField('id');
+        $this->forge->addField([
+            'campus_id'     => ['type' => 'integer', 'null' => true],
+            'name'          => ['type' => 'varchar', 'constraint' => 150],
+            'email'         => ['type' => 'varchar', 'constraint' => 255, 'null' => true],
+            'phone'         => ['type' => 'varchar', 'constraint' => 30, 'null' => true],
+            'is_active'     => ['type' => 'integer', 'constraint' => 1, 'default' => 1],
+            'is_available'  => ['type' => 'integer', 'constraint' => 1, 'default' => 1],
+            'created_at'    => ['type' => 'datetime', 'null' => true],
+            'updated_at'    => ['type' => 'datetime', 'null' => true],
+        ]);
+        $this->forge->addKey('campus_id');
+        $this->forge->createTable('pastors');
     }
 
     private function createBookingsTable(): void
@@ -152,6 +173,21 @@ class WeddingAppTestSchema extends Migration
         $this->forge->addKey('campus_id');
         $this->forge->addKey('blocked_date');
         $this->forge->createTable('blocked_dates');
+    }
+
+    private function createApplicationDraftsTable(): void
+    {
+        $this->forge->addField('id');
+        $this->forge->addField([
+            'user_id'      => ['type' => 'integer'],
+            'form_data'    => ['type' => 'text', 'null' => true],
+            'current_step' => ['type' => 'integer', 'default' => 1],
+            'last_updated' => ['type' => 'datetime', 'null' => true],
+            'created_at'   => ['type' => 'datetime', 'null' => true],
+            'updated_at'   => ['type' => 'datetime', 'null' => true],
+        ]);
+        $this->forge->addUniqueKey('user_id');
+        $this->forge->createTable('application_drafts');
     }
 
     private function createEmailVerificationsTable(): void

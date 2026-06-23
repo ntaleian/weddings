@@ -1374,6 +1374,48 @@ window.selectTime = selectTime;
 let currentStep = 1;
 const totalSteps = 4;
 
+function setCurrentStep(step) {
+    currentStep = Math.max(1, Math.min(totalSteps, parseInt(step, 10) || 1));
+    window.currentStep = currentStep;
+    return currentStep;
+}
+
+function goToApplicationStep(step, options = {}) {
+    setCurrentStep(step);
+
+    for (let i = 1; i <= totalSteps; i++) {
+        const stepElement = document.querySelector('.form-section[data-step="' + i + '"]');
+        if (stepElement) {
+            stepElement.style.display = i === currentStep ? 'block' : 'none';
+        }
+    }
+
+    updateStepIndicators();
+    updateNavigationButtons();
+
+    if (currentStep === 4) {
+        setTimeout(function() {
+            if (window.populateStep4Review) {
+                window.populateStep4Review();
+            } else if (window.populateReviewSummary) {
+                window.populateReviewSummary();
+            }
+            document.dispatchEvent(new Event('step4shown'));
+        }, 300);
+    }
+
+    if (options.autoSave !== false) {
+        autoSaveProgress();
+    }
+
+    if (options.scroll !== false) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+}
+
+setCurrentStep(currentStep);
+window.goToApplicationStep = goToApplicationStep;
+
 // Step navigation functions
 function nextStep() {
     // Validate current step before proceeding
@@ -1411,7 +1453,7 @@ function nextStep() {
         }
         
         // Move to next step
-        currentStep++;
+        setCurrentStep(currentStep + 1);
         
         // Show next step
         const nextStepElement = document.querySelector('.form-section[data-step="' + currentStep + '"]');
@@ -1455,7 +1497,7 @@ function previousStep() {
         }
         
         // Move to previous step
-        currentStep--;
+        setCurrentStep(currentStep - 1);
         
         // Show previous step
         const prevStepElement = document.querySelector('.form-section[data-step="' + currentStep + '"]');
@@ -1858,7 +1900,7 @@ function autoSaveProgress() {
         
         // Optional: Also save to server as draft (not final submission)
         if (window.scheduleAutoSave) {
-            window.scheduleAutoSave();
+            window.scheduleAutoSave(currentStep);
         }
     } catch (error) {
         if (error.name === 'QuotaExceededError' || error.code === 22) {
@@ -1908,6 +1950,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (step1Element) {
         step1Element.style.display = 'block';
     }
+
+    setCurrentStep(1);
     
     // Initialize navigation buttons
     updateNavigationButtons();
