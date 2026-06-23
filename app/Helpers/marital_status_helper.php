@@ -4,20 +4,15 @@ declare(strict_types=1);
 
 if (! function_exists('witness_marital_status_options')) {
     /**
-     * Value => label for best man / matron marital status (aligned with couple options).
+     * Value => label for best man / matron marital status.
      *
      * @return array<string, string>
      */
     function witness_marital_status_options(): array
     {
         return [
-            'bachelor'              => 'Bachelor',
-            'spinster'              => 'Spinster',
-            'divorced-separated'    => 'Divorced/Separated',
-            'married-traditionally'   => 'Married Traditionally',
-            'widowed'                 => 'Widowed',
-            'civil-marriage'        => 'Civil Marriage',
-            'cohabiting'            => 'Cohabiting',
+            'single'  => 'Single',
+            'married' => 'Married',
         ];
     }
 }
@@ -36,6 +31,13 @@ if (! function_exists('witness_marital_status_label')) {
 
         // Legacy relationship field values
         $legacy = [
+            'bachelor'              => 'Bachelor',
+            'spinster'              => 'Spinster',
+            'divorced-separated'    => 'Divorced/Separated',
+            'married-traditionally' => 'Married Traditionally',
+            'widowed'               => 'Widowed',
+            'civil-marriage'        => 'Civil Marriage',
+            'cohabiting'            => 'Cohabiting',
             'family'        => 'Family Member (previous field)',
             'friend'        => 'Friend (previous field)',
             'colleague'     => 'Colleague (previous field)',
