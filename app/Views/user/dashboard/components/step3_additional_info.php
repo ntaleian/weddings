@@ -303,6 +303,10 @@ if ($gmp === '' && $legacyGroomFamily !== '') {
                     <input type="tel" id="witness1Phone" name="witness1_phone" value="<?= old('witness1_phone', $application['witness1_phone'] ?? '') ?>" required>
                 </div>
                 <div class="step3-field">
+                    <label for="witness1Occupation">Occupation</label>
+                    <input type="text" id="witness1Occupation" name="witness1_occupation" value="<?= old('witness1_occupation', $application['witness1_occupation'] ?? '') ?>">
+                </div>
+                <div class="step3-field">
                     <label for="witness1IdNumber">ID number *</label>
                     <input type="text" id="witness1IdNumber" name="witness1_id_number" value="<?= old('witness1_id_number', $application['witness1_id_number'] ?? '') ?>" required>
                 </div>
@@ -328,6 +332,10 @@ if ($gmp === '' && $legacyGroomFamily !== '') {
                 <div class="step3-field">
                     <label for="witness2Phone">Phone *</label>
                     <input type="tel" id="witness2Phone" name="witness2_phone" value="<?= old('witness2_phone', $application['witness2_phone'] ?? '') ?>" required>
+                </div>
+                <div class="step3-field">
+                    <label for="witness2Occupation">Occupation</label>
+                    <input type="text" id="witness2Occupation" name="witness2_occupation" value="<?= old('witness2_occupation', $application['witness2_occupation'] ?? '') ?>">
                 </div>
                 <div class="step3-field">
                     <label for="witness2IdNumber">ID number *</label>

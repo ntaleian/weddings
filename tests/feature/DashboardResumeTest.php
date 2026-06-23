@@ -86,8 +86,10 @@ final class DashboardResumeTest extends CIUnitTestCase
         $body = (string) $response->response()->getBody();
         $this->assertStringContainsString('"current_step":2', $body);
         $this->assertStringContainsString('Witnesses', $body);
-        $this->assertStringContainsString('Documents', $body);
-        $this->assertStringContainsString('Payment', $body);
+        $this->assertStringContainsString('Document Checklist', $body);
+        $this->assertStringContainsString('Payment Information', $body);
+        $this->assertStringContainsString('name="witness1_occupation"', $body);
+        $this->assertStringContainsString('name="witness2_occupation"', $body);
         $this->assertStringContainsString('Not listed - type manually', $body);
         $this->assertStringContainsString('handleResVillageChange', $body);
     }

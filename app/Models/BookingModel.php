@@ -30,8 +30,8 @@ class BookingModel extends Model
         'bride_family_phone', 'bride_father_phone', 'bride_mother_phone',
         'groom_father', 'groom_father_occupation', 'groom_father_status', 'groom_mother', 'groom_mother_occupation', 'groom_mother_status',
         'groom_family_phone', 'groom_father_phone', 'groom_mother_phone',
-        'witness1_name', 'witness1_phone', 'witness1_id_number', 'witness1_marital_status',
-        'witness2_name', 'witness2_phone', 'witness2_id_number', 'witness2_marital_status',
+        'witness1_name', 'witness1_phone', 'witness1_occupation', 'witness1_id_number', 'witness1_marital_status',
+        'witness2_name', 'witness2_phone', 'witness2_occupation', 'witness2_id_number', 'witness2_marital_status',
         'premarital_counseling', 'counseling_pastor', 'pastor_recommendation',
         'accept_terms', 'application_step', 'is_draft', 'status', 'total_cost', 'payment_status', 'admin_notes',
         // Admin-managed fields

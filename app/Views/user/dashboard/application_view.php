@@ -785,6 +785,10 @@ $w2marital = $booking['witness2_marital_status'] ?? $booking['witness2_relations
                             <span class="detail-value"><?= esc($booking['witness1_phone'] ?? 'Not provided') ?></span>
                         </div>
                         <div class="detail-item">
+                            <span class="detail-label">Occupation</span>
+                            <span class="detail-value"><?= esc($booking['witness1_occupation'] ?? 'Not provided') ?></span>
+                        </div>
+                        <div class="detail-item">
                             <span class="detail-label">ID Number</span>
                             <span class="detail-value"><?= esc($booking['witness1_id_number'] ?? 'Not provided') ?></span>
                         </div>
@@ -805,6 +809,10 @@ $w2marital = $booking['witness2_marital_status'] ?? $booking['witness2_relations
                         <div class="detail-item">
                             <span class="detail-label">Phone</span>
                             <span class="detail-value"><?= esc($booking['witness2_phone'] ?? 'Not provided') ?></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Occupation</span>
+                            <span class="detail-value"><?= esc($booking['witness2_occupation'] ?? 'Not provided') ?></span>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">ID Number</span>

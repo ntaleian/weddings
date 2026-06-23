@@ -335,6 +335,7 @@ function generateApplicationPdf() {
     witnessY += 6;
     witnessY = addLabelValue('Full Name', <?= json_encode($booking['witness1_name'] ?? 'Not provided', JSON_UNESCAPED_UNICODE) ?>, 20, witnessY, 150);
     witnessY = addLabelValue('Phone', <?= json_encode($booking['witness1_phone'] ?? 'Not provided', JSON_UNESCAPED_UNICODE) ?>, 20, witnessY, 150);
+    witnessY = addLabelValue('Occupation', <?= json_encode($booking['witness1_occupation'] ?? 'Not provided', JSON_UNESCAPED_UNICODE) ?>, 20, witnessY, 150);
     witnessY = addLabelValue('ID Number', <?= json_encode($booking['witness1_id_number'] ?? 'Not provided', JSON_UNESCAPED_UNICODE) ?>, 20, witnessY, 150);
     witnessY = addLabelValue('Marital status', <?= json_encode(witness_marital_status_label($w1marital), JSON_UNESCAPED_UNICODE) ?>, 20, witnessY, 150);
     witnessY += 3;
@@ -344,6 +345,7 @@ function generateApplicationPdf() {
     witnessY += 6;
     witnessY = addLabelValue('Full Name', <?= json_encode($booking['witness2_name'] ?? 'Not provided', JSON_UNESCAPED_UNICODE) ?>, 20, witnessY, 150);
     witnessY = addLabelValue('Phone', <?= json_encode($booking['witness2_phone'] ?? 'Not provided', JSON_UNESCAPED_UNICODE) ?>, 20, witnessY, 150);
+    witnessY = addLabelValue('Occupation', <?= json_encode($booking['witness2_occupation'] ?? 'Not provided', JSON_UNESCAPED_UNICODE) ?>, 20, witnessY, 150);
     witnessY = addLabelValue('ID Number', <?= json_encode($booking['witness2_id_number'] ?? 'Not provided', JSON_UNESCAPED_UNICODE) ?>, 20, witnessY, 150);
     witnessY = addLabelValue('Marital status', <?= json_encode(witness_marital_status_label($w2marital), JSON_UNESCAPED_UNICODE) ?>, 20, witnessY, 150);
     yPos = witnessY + 5;

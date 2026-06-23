@@ -188,6 +188,10 @@
                     <span id="reviewWitness1Phone">-</span>
                 </div>
                 <div class="review-item">
+                    <strong>Best Man Occupation:</strong>
+                    <span id="reviewWitness1Occupation">-</span>
+                </div>
+                <div class="review-item">
                     <strong>Best Man ID:</strong>
                     <span id="reviewWitness1Id">-</span>
                 </div>
@@ -202,6 +206,10 @@
                 <div class="review-item">
                     <strong>Matron Phone:</strong>
                     <span id="reviewWitness2Phone">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Matron Occupation:</strong>
+                    <span id="reviewWitness2Occupation">-</span>
                 </div>
                 <div class="review-item">
                     <strong>Matron ID:</strong>
@@ -430,22 +438,26 @@ function populateStep4Review() {
     // 4. Witness Details - Best Man
     const witness1Name = document.getElementById('witness1Name');
     const witness1Phone = document.getElementById('witness1Phone');
+    const witness1Occupation = document.getElementById('witness1Occupation');
     const witness1IdNumber = document.getElementById('witness1IdNumber');
     const witness1MaritalStatus = document.getElementById('witness1MaritalStatus');
     
     setReviewText('reviewWitness1', witness1Name ? witness1Name.value : null);
     setReviewText('reviewWitness1Phone', witness1Phone ? witness1Phone.value : null);
+    setReviewText('reviewWitness1Occupation', witness1Occupation ? witness1Occupation.value : null);
     setReviewText('reviewWitness1Id', witness1IdNumber ? witness1IdNumber.value : null);
     setReviewText('reviewWitness1MaritalStatus', witness1MaritalStatus ? getSelectText(witness1MaritalStatus) : null);
     
     // 5. Witness Details - Matron
     const witness2Name = document.getElementById('witness2Name');
     const witness2Phone = document.getElementById('witness2Phone');
+    const witness2Occupation = document.getElementById('witness2Occupation');
     const witness2IdNumber = document.getElementById('witness2IdNumber');
     const witness2MaritalStatus = document.getElementById('witness2MaritalStatus');
     
     setReviewText('reviewWitness2', witness2Name ? witness2Name.value : null);
     setReviewText('reviewWitness2Phone', witness2Phone ? witness2Phone.value : null);
+    setReviewText('reviewWitness2Occupation', witness2Occupation ? witness2Occupation.value : null);
     setReviewText('reviewWitness2Id', witness2IdNumber ? witness2IdNumber.value : null);
     setReviewText('reviewWitness2MaritalStatus', witness2MaritalStatus ? getSelectText(witness2MaritalStatus) : null);
 

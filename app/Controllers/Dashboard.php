@@ -1256,6 +1256,8 @@ class Dashboard extends Controller
             'witness2_name' => 'required|max_length[255]',
             'witness1_phone' => 'required|max_length[20]',
             'witness2_phone' => 'required|max_length[20]',
+            'witness1_occupation' => 'permit_empty|max_length[150]',
+            'witness2_occupation' => 'permit_empty|max_length[150]',
             'witness1_id_number' => 'required|max_length[100]',
             'witness2_id_number' => 'required|max_length[100]',
             'witness1_marital_status' => 'required|in_list[single,married]',
@@ -1469,10 +1471,12 @@ class Dashboard extends Controller
                 // Witnesses
                 'witness1_name' => $this->request->getPost('witness1_name'),
                 'witness1_phone' => $this->request->getPost('witness1_phone'),
+                'witness1_occupation' => $this->request->getPost('witness1_occupation'),
                 'witness1_id_number' => $this->request->getPost('witness1_id_number'),
                 'witness1_marital_status' => $this->request->getPost('witness1_marital_status'),
                 'witness2_name' => $this->request->getPost('witness2_name'),
                 'witness2_phone' => $this->request->getPost('witness2_phone'),
+                'witness2_occupation' => $this->request->getPost('witness2_occupation'),
                 'witness2_id_number' => $this->request->getPost('witness2_id_number'),
                 'witness2_marital_status' => $this->request->getPost('witness2_marital_status'),
                 

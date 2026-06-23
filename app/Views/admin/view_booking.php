@@ -451,6 +451,10 @@ $this->setData([
                                 <span class="value"><?= esc($booking['witness1_phone'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
+                                <span class="label">Occupation:</span>
+                                <span class="value"><?= esc($booking['witness1_occupation'] ?? 'Not provided') ?></span>
+                            </div>
+                            <div class="detail-row">
                                 <span class="label">ID Number:</span>
                                 <span class="value"><?= esc($booking['witness1_id_number'] ?? 'Not provided') ?></span>
                             </div>
@@ -468,6 +472,10 @@ $this->setData([
                             <div class="detail-row">
                                 <span class="label">Phone:</span>
                                 <span class="value"><?= esc($booking['witness2_phone'] ?? 'Not provided') ?></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Occupation:</span>
+                                <span class="value"><?= esc($booking['witness2_occupation'] ?? 'Not provided') ?></span>
                             </div>
                             <div class="detail-row">
                                 <span class="label">ID Number:</span>
@@ -1765,10 +1773,10 @@ function generatePDF() {
     checkNewPage(40);
     
     doc.setFillColor(245, 245, 250);
-    doc.roundedRect(15, yPos - 3, 180, 40, 2, 2, 'F');
+    doc.roundedRect(15, yPos - 3, 180, 48, 2, 2, 'F');
     doc.setDrawColor(200, 200, 220);
     doc.setLineWidth(0.3);
-    doc.roundedRect(15, yPos - 3, 180, 40, 2, 2, 'D');
+    doc.roundedRect(15, yPos - 3, 180, 48, 2, 2, 'D');
     
     let witnessY = yPos;
     doc.setTextColor(100, 1, 127);
@@ -1778,6 +1786,7 @@ function generatePDF() {
     witnessY += 6;
     witnessY = addLabelValue('Full Name', '<?= esc($booking["witness1_name"] ?? "Not provided") ?>', 20, witnessY, 150);
     witnessY = addLabelValue('Phone', '<?= esc($booking["witness1_phone"] ?? "Not provided") ?>', 20, witnessY, 150);
+    witnessY = addLabelValue('Occupation', '<?= esc($booking["witness1_occupation"] ?? "Not provided") ?>', 20, witnessY, 150);
     witnessY = addLabelValue('ID Number', '<?= esc($booking["witness1_id_number"] ?? "Not provided") ?>', 20, witnessY, 150);
     witnessY = addLabelValue('Marital status', <?= json_encode(witness_marital_status_label($booking['witness1_marital_status'] ?? $booking['witness1_relationship'] ?? null), JSON_UNESCAPED_UNICODE) ?>, 20, witnessY, 150);
     witnessY += 3;
@@ -1788,6 +1797,7 @@ function generatePDF() {
     witnessY += 6;
     witnessY = addLabelValue('Full Name', '<?= esc($booking["witness2_name"] ?? "Not provided") ?>', 20, witnessY, 150);
     witnessY = addLabelValue('Phone', '<?= esc($booking["witness2_phone"] ?? "Not provided") ?>', 20, witnessY, 150);
+    witnessY = addLabelValue('Occupation', '<?= esc($booking["witness2_occupation"] ?? "Not provided") ?>', 20, witnessY, 150);
     witnessY = addLabelValue('ID Number', '<?= esc($booking["witness2_id_number"] ?? "Not provided") ?>', 20, witnessY, 150);
     witnessY = addLabelValue('Marital status', <?= json_encode(witness_marital_status_label($booking['witness2_marital_status'] ?? $booking['witness2_relationship'] ?? null), JSON_UNESCAPED_UNICODE) ?>, 20, witnessY, 150);
     yPos = witnessY + 5;
