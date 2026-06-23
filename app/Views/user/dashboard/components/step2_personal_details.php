@@ -98,7 +98,8 @@ $groomNat = old('groom_nationality', $application['groom_nationality'] ?? '');
             </div>
             <div class="form-group">
                 <label for="brideResCountry">Country *</label>
-                <select id="brideResCountry" name="bride_res_country" required>
+                <select id="brideResCountry" name="bride_res_country" required
+                        onchange="handleResCountryChange('bride', this.value)">
                     <option value="">Select country</option>
                     <?php foreach ($countries as $cname) : ?>
                         <option value="<?= esc($cname) ?>" <?= $brideRes['country'] === $cname ? 'selected' : '' ?>><?= esc($cname) ?></option>
@@ -108,25 +109,65 @@ $groomNat = old('groom_nationality', $application['groom_nationality'] ?? '');
                     <?php endif; ?>
                 </select>
             </div>
-            <div class="form-group">
+            <!-- Region: dropdown for Uganda, text input otherwise -->
+            <div class="form-group" id="brideResRegionGroup">
                 <label for="brideResRegion">Region *</label>
-                <input type="text" id="brideResRegion" name="bride_res_region" value="<?= esc($brideRes['region']) ?>" required>
+                <select id="brideResRegionSelect" style="display:none;"
+                        onchange="handleResRegionChange('bride', this.value)">
+                    <option value="">Select region</option>
+                </select>
+                <input type="text" id="brideResRegionText" placeholder="Enter region"
+                       value="<?= esc($brideRes['region']) ?>">
+                <input type="hidden" id="brideResRegion" name="bride_res_region"
+                       value="<?= esc($brideRes['region']) ?>" required>
             </div>
-            <div class="form-group">
+            <!-- District: dropdown for Uganda, text input otherwise -->
+            <div class="form-group" id="brideResDistrictGroup">
                 <label for="brideResDistrict">District *</label>
-                <input type="text" id="brideResDistrict" name="bride_res_district" value="<?= esc($brideRes['district']) ?>" required>
+                <select id="brideResDistrictSelect" style="display:none;"
+                        onchange="handleResDistrictChange('bride', this.value)">
+                    <option value="">Select district</option>
+                </select>
+                <input type="text" id="brideResDistrictText" placeholder="Enter district"
+                       value="<?= esc($brideRes['district']) ?>">
+                <input type="hidden" id="brideResDistrict" name="bride_res_district"
+                       value="<?= esc($brideRes['district']) ?>" required>
             </div>
-            <div class="form-group">
-                <label for="brideResSubCounty">Sub county *</label>
-                <input type="text" id="brideResSubCounty" name="bride_res_sub_county" value="<?= esc($brideRes['sub_county']) ?>" required>
+            <!-- Sub County: dropdown for Uganda, text input otherwise -->
+            <div class="form-group" id="brideResSubCountyGroup">
+                <label for="brideResSubCounty">Sub County *</label>
+                <select id="brideResSubCountySelect" style="display:none;"
+                        onchange="handleResSubCountyChange('bride', this.value)">
+                    <option value="">Select sub county</option>
+                </select>
+                <input type="text" id="brideResSubCountyText" placeholder="Enter sub county"
+                       value="<?= esc($brideRes['sub_county']) ?>">
+                <input type="hidden" id="brideResSubCounty" name="bride_res_sub_county"
+                       value="<?= esc($brideRes['sub_county']) ?>" required>
             </div>
-            <div class="form-group">
+            <!-- Parish: dropdown for Uganda, text input otherwise -->
+            <div class="form-group" id="brideResParishGroup">
                 <label for="brideResParish">Parish *</label>
-                <input type="text" id="brideResParish" name="bride_res_parish" value="<?= esc($brideRes['parish']) ?>" required>
+                <select id="brideResParishSelect" style="display:none;"
+                        onchange="handleResParishChange('bride', this.value)">
+                    <option value="">Select parish</option>
+                </select>
+                <input type="text" id="brideResParishText" placeholder="Enter parish"
+                       value="<?= esc($brideRes['parish']) ?>">
+                <input type="hidden" id="brideResParish" name="bride_res_parish"
+                       value="<?= esc($brideRes['parish']) ?>" required>
             </div>
-            <div class="form-group">
+            <!-- Village: dropdown for Uganda, text input otherwise -->
+            <div class="form-group" id="brideResVillageGroup">
                 <label for="brideResVillage">Village *</label>
-                <input type="text" id="brideResVillage" name="bride_res_village" value="<?= esc($brideRes['village']) ?>" required>
+                <select id="brideResVillageSelect" style="display:none;"
+                        onchange="handleResVillageChange('bride', this.value)">
+                    <option value="">Select village</option>
+                </select>
+                <input type="text" id="brideResVillageText" placeholder="Enter village"
+                       value="<?= esc($brideRes['village']) ?>">
+                <input type="hidden" id="brideResVillage" name="bride_res_village"
+                       value="<?= esc($brideRes['village']) ?>" required>
             </div>
             <?php if (! empty($ba['legacy_plain']) && $ba['raw'] !== '') : ?>
             <div class="form-group full-width">
@@ -256,7 +297,8 @@ $groomNat = old('groom_nationality', $application['groom_nationality'] ?? '');
             </div>
             <div class="form-group">
                 <label for="groomResCountry">Country *</label>
-                <select id="groomResCountry" name="groom_res_country" required>
+                <select id="groomResCountry" name="groom_res_country" required
+                        onchange="handleResCountryChange('groom', this.value)">
                     <option value="">Select country</option>
                     <?php foreach ($countries as $cname) : ?>
                         <option value="<?= esc($cname) ?>" <?= $groomRes['country'] === $cname ? 'selected' : '' ?>><?= esc($cname) ?></option>
@@ -266,25 +308,65 @@ $groomNat = old('groom_nationality', $application['groom_nationality'] ?? '');
                     <?php endif; ?>
                 </select>
             </div>
-            <div class="form-group">
+            <!-- Region: dropdown for Uganda, text input otherwise -->
+            <div class="form-group" id="groomResRegionGroup">
                 <label for="groomResRegion">Region *</label>
-                <input type="text" id="groomResRegion" name="groom_res_region" value="<?= esc($groomRes['region']) ?>" required>
+                <select id="groomResRegionSelect" style="display:none;"
+                        onchange="handleResRegionChange('groom', this.value)">
+                    <option value="">Select region</option>
+                </select>
+                <input type="text" id="groomResRegionText" placeholder="Enter region"
+                       value="<?= esc($groomRes['region']) ?>">
+                <input type="hidden" id="groomResRegion" name="groom_res_region"
+                       value="<?= esc($groomRes['region']) ?>" required>
             </div>
-            <div class="form-group">
+            <!-- District: dropdown for Uganda, text input otherwise -->
+            <div class="form-group" id="groomResDistrictGroup">
                 <label for="groomResDistrict">District *</label>
-                <input type="text" id="groomResDistrict" name="groom_res_district" value="<?= esc($groomRes['district']) ?>" required>
+                <select id="groomResDistrictSelect" style="display:none;"
+                        onchange="handleResDistrictChange('groom', this.value)">
+                    <option value="">Select district</option>
+                </select>
+                <input type="text" id="groomResDistrictText" placeholder="Enter district"
+                       value="<?= esc($groomRes['district']) ?>">
+                <input type="hidden" id="groomResDistrict" name="groom_res_district"
+                       value="<?= esc($groomRes['district']) ?>" required>
             </div>
-            <div class="form-group">
-                <label for="groomResSubCounty">Sub county *</label>
-                <input type="text" id="groomResSubCounty" name="groom_res_sub_county" value="<?= esc($groomRes['sub_county']) ?>" required>
+            <!-- Sub County: dropdown for Uganda, text input otherwise -->
+            <div class="form-group" id="groomResSubCountyGroup">
+                <label for="groomResSubCounty">Sub County *</label>
+                <select id="groomResSubCountySelect" style="display:none;"
+                        onchange="handleResSubCountyChange('groom', this.value)">
+                    <option value="">Select sub county</option>
+                </select>
+                <input type="text" id="groomResSubCountyText" placeholder="Enter sub county"
+                       value="<?= esc($groomRes['sub_county']) ?>">
+                <input type="hidden" id="groomResSubCounty" name="groom_res_sub_county"
+                       value="<?= esc($groomRes['sub_county']) ?>" required>
             </div>
-            <div class="form-group">
+            <!-- Parish: dropdown for Uganda, text input otherwise -->
+            <div class="form-group" id="groomResParishGroup">
                 <label for="groomResParish">Parish *</label>
-                <input type="text" id="groomResParish" name="groom_res_parish" value="<?= esc($groomRes['parish']) ?>" required>
+                <select id="groomResParishSelect" style="display:none;"
+                        onchange="handleResParishChange('groom', this.value)">
+                    <option value="">Select parish</option>
+                </select>
+                <input type="text" id="groomResParishText" placeholder="Enter parish"
+                       value="<?= esc($groomRes['parish']) ?>">
+                <input type="hidden" id="groomResParish" name="groom_res_parish"
+                       value="<?= esc($groomRes['parish']) ?>" required>
             </div>
-            <div class="form-group">
+            <!-- Village: dropdown for Uganda, text input otherwise -->
+            <div class="form-group" id="groomResVillageGroup">
                 <label for="groomResVillage">Village *</label>
-                <input type="text" id="groomResVillage" name="groom_res_village" value="<?= esc($groomRes['village']) ?>" required>
+                <select id="groomResVillageSelect" style="display:none;"
+                        onchange="handleResVillageChange('groom', this.value)">
+                    <option value="">Select village</option>
+                </select>
+                <input type="text" id="groomResVillageText" placeholder="Enter village"
+                       value="<?= esc($groomRes['village']) ?>">
+                <input type="hidden" id="groomResVillage" name="groom_res_village"
+                       value="<?= esc($groomRes['village']) ?>" required>
             </div>
             <?php if (! empty($ga['legacy_plain']) && $ga['raw'] !== '') : ?>
             <div class="form-group full-width">
@@ -539,4 +621,354 @@ window.validateStep2Ages = function() {
 
 window.toggleBrideChurchFields = toggleBrideChurchFields;
 window.toggleGroomChurchFields = toggleGroomChurchFields;
+
+// Uganda Cascading Location Dropdowns
+
+const UGANDA_API_BASE = '<?= site_url('api/uganda') ?>';
+const MANUAL_LOCATION_VALUE = '__manual__';
+
+function isUganda(country) {
+    return country.trim().toLowerCase() === 'uganda';
+}
+
+async function fetchUgandaRegions() {
+    if (window._ugandaRegions) return window._ugandaRegions;
+    const res = await fetch(UGANDA_API_BASE + '/regions');
+    const data = await res.json();
+    window._ugandaRegions = data.success ? data.regions : [];
+    return window._ugandaRegions;
+}
+
+async function fetchUgandaDistricts(region) {
+    const res = await fetch(UGANDA_API_BASE + '/districts/' + encodeURIComponent(region));
+    const data = await res.json();
+    return data.success ? data.districts : [];
+}
+
+async function fetchUgandaSubcounties(district) {
+    const res = await fetch(UGANDA_API_BASE + '/subcounties/' + encodeURIComponent(district));
+    const data = await res.json();
+    return data.success ? data.subcounties : [];
+}
+
+async function fetchUgandaParishes(subCounty) {
+    const res = await fetch(UGANDA_API_BASE + '/parishes/' + encodeURIComponent(subCounty));
+    const data = await res.json();
+    return data.success ? data.parishes : [];
+}
+
+async function fetchUgandaVillages(parish) {
+    const res = await fetch(UGANDA_API_BASE + '/villages/' + encodeURIComponent(parish));
+    const data = await res.json();
+    return data.success ? data.villages : [];
+}
+
+function idFor(person, field) {
+    // Maps field keys to element id prefixes.
+    const map = {
+        region:     { select: person + 'ResRegionSelect',     text: person + 'ResRegionText',     hidden: person + 'ResRegion' },
+        district:   { select: person + 'ResDistrictSelect',   text: person + 'ResDistrictText',   hidden: person + 'ResDistrict' },
+        sub_county: { select: person + 'ResSubCountySelect',  text: person + 'ResSubCountyText',  hidden: person + 'ResSubCounty' },
+        parish:     { select: person + 'ResParishSelect',     text: person + 'ResParishText',     hidden: person + 'ResParish' },
+        village:    { select: person + 'ResVillageSelect',    text: person + 'ResVillageText',    hidden: person + 'ResVillage' },
+    };
+    return map[field];
+}
+
+function populateSelect(selectEl, options, placeholder) {
+    selectEl.innerHTML = '<option value="">' + placeholder + '</option>';
+    options.forEach(function(opt) {
+        const o = document.createElement('option');
+        o.value = opt;
+        o.textContent = opt;
+        selectEl.appendChild(o);
+    });
+
+    const manualOption = document.createElement('option');
+    manualOption.value = MANUAL_LOCATION_VALUE;
+    manualOption.textContent = 'Not listed - type manually';
+    selectEl.appendChild(manualOption);
+}
+
+function valueExists(options, value) {
+    return !value || options.indexOf(value) !== -1;
+}
+
+function isManualLocationChoice(value) {
+    return value === MANUAL_LOCATION_VALUE;
+}
+
+function setResMode(person, field, mode, selectedValue) {
+    const ids = idFor(person, field);
+    if (!ids) return;
+    const sel    = document.getElementById(ids.select);
+    const txt    = document.getElementById(ids.text);
+    const hidden = document.getElementById(ids.hidden);
+    if (!sel || !txt || !hidden) return;
+
+    if (mode === 'dropdown') {
+        sel.style.display = '';
+        txt.style.display = 'none';
+        if (selectedValue !== undefined) {
+            sel.value  = selectedValue;
+            hidden.value = selectedValue;
+        }
+    } else {
+        sel.style.display = 'none';
+        txt.style.display = '';
+        if (selectedValue !== undefined) {
+            txt.value    = selectedValue;
+            hidden.value = selectedValue;
+        }
+    }
+}
+
+function setDropdownOptions(person, field, options, placeholder, selectedValue, fallbackToText) {
+    const ids = idFor(person, field);
+    if (!ids) return;
+
+    const sel = document.getElementById(ids.select);
+    if (!sel) return;
+
+    populateSelect(sel, options, placeholder);
+
+    if (fallbackToText && (options.length === 0 || !valueExists(options, selectedValue || ''))) {
+        setResMode(person, field, 'text', selectedValue || '');
+        return;
+    }
+
+    setResMode(person, field, 'dropdown', selectedValue || '');
+}
+
+function clearResField(person, field, mode) {
+    setResMode(person, field, mode || 'dropdown', '');
+    syncResField(person, field, '');
+}
+
+function enableManualResField(person, field, dependentFields) {
+    setResMode(person, field, 'text', '');
+    syncResField(person, field, '');
+
+    dependentFields.forEach(function(dependentField) {
+        setResMode(person, dependentField, 'text', '');
+        syncResField(person, dependentField, '');
+    });
+
+    const ids = idFor(person, field);
+    const txt = ids ? document.getElementById(ids.text) : null;
+    if (txt) txt.focus();
+
+    if (window.scheduleAutoSave) window.scheduleAutoSave(2);
+}
+
+function syncResField(person, field, value) {
+    const ids = idFor(person, field);
+    if (!ids) return;
+    const hidden = document.getElementById(ids.hidden);
+    if (hidden) hidden.value = value;
+    if (window.scheduleAutoSave) window.scheduleAutoSave(2);
+}
+
+async function handleResCountryChange(person, country) {
+    if (isUganda(country)) {
+        const regions = await fetchUgandaRegions();
+        setDropdownOptions(person, 'region', regions, 'Select region', '', false);
+        setDropdownOptions(person, 'district', [], 'Select district', '', false);
+        setDropdownOptions(person, 'sub_county', [], 'Select sub county', '', false);
+        setDropdownOptions(person, 'parish', [], 'Select parish', '', false);
+        setDropdownOptions(person, 'village', [], 'Select village', '', false);
+    } else {
+        setResMode(person, 'region',     'text', '');
+        setResMode(person, 'district',   'text', '');
+        setResMode(person, 'sub_county', 'text', '');
+        setResMode(person, 'parish',     'text', '');
+        setResMode(person, 'village',    'text', '');
+    }
+    syncResField(person, 'region',     '');
+    syncResField(person, 'district',   '');
+    syncResField(person, 'sub_county', '');
+    syncResField(person, 'parish',     '');
+    syncResField(person, 'village',    '');
+    if (window.scheduleAutoSave) window.scheduleAutoSave(2);
+}
+
+async function handleResRegionChange(person, region) {
+    if (isManualLocationChoice(region)) {
+        enableManualResField(person, 'region', ['district', 'sub_county', 'parish', 'village']);
+        return;
+    }
+
+    syncResField(person, 'region', region);
+    clearResField(person, 'district');
+    clearResField(person, 'sub_county');
+    clearResField(person, 'parish');
+    clearResField(person, 'village');
+
+    if (region) {
+        const districts = await fetchUgandaDistricts(region);
+        setDropdownOptions(person, 'district', districts, 'Select district', '', true);
+
+        if (districts.length === 0) {
+            setResMode(person, 'sub_county', 'text', '');
+            setResMode(person, 'parish', 'text', '');
+            setResMode(person, 'village', 'text', '');
+        }
+    } else {
+        setDropdownOptions(person, 'district', [], 'Select district', '', false);
+        setDropdownOptions(person, 'sub_county', [], 'Select sub county', '', false);
+        setDropdownOptions(person, 'parish', [], 'Select parish', '', false);
+        setDropdownOptions(person, 'village', [], 'Select village', '', false);
+    }
+    if (window.scheduleAutoSave) window.scheduleAutoSave(2);
+}
+
+async function handleResDistrictChange(person, district) {
+    if (isManualLocationChoice(district)) {
+        enableManualResField(person, 'district', ['sub_county', 'parish', 'village']);
+        return;
+    }
+
+    syncResField(person, 'district', district);
+    clearResField(person, 'sub_county');
+    clearResField(person, 'parish');
+    clearResField(person, 'village');
+
+    if (district) {
+        const subcounties = await fetchUgandaSubcounties(district);
+        setDropdownOptions(person, 'sub_county', subcounties, 'Select sub county', '', true);
+
+        if (subcounties.length === 0) {
+            setResMode(person, 'parish', 'text', '');
+            setResMode(person, 'village', 'text', '');
+        }
+    } else {
+        setDropdownOptions(person, 'sub_county', [], 'Select sub county', '', false);
+        setDropdownOptions(person, 'parish', [], 'Select parish', '', false);
+        setDropdownOptions(person, 'village', [], 'Select village', '', false);
+    }
+    if (window.scheduleAutoSave) window.scheduleAutoSave(2);
+}
+
+async function handleResSubCountyChange(person, subCounty) {
+    if (isManualLocationChoice(subCounty)) {
+        enableManualResField(person, 'sub_county', ['parish', 'village']);
+        return;
+    }
+
+    syncResField(person, 'sub_county', subCounty);
+    clearResField(person, 'parish');
+    clearResField(person, 'village');
+
+    if (subCounty) {
+        const parishes = await fetchUgandaParishes(subCounty);
+        setDropdownOptions(person, 'parish', parishes, 'Select parish', '', true);
+
+        if (parishes.length === 0) {
+            setResMode(person, 'village', 'text', '');
+        }
+    } else {
+        setDropdownOptions(person, 'parish', [], 'Select parish', '', false);
+        setDropdownOptions(person, 'village', [], 'Select village', '', false);
+    }
+    if (window.scheduleAutoSave) window.scheduleAutoSave(2);
+}
+
+async function handleResParishChange(person, parish) {
+    if (isManualLocationChoice(parish)) {
+        enableManualResField(person, 'parish', ['village']);
+        return;
+    }
+
+    syncResField(person, 'parish', parish);
+    clearResField(person, 'village');
+
+    if (parish) {
+        const villages = await fetchUgandaVillages(parish);
+        setDropdownOptions(person, 'village', villages, 'Select village', '', true);
+    } else {
+        setDropdownOptions(person, 'village', [], 'Select village', '', false);
+    }
+    if (window.scheduleAutoSave) window.scheduleAutoSave(2);
+}
+
+function handleResVillageChange(person, village) {
+    if (isManualLocationChoice(village)) {
+        enableManualResField(person, 'village', []);
+        return;
+    }
+
+    syncResField(person, 'village', village);
+    if (window.scheduleAutoSave) window.scheduleAutoSave(2);
+}
+
+// Sync text inputs to hidden fields on each keystroke.
+['bride', 'groom'].forEach(function(person) {
+    [
+        { suffix: 'Region', key: 'region' },
+        { suffix: 'District', key: 'district' },
+        { suffix: 'SubCounty', key: 'sub_county' },
+        { suffix: 'Parish', key: 'parish' },
+        { suffix: 'Village', key: 'village' },
+    ].forEach(function(field) {
+        const txt = document.getElementById(person + 'Res' + field.suffix + 'Text');
+        if (txt) {
+            txt.addEventListener('input', function() {
+                syncResField(person, field.key, this.value);
+            });
+        }
+    });
+});
+
+// On page load: if Uganda is already selected, restore dropdowns
+window.addEventListener('DOMContentLoaded', async function() {
+    for (const person of ['bride', 'groom']) {
+        const countrySel = document.getElementById(person + 'ResCountry');
+        if (!countrySel) continue;
+        const country = countrySel.value;
+        if (!isUganda(country)) continue;
+
+        const savedRegion     = document.getElementById(person + 'ResRegion')?.value     || '';
+        const savedDistrict   = document.getElementById(person + 'ResDistrict')?.value   || '';
+        const savedSubCounty  = document.getElementById(person + 'ResSubCounty')?.value  || '';
+        const savedParish     = document.getElementById(person + 'ResParish')?.value     || '';
+        const savedVillage    = document.getElementById(person + 'ResVillage')?.value    || '';
+
+        const regions = await fetchUgandaRegions();
+        setDropdownOptions(person, 'region', regions, 'Select region', savedRegion, true);
+
+        if (savedRegion) {
+            const districts = await fetchUgandaDistricts(savedRegion);
+            setDropdownOptions(person, 'district', districts, 'Select district', savedDistrict, true);
+
+            if (savedDistrict) {
+                const subcounties = await fetchUgandaSubcounties(savedDistrict);
+                setDropdownOptions(person, 'sub_county', subcounties, 'Select sub county', savedSubCounty, true);
+
+                if (savedSubCounty) {
+                    const parishes = await fetchUgandaParishes(savedSubCounty);
+                    setDropdownOptions(person, 'parish', parishes, 'Select parish', savedParish, true);
+
+                    if (savedParish) {
+                        const villages = await fetchUgandaVillages(savedParish);
+                        setDropdownOptions(person, 'village', villages, 'Select village', savedVillage, true);
+                    } else {
+                        setDropdownOptions(person, 'village', [], 'Select village', savedVillage, Boolean(savedVillage));
+                    }
+                } else {
+                    setDropdownOptions(person, 'parish', [], 'Select parish', savedParish, Boolean(savedParish));
+                    setDropdownOptions(person, 'village', [], 'Select village', savedVillage, Boolean(savedVillage));
+                }
+            } else {
+                setResMode(person, 'sub_county', 'dropdown', '');
+                setDropdownOptions(person, 'parish', [], 'Select parish', savedParish, Boolean(savedParish));
+                setDropdownOptions(person, 'village', [], 'Select village', savedVillage, Boolean(savedVillage));
+            }
+        } else {
+            setResMode(person, 'district',   'dropdown', '');
+            setResMode(person, 'sub_county', 'dropdown', '');
+            setDropdownOptions(person, 'parish', [], 'Select parish', savedParish, Boolean(savedParish));
+            setDropdownOptions(person, 'village', [], 'Select village', savedVillage, Boolean(savedVillage));
+        }
+    }
+});
 </script>

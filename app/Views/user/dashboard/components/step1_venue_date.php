@@ -1317,28 +1317,97 @@ function resetTimeSlotAvailability() {
     });
 }
 
+// ─── Field Error Helpers ─────────────────────────────────────────────────────
+
+function markFieldError(fieldId, message) {
+    const el = document.getElementById(fieldId);
+    if (!el) return;
+    const group = el.closest('.form-group') || el.parentElement;
+    group.classList.add('field-error');
+    el.classList.add('error');
+    // Remove existing error message if any
+    const existing = group.querySelector('.field-error-msg');
+    if (existing) existing.remove();
+    const msg = document.createElement('span');
+    msg.className = 'field-error-msg';
+    msg.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + message;
+    group.appendChild(msg);
+    // Clear error when user interacts
+    const clear = function() {
+        group.classList.remove('field-error');
+        el.classList.remove('error');
+        const m = group.querySelector('.field-error-msg');
+        if (m) m.remove();
+        el.removeEventListener('input', clear);
+        el.removeEventListener('change', clear);
+    };
+    el.addEventListener('input', clear);
+    el.addEventListener('change', clear);
+}
+
+function clearFieldError(fieldId) {
+    const el = document.getElementById(fieldId);
+    if (!el) return;
+    const group = el.closest('.form-group') || el.parentElement;
+    group.classList.remove('field-error');
+    el.classList.remove('error');
+    const msg = group.querySelector('.field-error-msg');
+    if (msg) msg.remove();
+}
+
+function scrollToFirstError(containerSelector) {
+    const container = containerSelector
+        ? document.querySelector(containerSelector)
+        : document;
+    const first = container ? container.querySelector('.field-error') : document.querySelector('.field-error');
+    if (first) {
+        first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const input = first.querySelector('input, select, textarea');
+        if (input) input.focus({ preventScroll: true });
+    }
+}
+
+function showStepError(message) {
+    // Show a non-blocking banner at the top of the visible step
+    const activeStep = document.querySelector('.form-section[data-step="' + currentStep + '"]');
+    if (!activeStep) return;
+    let banner = activeStep.querySelector('.step-error-banner');
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.className = 'step-error-banner';
+        activeStep.insertBefore(banner, activeStep.firstChild);
+    }
+    banner.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + message;
+    banner.style.display = 'flex';
+    setTimeout(function() { banner.style.display = 'none'; }, 6000);
+}
+
 // Validation function
 function validateStep1() {
     const campus = document.getElementById('selectedCampus').value;
     const date = document.getElementById('selectedDate').value;
     const time = document.getElementById('selectedTime').value;
-    
+    let valid = true;
+
     if (!campus) {
-        alert('Please select a campus.');
-        return false;
+        // Campus is selected via card click, highlight the campus grid
+        const grid = document.querySelector('.campus-grid');
+        if (grid) {
+            grid.classList.add('field-error-block');
+            setTimeout(function() { grid.classList.remove('field-error-block'); }, 3000);
+        }
+        showStepError('Please select a campus.');
+        valid = false;
     }
-    
     if (!date) {
-        alert('Please select a wedding date.');
-        return false;
+        showStepError('Please select a wedding date.');
+        valid = false;
     }
-    
     if (!time) {
-        alert('Please select a time slot.');
-        return false;
+        showStepError('Please select a time slot.');
+        valid = false;
     }
-    
-    return true;
+    return valid;
 }
 
 // Check if step 1 is complete and enable/disable next button accordingly
@@ -1453,7 +1522,8 @@ function nextStep() {
     }
     
     if (!isValid) {
-        alert(validationMessage);
+        showStepError(validationMessage);
+        scrollToFirstError('.form-section[data-step="' + currentStep + '"]');
         return;
     }
     
@@ -1590,95 +1660,169 @@ window.previousStep = previousStep;
 
 // Validation functions for other steps
 function validateStep2() {
+    let valid = true;
+
+    // Field id → friendly label for error messages
     const requiredFields = [
-        'brideName', 'brideDateOfBirth', 'brideAge', 'brideEmail', 'bridePhone',
-        'brideNationality', 'brideMaritalStatus', 'brideIdNumber', 'brideIdType',
-        'brideResCountry', 'brideResRegion', 'brideResDistrict', 'brideResSubCounty', 'brideResParish', 'brideResVillage',
-        'groomName', 'groomDateOfBirth', 'groomAge', 'groomEmail', 'groomPhone',
-        'groomNationality', 'groomMaritalStatus', 'groomIdNumber', 'groomIdType',
-        'groomResCountry', 'groomResRegion', 'groomResDistrict', 'groomResSubCounty', 'groomResParish', 'groomResVillage'
+        { id: 'brideName',            label: 'Full name' },
+        { id: 'brideDateOfBirth',     label: 'Date of birth' },
+        { id: 'brideEmail',           label: 'Email address' },
+        { id: 'bridePhone',           label: 'Phone number' },
+        { id: 'brideNationality',     label: 'Nationality' },
+        { id: 'brideMaritalStatus',   label: 'Marital status' },
+        { id: 'brideResCountry',      label: 'Country' },
+        { id: 'brideResRegion',       label: 'Region' },
+        { id: 'brideResDistrict',     label: 'District' },
+        { id: 'brideResSubCounty',    label: 'Sub county' },
+        { id: 'brideResParish',       label: 'Parish' },
+        { id: 'brideResVillage',      label: 'Village' },
+        { id: 'brideIdNumber',        label: 'ID / Passport number' },
+        { id: 'brideIdType',          label: 'ID type' },
+        { id: 'groomName',            label: 'Full name' },
+        { id: 'groomDateOfBirth',     label: 'Date of birth' },
+        { id: 'groomEmail',           label: 'Email address' },
+        { id: 'groomPhone',           label: 'Phone number' },
+        { id: 'groomNationality',     label: 'Nationality' },
+        { id: 'groomMaritalStatus',   label: 'Marital status' },
+        { id: 'groomResCountry',      label: 'Country' },
+        { id: 'groomResRegion',       label: 'Region' },
+        { id: 'groomResDistrict',     label: 'District' },
+        { id: 'groomResSubCounty',    label: 'Sub county' },
+        { id: 'groomResParish',       label: 'Parish' },
+        { id: 'groomResVillage',      label: 'Village' },
+        { id: 'groomIdNumber',        label: 'ID / Passport number' },
+        { id: 'groomIdType',          label: 'ID type' },
     ];
-    
-    const allFieldsFilled = requiredFields.every(fieldId => {
-        const field = document.getElementById(fieldId);
-        return field && String(field.value).trim() !== '';
+
+    requiredFields.forEach(function(f) {
+        const el = document.getElementById(f.id);
+        if (!el || String(el.value).trim() === '') {
+            markFieldError(f.id, f.label + ' is required.');
+            valid = false;
+        } else {
+            clearFieldError(f.id);
+        }
     });
-    
-    let agesValid = true;
-    if (window.validateStep2Ages) {
-        agesValid = window.validateStep2Ages();
-    }
-    
+
+    // Age validation
     const brideAge = document.getElementById('brideAge');
     const groomAge = document.getElementById('groomAge');
-    
-    if (brideAge && (parseInt(brideAge.value, 10) < 18 || !brideAge.value)) {
-        agesValid = false;
+    if (brideAge && (!brideAge.value || parseInt(brideAge.value, 10) < 18)) {
+        markFieldError('brideDateOfBirth', 'Bride must be at least 18 years old.');
+        valid = false;
     }
-    if (groomAge && (parseInt(groomAge.value, 10) < 18 || !groomAge.value)) {
-        agesValid = false;
+    if (groomAge && (!groomAge.value || parseInt(groomAge.value, 10) < 18)) {
+        markFieldError('groomDateOfBirth', 'Groom must be at least 18 years old.');
+        valid = false;
     }
-    
-    function requireIfPresent(ids) {
-        return ids.every(function(id) {
-            const f = document.getElementById(id);
-            return f && String(f.value).trim() !== '';
+    if (window.validateStep2Ages) {
+        if (!window.validateStep2Ages()) valid = false;
+    }
+
+    // Church membership conditional fields
+    function requireConditional(ids) {
+        ids.forEach(function(item) {
+            const f = document.getElementById(item.id);
+            if (!f || String(f.value).trim() === '') {
+                markFieldError(item.id, item.label + ' is required.');
+                valid = false;
+            } else {
+                clearFieldError(item.id);
+            }
         });
     }
-    
-    let churchOk = true;
+
     const brideChurch = document.querySelector('input[name="bride_church_member"]:checked');
-    if (brideChurch && brideChurch.value === 'yes') {
-        churchOk = churchOk && requireIfPresent(['brideCellGroupNumber', 'brideCellLeaderName', 'brideCellLeaderPhone']);
-    } else if (brideChurch && brideChurch.value === 'other') {
-        churchOk = churchOk && requireIfPresent(['brideChurchName', 'brideSeniorPastor', 'bridePastorPhone']);
+    if (!brideChurch) {
+        // highlight the radio group container
+        const radioGroup = document.getElementById('brideChurchMemberYes')?.closest('.form-group');
+        if (radioGroup) { radioGroup.classList.add('field-error'); }
+        valid = false;
+    } else if (brideChurch.value === 'yes') {
+        requireConditional([
+            { id: 'brideCellGroupNumber',  label: 'Cell family number' },
+            { id: 'brideCellLeaderName',   label: 'Cell family leader name' },
+            { id: 'brideCellLeaderPhone',  label: 'Cell family leader phone' },
+        ]);
+    } else if (brideChurch.value === 'other') {
+        requireConditional([
+            { id: 'brideChurchName',    label: 'Church name' },
+            { id: 'brideSeniorPastor',  label: 'Senior pastor name' },
+            { id: 'bridePastorPhone',   label: 'Senior pastor phone' },
+        ]);
     }
-    
+
     const groomChurch = document.querySelector('input[name="groom_church_member"]:checked');
-    if (groomChurch && groomChurch.value === 'yes') {
-        churchOk = churchOk && requireIfPresent(['groomCellGroupNumber', 'groomCellLeaderName', 'groomCellLeaderPhone']);
-    } else if (groomChurch && groomChurch.value === 'other') {
-        churchOk = churchOk && requireIfPresent(['groomChurchName', 'groomSeniorPastor', 'groomPastorPhone']);
+    if (!groomChurch) {
+        const radioGroup = document.getElementById('groomChurchMemberYes')?.closest('.form-group');
+        if (radioGroup) { radioGroup.classList.add('field-error'); }
+        valid = false;
+    } else if (groomChurch.value === 'yes') {
+        requireConditional([
+            { id: 'groomCellGroupNumber',  label: 'Cell family number' },
+            { id: 'groomCellLeaderName',   label: 'Cell family leader name' },
+            { id: 'groomCellLeaderPhone',  label: 'Cell family leader phone' },
+        ]);
+    } else if (groomChurch.value === 'other') {
+        requireConditional([
+            { id: 'groomChurchName',    label: 'Church name' },
+            { id: 'groomSeniorPastor',  label: 'Senior pastor name' },
+            { id: 'groomPastorPhone',   label: 'Senior pastor phone' },
+        ]);
     }
-    
-    return allFieldsFilled && agesValid && churchOk;
+
+    return valid;
 }
 
 function validateStep3() {
-    const requiredWitnessFields = [
-        'witness1Name', 'witness1Phone', 'witness1IdNumber', 'witness1MaritalStatus',
-        'witness2Name', 'witness2Phone', 'witness2IdNumber', 'witness2MaritalStatus'
+    let valid = true;
+
+    const witnessFields = [
+        { id: 'witness1Name',           label: 'Witness 1 full name' },
+        { id: 'witness1Phone',          label: 'Witness 1 phone' },
+        { id: 'witness1IdNumber',       label: 'Witness 1 ID number' },
+        { id: 'witness1MaritalStatus',  label: 'Witness 1 marital status' },
+        { id: 'witness2Name',           label: 'Witness 2 full name' },
+        { id: 'witness2Phone',          label: 'Witness 2 phone' },
+        { id: 'witness2IdNumber',       label: 'Witness 2 ID number' },
+        { id: 'witness2MaritalStatus',  label: 'Witness 2 marital status' },
     ];
-    
-    const witnessFieldsValid = requiredWitnessFields.every(fieldId => {
-        const field = document.getElementById(fieldId);
-        return field && String(field.value).trim() !== '';
-    });
-    
-    const parentPairs = [
-        ['bride_father_status', 'brideFatherPhone'],
-        ['bride_mother_status', 'brideMotherPhone'],
-        ['groom_father_status', 'groomFatherPhone'],
-        ['groom_mother_status', 'groomMotherPhone']
-    ];
-    let parentsOk = true;
-    parentPairs.forEach(function(pair) {
-        const statusName = pair[0];
-        const phoneId = pair[1];
-        const sel = document.querySelector('input[name="' + statusName + '"]:checked');
-        if (!sel) {
-            parentsOk = false;
-            return;
+
+    witnessFields.forEach(function(f) {
+        const el = document.getElementById(f.id);
+        if (!el || String(el.value).trim() === '') {
+            markFieldError(f.id, f.label + ' is required.');
+            valid = false;
+        } else {
+            clearFieldError(f.id);
         }
-        if (sel.value === 'alive') {
-            const phone = document.getElementById(phoneId);
+    });
+
+    const parentPairs = [
+        { name: 'bride_father_status', phoneId: 'brideFatherPhone',  label: "Bride's father phone" },
+        { name: 'bride_mother_status', phoneId: 'brideMotherPhone',  label: "Bride's mother phone" },
+        { name: 'groom_father_status', phoneId: 'groomFatherPhone',  label: "Groom's father phone" },
+        { name: 'groom_mother_status', phoneId: 'groomMotherPhone',  label: "Groom's mother phone" },
+    ];
+
+    parentPairs.forEach(function(p) {
+        const sel = document.querySelector('input[name="' + p.name + '"]:checked');
+        if (!sel) {
+            const radioGroup = document.querySelector('input[name="' + p.name + '"]')?.closest('.form-group');
+            if (radioGroup) radioGroup.classList.add('field-error');
+            valid = false;
+        } else if (sel.value === 'alive') {
+            const phone = document.getElementById(p.phoneId);
             if (!phone || String(phone.value).trim() === '') {
-                parentsOk = false;
+                markFieldError(p.phoneId, p.label + ' is required.');
+                valid = false;
+            } else {
+                clearFieldError(p.phoneId);
             }
         }
     });
-    
-    return witnessFieldsValid && parentsOk;
+
+    return valid;
 }
 
 function validateStep4() {

@@ -58,6 +58,8 @@ final class DashboardResumeTest extends CIUnitTestCase
         $this->assertStringContainsString('Witnesses', $body);
         $this->assertStringContainsString('Documents', $body);
         $this->assertStringContainsString('Payment', $body);
+        $this->assertStringContainsString('Not listed - type manually', $body);
+        $this->assertStringContainsString('handleResVillageChange', $body);
     }
 
     private function insertDraft(array $formData, int $currentStep): void

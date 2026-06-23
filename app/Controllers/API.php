@@ -302,7 +302,7 @@ class API extends Controller
         } catch (\Exception $e) {
             // Log the error
             log_message('error', 'Quick availability check error: ' . $e->getMessage());
-            
+
             // Return JSON error response
             return $this->response->setJSON([
                 'status' => 'error',
@@ -310,5 +310,95 @@ class API extends Controller
                 'error' => ENVIRONMENT === 'development' ? $e->getMessage() : null
             ])->setStatusCode(500);
         }
+    }
+
+    // Uganda Administrative Data
+
+    private function loadUgandaAdminData(): array
+    {
+        $path = APPPATH . 'Config/Data/uganda_admin_data.json';
+        if (! is_file($path)) {
+            return [];
+        }
+        $data = json_decode((string) file_get_contents($path), true);
+        return is_array($data) ? $data : [];
+    }
+
+    private function ugandaOptions(string $level, string $parent): array
+    {
+        $data = $this->loadUgandaAdminData();
+        $parent = urldecode($parent);
+
+        return $data[$level][$parent] ?? [];
+    }
+
+    public function ugandaRegions(): \CodeIgniter\HTTP\ResponseInterface
+    {
+        $data = $this->loadUgandaAdminData();
+        return $this->response->setJSON([
+            'success' => true,
+            'regions' => $data['regions'] ?? [],
+        ]);
+    }
+
+    public function ugandaDistricts(string $region): \CodeIgniter\HTTP\ResponseInterface
+    {
+        $region   = urldecode($region);
+        $districts = $this->ugandaOptions('districts', $region);
+        return $this->response->setJSON([
+            'success'   => true,
+            'region'    => $region,
+            'districts' => $districts,
+        ]);
+    }
+
+    public function ugandaSubcounties(string $district): \CodeIgniter\HTTP\ResponseInterface
+    {
+        $district   = urldecode($district);
+        $subcounties = $this->ugandaOptions('subcounties', $district);
+        return $this->response->setJSON([
+            'success'     => true,
+            'district'    => $district,
+            'subcounties' => $subcounties,
+        ]);
+    }
+
+    public function ugandaParishes(string $subCounty): \CodeIgniter\HTTP\ResponseInterface
+    {
+        $subCounty = urldecode($subCounty);
+        $parishes = $this->ugandaOptions('parishes', $subCounty);
+        return $this->response->setJSON([
+            'success'    => true,
+            'sub_county' => $subCounty,
+            'parishes'   => $parishes,
+        ]);
+    }
+
+    public function ugandaVillages(string $parish): \CodeIgniter\HTTP\ResponseInterface
+    {
+        $parish = urldecode($parish);
+        $villages = $this->ugandaOptions('villages', $parish);
+        return $this->response->setJSON([
+            'success'  => true,
+            'parish'   => $parish,
+            'villages' => $villages,
+        ]);
+    }
+
+    public function ugandaMetadata(): \CodeIgniter\HTTP\ResponseInterface
+    {
+        $data = $this->loadUgandaAdminData();
+
+        return $this->response->setJSON([
+            'success'  => true,
+            'metadata' => $data['metadata'] ?? [],
+            'counts'   => [
+                'regions'     => count($data['regions'] ?? []),
+                'districts'   => array_sum(array_map('count', $data['districts'] ?? [])),
+                'subcounties' => array_sum(array_map('count', $data['subcounties'] ?? [])),
+                'parishes'    => array_sum(array_map('count', $data['parishes'] ?? [])),
+                'villages'    => array_sum(array_map('count', $data['villages'] ?? [])),
+            ],
+        ]);
     }
 }

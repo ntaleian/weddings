@@ -148,4 +148,11 @@ $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
     $routes->get('notifications', 'API::getNotifications');
     $routes->post('notifications/(:num)/read', 'API::markNotificationRead/$1');
     $routes->post('quick-availability-check', 'API::quickAvailabilityCheck');
+    // Uganda administrative data
+    $routes->get('uganda/regions', 'API::ugandaRegions');
+    $routes->get('uganda/districts/(:segment)', 'API::ugandaDistricts/$1');
+    $routes->get('uganda/subcounties/(:segment)', 'API::ugandaSubcounties/$1');
+    $routes->get('uganda/parishes/(:segment)', 'API::ugandaParishes/$1');
+    $routes->get('uganda/villages/(:segment)', 'API::ugandaVillages/$1');
+    $routes->get('uganda/metadata', 'API::ugandaMetadata');
 });
