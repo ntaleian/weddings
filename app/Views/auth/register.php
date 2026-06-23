@@ -5,40 +5,15 @@
 <?= $this->endSection() ?>
 
 <?= $this->section('auth_left') ?>
-    <div class="auth-welcome">
+    <div class="auth-welcome auth-welcome-simple">
         <div class="welcome-header">
-            <h1>Glad to have you here!</h1>
-            <p class="welcome-subtitle">Start your beautiful wedding journey with Watoto Church</p>
+            <h1>Start your wedding booking</h1>
+            <p class="welcome-subtitle">Create an account, then continue your application from your dashboard.</p>
         </div>
         
-        <div class="auth-features">
-            <div class="auth-feature">
-                <i class="fas fa-user-check"></i>
-                <div>
-                    <strong>Easy Registration</strong>
-                    <span>Create your account in minutes</span>
-                </div>
-            </div>
-            <div class="auth-feature">
-                <i class="fas fa-calendar-alt"></i>
-                <div>
-                    <strong>Book Your Wedding</strong>
-                    <span>Reserve your special day</span>
-                </div>
-            </div>
-            <div class="auth-feature">
-                <i class="fas fa-hands-helping"></i>
-                <div>
-                    <strong>Expert Support</strong>
-                    <span>Get help from our dedicated team</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="auth-quote">
-            <i class="fas fa-quote-left"></i>
-            <p>"Therefore what God has joined together, let no one separate."</p>
-            <cite>Mark 10:9</cite>
+        <div class="auth-quote simple-signup-note">
+            <i class="fas fa-check-circle"></i>
+            <p>You only need the basics now. The wedding details can be completed later.</p>
         </div>
     </div>
 <?= $this->endSection() ?>
@@ -46,11 +21,8 @@
 <?= $this->section('auth_right') ?>
     <div class="register-container">
         <div class="register-header">
-            <div class="register-icon">
-                <i class="fas fa-heart"></i>
-            </div>
             <h1>Create Account</h1>
-            <p class="register-subtitle">Join us and begin your wedding journey</p>
+            <p class="register-subtitle">A few details to get you started</p>
         </div>
 
         <!-- Flash Messages -->
@@ -58,6 +30,27 @@
 
         <form class="register-form" method="post" action="<?= base_url('register') ?>" autocomplete="off" id="registerForm">
             <?= csrf_field() ?>
+
+            <div class="form-field wedding-role-field">
+                <span class="field-label">I am the</span>
+                <div class="role-options" role="radiogroup" aria-label="Wedding role">
+                    <label class="role-option">
+                        <input type="radio" name="wedding_role" value="bride" <?= old('wedding_role') === 'bride' ? 'checked' : '' ?> required>
+                        <span class="role-card">
+                            <i class="fas fa-ring"></i>
+                            <span>Bride</span>
+                        </span>
+                    </label>
+                    <label class="role-option">
+                        <input type="radio" name="wedding_role" value="groom" <?= old('wedding_role') === 'groom' ? 'checked' : '' ?> required>
+                        <span class="role-card">
+                            <i class="fas fa-user-tie"></i>
+                            <span>Groom</span>
+                        </span>
+                    </label>
+                </div>
+                <span class="field-error"></span>
+            </div>
             
             <div class="form-grid">
                 <div class="form-field">
@@ -94,55 +87,19 @@
                 <span class="field-error"></span>
             </div>
 
-            <div class="form-field wedding-role-field">
-                <span class="field-label">I am the</span>
-                <div class="role-options" role="radiogroup" aria-label="Wedding role">
-                    <label class="role-option">
-                        <input type="radio" name="wedding_role" value="bride" <?= old('wedding_role') === 'bride' ? 'checked' : '' ?> required>
-                        <span class="role-card">
-                            <i class="fas fa-ring"></i>
-                            <span>Bride</span>
-                        </span>
-                    </label>
-                    <label class="role-option">
-                        <input type="radio" name="wedding_role" value="groom" <?= old('wedding_role') === 'groom' ? 'checked' : '' ?> required>
-                        <span class="role-card">
-                            <i class="fas fa-user-tie"></i>
-                            <span>Groom</span>
-                        </span>
-                    </label>
+            <div class="form-field">
+                <label for="password" class="field-label">
+                    Password
+                </label>
+                <div class="input-wrapper">
+                    <i class="input-icon fas fa-lock"></i>
+                    <input type="password" id="password" name="password" required autocomplete="new-password" minlength="8" placeholder="At least 8 characters">
+                    <button type="button" class="password-toggle-btn" onclick="togglePassword('password')" aria-label="Toggle password visibility">
+                        <i class="fas fa-eye"></i>
+                    </button>
                 </div>
+                <span class="field-hint">Use at least 8 characters.</span>
                 <span class="field-error"></span>
-            </div>
-
-            <div class="form-grid">
-                <div class="form-field">
-                    <label for="password" class="field-label">
-                        Password
-                    </label>
-                    <div class="input-wrapper">
-                        <i class="input-icon fas fa-lock"></i>
-                        <input type="password" id="password" name="password" required autocomplete="new-password" placeholder="••••••••">
-                        <button type="button" class="password-toggle-btn" onclick="togglePassword('password')" aria-label="Toggle password visibility">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <span class="field-error"></span>
-                </div>
-                
-                <div class="form-field">
-                    <label for="confirm_password" class="field-label">
-                        Confirm Password
-                    </label>
-                    <div class="input-wrapper">
-                        <i class="input-icon fas fa-lock"></i>
-                        <input type="password" id="confirm_password" name="confirm_password" required placeholder="••••••••">
-                        <button type="button" class="password-toggle-btn" onclick="togglePassword('confirm_password')" aria-label="Toggle password visibility">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                    <span class="field-error"></span>
-                </div>
             </div>
 
             <!-- Math CAPTCHA -->
@@ -199,38 +156,20 @@
 
 <?= $this->section('additional_css') ?>
     <style>
-    /* Modern Register Page Design */
     .register-container {
         width: 100%;
         max-width: 100%;
     }
 
     .register-header {
-        text-align: center;
-        margin-bottom: 35px;
-        padding-bottom: 25px;
+        text-align: left;
+        margin-bottom: 24px;
+        padding-bottom: 18px;
         border-bottom: 1px solid #e9ecef;
     }
 
-    .register-icon {
-        width: 64px;
-        height: 64px;
-        margin: 0 auto 20px;
-        background: #008C15;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 20px rgba(0, 140, 21, 0.25);
-    }
-
-    .register-icon i {
-        font-size: 28px;
-        color: white;
-    }
-
     .register-header h1 {
-        font-size: 28px;
+        font-size: 26px;
         font-weight: 700;
         color: #1a1a1a;
         margin: 0 0 8px 0;
@@ -247,7 +186,7 @@
     .register-form {
         display: flex;
         flex-direction: column;
-        gap: 22px;
+        gap: 18px;
     }
 
     .form-grid {
@@ -350,6 +289,12 @@
         background: #fff5f5;
     }
 
+    .field-hint {
+        font-size: 12px;
+        color: #6c757d;
+        margin-top: 2px;
+    }
+
     .role-options {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -404,14 +349,14 @@
 
     /* CAPTCHA Styling */
     .captcha-field {
-        margin-top: 8px;
+        margin-top: 4px;
     }
 
     .captcha-box {
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        padding: 18px;
+        gap: 10px;
+        padding: 14px;
         background: #f8f9fa;
         border: 1.5px solid #e9ecef;
         border-radius: 10px;
@@ -421,7 +366,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 14px 16px;
+        padding: 12px 14px;
         background: white;
         border: 1.5px solid #dee2e6;
         border-radius: 8px;
@@ -495,7 +440,7 @@
 
     /* Checkbox Styling */
     .checkbox-field {
-        margin-top: 8px;
+        margin-top: 4px;
     }
 
     .custom-checkbox {
@@ -559,7 +504,7 @@
     /* Submit Button */
     .submit-btn {
         width: 100%;
-        padding: 16px 24px;
+        padding: 14px 22px;
         background: #008C15;
         color: white;
         border: none;
@@ -572,7 +517,7 @@
         align-items: center;
         justify-content: center;
         gap: 10px;
-        margin-top: 8px;
+        margin-top: 4px;
         position: relative;
         overflow: hidden;
         box-shadow: 0 4px 12px rgba(0, 140, 21, 0.25);
@@ -613,8 +558,8 @@
 
     /* Footer */
     .register-footer {
-        margin-top: 28px;
-        padding-top: 24px;
+        margin-top: 22px;
+        padding-top: 20px;
         border-top: 1px solid #e9ecef;
         text-align: center;
     }

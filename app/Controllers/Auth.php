@@ -114,7 +114,6 @@ class Auth extends Controller
             // 'phone' => 'required|min_length[10]|max_length[20]',
             'wedding_role' => 'required|in_list[bride,groom]',
             'password' => 'required|min_length[8]',
-            'confirm_password' => 'required|matches[password]',
             'captcha_answer' => 'required|numeric'
         ]);
 

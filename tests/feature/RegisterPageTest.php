@@ -20,5 +20,6 @@ final class RegisterPageTest extends CIUnitTestCase
         $this->assertStringContainsString('name="wedding_role"', $body);
         $this->assertStringContainsString('value="bride"', $body);
         $this->assertStringContainsString('value="groom"', $body);
+        $this->assertStringNotContainsString('name="confirm_password"', $body);
     }
 }
