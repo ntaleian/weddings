@@ -460,6 +460,87 @@
 .summary-item strong {
     color: var(--primary-color);
 }
+
+.auth-required-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.52);
+}
+
+.auth-required-modal-backdrop.active {
+    display: flex;
+}
+
+.auth-required-modal {
+    width: min(100%, 500px);
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+    overflow: hidden;
+}
+
+.auth-required-modal-header {
+    padding: 22px 24px 16px;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.auth-required-modal-header span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--primary-color);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.auth-required-modal-header h3 {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 24px;
+}
+
+.auth-required-modal-body {
+    padding: 20px 24px;
+    color: var(--gray);
+    line-height: 1.6;
+}
+
+.auth-required-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 16px 24px 24px;
+}
+
+.auth-required-modal-btn {
+    min-height: 42px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--light-gray);
+    background: var(--white);
+    color: var(--text-color);
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.auth-required-modal-btn.primary {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.auth-required-modal-btn.secondary {
+    border-color: rgba(0, 140, 21, 0.28);
+    color: var(--primary-color);
+}
 </style>
 
 <script>
@@ -1076,11 +1157,19 @@ function checkTimeSlotAvailability(campusId, date, options) {
         }
     })
         .then(response => response.json())
-        .then(data => {
-            console.log('Availability response:', data);
+	        .then(data => {
+	            console.log('Availability response:', data);
 
-            if (data.status === 'error') {
-                console.error('Date selection error:', data.message);
+	            if (data.status === 'auth_required' || data.code === 'auth_required') {
+	                resetTimeSlotAvailability();
+	                if (!suppressErrorUI) {
+	                    showAvailabilityAuthPrompt(data);
+	                }
+	                return;
+	            }
+
+	            if (data.status === 'error') {
+	                console.error('Date selection error:', data.message);
 
                 if (!suppressErrorUI) {
                     alert(`Sorry, this date is not available: ${data.message}`);
@@ -1142,10 +1231,72 @@ function checkTimeSlotAvailability(campusId, date, options) {
         .catch(error => {
             console.error('Error checking time slot availability:', error);
             resetTimeSlotAvailability();
-        });
-}
+	        });
+	}
 
-// Reset time slots to default available state
+	function showAvailabilityAuthPrompt(data) {
+	    let backdrop = document.querySelector('.auth-required-modal-backdrop');
+	    if (!backdrop) {
+	        backdrop = document.createElement('div');
+	        backdrop.className = 'auth-required-modal-backdrop';
+	        backdrop.innerHTML = '<div class="auth-required-modal" role="dialog" aria-modal="true" aria-labelledby="authRequiredTitle">' +
+	            '<div class="auth-required-modal-header">' +
+	                '<span>Login required</span>' +
+	                '<h3 id="authRequiredTitle">Sign in to continue</h3>' +
+	            '</div>' +
+	            '<div class="auth-required-modal-body"></div>' +
+	            '<div class="auth-required-modal-actions"></div>' +
+	        '</div>';
+	        document.body.appendChild(backdrop);
+
+	        backdrop.addEventListener('click', function(event) {
+	            if (event.target === backdrop) {
+	                closeAvailabilityAuthPrompt();
+	            }
+	        });
+	    }
+
+	    backdrop.querySelector('.auth-required-modal-body').innerHTML =
+	        '<p>' + escapeAvailabilityHtml(data.message || 'Please sign in or create an account to check detailed availability and continue your wedding application.') + '</p>' +
+	        '<p>Your selections can be completed after you sign in.</p>';
+
+	    const actions = backdrop.querySelector('.auth-required-modal-actions');
+	    actions.innerHTML = '';
+	    actions.appendChild(createAuthPromptAction('Create account', data.register_url || '<?= site_url('register') ?>', 'primary'));
+	    actions.appendChild(createAuthPromptAction('Sign in', data.login_url || '<?= site_url('login') ?>', 'secondary'));
+
+	    const closeButton = document.createElement('button');
+	    closeButton.type = 'button';
+	    closeButton.className = 'auth-required-modal-btn';
+	    closeButton.textContent = 'Stay here';
+	    closeButton.addEventListener('click', closeAvailabilityAuthPrompt);
+	    actions.appendChild(closeButton);
+
+	    backdrop.classList.add('active');
+	}
+
+	function createAuthPromptAction(label, href, kind) {
+	    const action = document.createElement('a');
+	    action.className = 'auth-required-modal-btn ' + kind;
+	    action.textContent = label;
+	    action.href = href;
+	    return action;
+	}
+
+	function closeAvailabilityAuthPrompt() {
+	    const backdrop = document.querySelector('.auth-required-modal-backdrop');
+	    if (backdrop) {
+	        backdrop.classList.remove('active');
+	    }
+	}
+
+	function escapeAvailabilityHtml(value) {
+	    const div = document.createElement('div');
+	    div.textContent = value == null ? '' : String(value);
+	    return div.innerHTML;
+	}
+
+	// Reset time slots to default available state
 function resetTimeSlotAvailability() {
     const timeSlots = document.querySelectorAll('.time-slot');
     timeSlots.forEach(slot => {

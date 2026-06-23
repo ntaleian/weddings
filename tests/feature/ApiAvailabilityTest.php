@@ -19,10 +19,10 @@ final class ApiAvailabilityTest extends CIUnitTestCase
     {
         $response = $this->get('/api/campuses/1/availability/' . $this->nextSaturday());
 
-        $response->assertOK();
+        $response->assertStatus(401);
         $response->assertJSONFragment([
-            'status'  => 'error',
-            'message' => 'Unauthorized',
+            'status' => 'auth_required',
+            'code'   => 'auth_required',
         ]);
     }
 

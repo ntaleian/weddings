@@ -29,7 +29,13 @@ class API extends Controller
     {
         // Check if user is logged in
         if (!$this->session->get('user_id')) {
-            return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
+            return $this->response->setStatusCode(401)->setJSON([
+                'status'       => 'auth_required',
+                'code'         => 'auth_required',
+                'message'      => 'Please sign in or create an account to check detailed time-slot availability and continue your wedding application.',
+                'login_url'    => site_url('login'),
+                'register_url' => site_url('register'),
+            ]);
         }
 
         // Check if campus exists
@@ -284,6 +290,9 @@ class API extends Controller
             return $this->response->setJSON([
                 'status' => 'available',
                 'message' => 'Date is available for booking',
+                'next_step_message' => 'Availability is not a reservation yet. Sign in or create an account to continue and save your wedding application.',
+                'login_url' => site_url('login'),
+                'register_url' => site_url('register') . '?date=' . rawurlencode($date) . '&campus=' . rawurlencode((string) $campusId),
                 'date' => $date,
                 'campus' => $campus['name'],
                 'time_slots' => array_values($availableTimeSlots),

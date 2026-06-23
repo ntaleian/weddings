@@ -183,6 +183,120 @@
     box-shadow: 0 6px 20px rgba(0, 140, 21, 0.35);
 }
 
+.availability-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.52);
+}
+
+.availability-modal-backdrop.active {
+    display: flex;
+}
+
+.availability-modal {
+    width: min(100%, 520px);
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+    overflow: hidden;
+    font-family: 'Outfit', sans-serif;
+}
+
+.availability-modal-header {
+    padding: 22px 24px 16px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.availability-modal-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: #008C15;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.availability-modal-title {
+    margin: 0;
+    color: #1a1a1a;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.availability-modal-body {
+    padding: 20px 24px;
+    color: #495057;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.availability-modal-body p {
+    margin: 0 0 14px;
+}
+
+.availability-slot-list {
+    display: grid;
+    gap: 8px;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.availability-slot-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    background: rgba(0, 140, 21, 0.08);
+    border: 1px solid rgba(0, 140, 21, 0.16);
+    border-radius: 8px;
+    color: #006010;
+    font-weight: 600;
+}
+
+.availability-modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    padding: 16px 24px 24px;
+}
+
+.availability-modal-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    background: #ffffff;
+    color: #343a40;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.availability-modal-btn.primary {
+    border-color: #008C15;
+    background: #008C15;
+    color: #ffffff;
+}
+
+.availability-modal-btn.secondary {
+    border-color: rgba(0, 140, 21, 0.28);
+    color: #006010;
+}
+
 .btn-check:active {
     transform: translateY(0);
 }
@@ -1297,48 +1411,89 @@
                 
                 // Handle error responses
                 if (!response.ok || data.status === 'error') {
-                    const errorMessage = data.message || 'Error checking availability. Please try again.';
-                    alert(errorMessage);
+                    showAvailabilityModal({
+                        eyebrow: 'Availability check',
+                        title: 'We could not check that date',
+                        body: '<p>' + escapeHtml(data.message || 'Please review your date and campus, then try again.') + '</p>',
+                        actions: [
+                            { label: 'Try again', kind: 'primary', close: true }
+                        ]
+                    });
                     return;
                 }
                 
                 if (data.status === 'available') {
-                    // Show success message with time slots
-                    let message = 'Great news! ' + (data.campus || 'This campus') + ' is available on ' + formatDate(data.date) + '.\n\n';
-                    message += 'Available time slots:\n';
-                    
+                    let slotList = '';
                     if (data.time_slots && Array.isArray(data.time_slots)) {
-                        data.time_slots.forEach(function(slot) {
-                            if (slot.available) {
-                                message += '✓ ' + slot.display + '\n';
-                            }
+                        const availableSlots = data.time_slots.filter(function(slot) {
+                            return slot.available;
                         });
+
+                        if (availableSlots.length > 0) {
+                            slotList = '<ul class="availability-slot-list">' + availableSlots.map(function(slot) {
+                                return '<li><span>' + escapeHtml(slot.display) + '</span><span>Open</span></li>';
+                            }).join('') + '</ul>';
+                        }
                     }
-                    
-                    message += '\nWould you like to proceed with booking?';
-                    
-                    if (confirm(message)) {
-                        // Redirect to registration with pre-filled data
-                        const registerUrl = '<?= base_url("register") ?>?date=' + weddingDate + '&campus=' + campusId;
-                        window.location.href = registerUrl;
-                    }
+
+                    const loginUrl = data.login_url || '<?= base_url("login") ?>';
+                    const registerUrl = data.register_url || ('<?= base_url("register") ?>?date=' + weddingDate + '&campus=' + campusId);
+
+                    showAvailabilityModal({
+                        eyebrow: 'Date available',
+                        title: (data.campus || 'This campus') + ' has openings',
+                        body: '<p><strong>' + escapeHtml(formatDate(data.date)) + '</strong> currently has available ceremony times.</p>' +
+                            slotList +
+                            '<p>' + escapeHtml(data.next_step_message || 'Sign in or create an account to continue. Availability is not reserved until you submit your application.') + '</p>',
+                        actions: [
+                            { label: 'Create account', kind: 'primary', href: registerUrl },
+                            { label: 'Sign in', kind: 'secondary', href: loginUrl },
+                            { label: 'Keep checking', close: true }
+                        ]
+                    });
                 } else if (data.status === 'blocked') {
-                    alert('Sorry, ' + (data.campus || 'This campus') + ' is not available on ' + formatDate(data.date) + '.\n\nReason: ' + (data.reason || 'Date is blocked') + '\n\nPlease select a different date.');
+                    showAvailabilityModal({
+                        eyebrow: 'Date unavailable',
+                        title: 'Please choose another date',
+                        body: '<p>' + escapeHtml(data.campus || 'This campus') + ' is not available on <strong>' + escapeHtml(formatDate(data.date)) + '</strong>.</p>' +
+                            '<p><strong>Reason:</strong> ' + escapeHtml(data.reason || 'Date is blocked') + '</p>',
+                        actions: [
+                            { label: 'Choose another date', kind: 'primary', close: true }
+                        ]
+                    });
                 } else if (data.status === 'unavailable') {
-                    let message = (data.campus || 'This campus') + ' is fully booked on ' + formatDate(data.date) + '.\n\n';
+                    let bookedSlots = '';
                     if (data.time_slots && Array.isArray(data.time_slots)) {
-                        message += 'Current bookings:\n';
-                        data.time_slots.forEach(function(slot) {
-                            if (!slot.available) {
-                                message += '✗ ' + slot.display + ' - ' + (slot.booking_status || 'Booked') + '\n';
-                            }
+                        const unavailableSlots = data.time_slots.filter(function(slot) {
+                            return !slot.available;
                         });
+
+                        if (unavailableSlots.length > 0) {
+                            bookedSlots = '<ul class="availability-slot-list">' + unavailableSlots.map(function(slot) {
+                                return '<li><span>' + escapeHtml(slot.display) + '</span><span>' + escapeHtml(slot.booking_status || 'Booked') + '</span></li>';
+                            }).join('') + '</ul>';
+                        }
                     }
-                    message += '\nPlease select a different date.';
-                    alert(message);
+
+                    showAvailabilityModal({
+                        eyebrow: 'Fully booked',
+                        title: 'No open slots on this date',
+                        body: '<p>' + escapeHtml(data.campus || 'This campus') + ' is fully booked on <strong>' + escapeHtml(formatDate(data.date)) + '</strong>.</p>' +
+                            bookedSlots +
+                            '<p>Please select a different Friday or Saturday.</p>',
+                        actions: [
+                            { label: 'Choose another date', kind: 'primary', close: true }
+                        ]
+                    });
                 } else {
-                    // Unknown status - show generic error
-                    alert(data.message || 'Error checking availability. Please try again.');
+                    showAvailabilityModal({
+                        eyebrow: 'Availability check',
+                        title: 'We could not check that date',
+                        body: '<p>' + escapeHtml(data.message || 'Please try again.') + '</p>',
+                        actions: [
+                            { label: 'Try again', kind: 'primary', close: true }
+                        ]
+                    });
                 }
             })
             .catch(function(error) {
@@ -1356,9 +1511,75 @@
                     errorMessage += 'Please try again.';
                 }
                 
-                alert(errorMessage);
+                showAvailabilityModal({
+                    eyebrow: 'Connection issue',
+                    title: 'Availability check failed',
+                    body: '<p>' + escapeHtml(errorMessage) + '</p>',
+                    actions: [
+                        { label: 'Try again', kind: 'primary', close: true }
+                    ]
+                });
             });
         });
+    }
+
+    function showAvailabilityModal(config) {
+        let backdrop = document.querySelector('.availability-modal-backdrop');
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.className = 'availability-modal-backdrop';
+            backdrop.innerHTML = '<div class="availability-modal" role="dialog" aria-modal="true" aria-labelledby="availabilityModalTitle">' +
+                '<div class="availability-modal-header">' +
+                    '<div class="availability-modal-eyebrow"></div>' +
+                    '<h2 class="availability-modal-title" id="availabilityModalTitle"></h2>' +
+                '</div>' +
+                '<div class="availability-modal-body"></div>' +
+                '<div class="availability-modal-actions"></div>' +
+            '</div>';
+            document.body.appendChild(backdrop);
+
+            backdrop.addEventListener('click', function(event) {
+                if (event.target === backdrop) {
+                    closeAvailabilityModal();
+                }
+            });
+        }
+
+        backdrop.querySelector('.availability-modal-eyebrow').textContent = config.eyebrow || 'Availability';
+        backdrop.querySelector('.availability-modal-title').textContent = config.title || 'Availability update';
+        backdrop.querySelector('.availability-modal-body').innerHTML = config.body || '';
+
+        const actions = backdrop.querySelector('.availability-modal-actions');
+        actions.innerHTML = '';
+        (config.actions || []).forEach(function(action) {
+            const element = action.href ? document.createElement('a') : document.createElement('button');
+            element.className = 'availability-modal-btn ' + (action.kind || '');
+            element.textContent = action.label;
+            if (action.href) {
+                element.href = action.href;
+            } else {
+                element.type = 'button';
+            }
+            if (action.close) {
+                element.addEventListener('click', closeAvailabilityModal);
+            }
+            actions.appendChild(element);
+        });
+
+        backdrop.classList.add('active');
+    }
+
+    function closeAvailabilityModal() {
+        const backdrop = document.querySelector('.availability-modal-backdrop');
+        if (backdrop) {
+            backdrop.classList.remove('active');
+        }
+    }
+
+    function escapeHtml(value) {
+        const div = document.createElement('div');
+        div.textContent = value == null ? '' : String(value);
+        return div.innerHTML;
     }
     
     // Smooth scrolling for navigation links
