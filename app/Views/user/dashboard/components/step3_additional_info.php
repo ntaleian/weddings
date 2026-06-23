@@ -49,7 +49,7 @@ if ($gmp === '' && $legacyGroomFamily !== '') {
 }
 .form-section[data-step="3"] .step3-parent-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
     gap: 1.25rem;
     align-items: stretch;
 }
@@ -105,7 +105,7 @@ if ($gmp === '' && $legacyGroomFamily !== '') {
 }
 .form-section[data-step="3"] .step3-witness-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
     gap: 1.25rem;
     align-items: start;
 }

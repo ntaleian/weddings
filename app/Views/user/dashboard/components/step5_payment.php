@@ -30,7 +30,7 @@ $paymentAcknowledged = old(
 .form-section[data-step="5"] .payment-details-grid {
     display: grid;
     gap: 12px;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
     margin-top: 18px;
 }
 

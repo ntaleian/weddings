@@ -20,7 +20,7 @@ $documentsAcknowledged = old(
 .form-section[data-step="4"] .documents-grid {
     display: grid;
     gap: 14px;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
     margin-bottom: 24px;
 }
 
