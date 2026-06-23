@@ -112,6 +112,7 @@ class Auth extends Controller
             'last_name' => 'required|min_length[2]|max_length[100]',
             'email' => 'required|valid_email|is_unique[users.email]',
             // 'phone' => 'required|min_length[10]|max_length[20]',
+            'wedding_role' => 'required|in_list[bride,groom]',
             'password' => 'required|min_length[8]',
             'confirm_password' => 'required|matches[password]',
             'captcha_answer' => 'required|numeric'
@@ -129,6 +130,7 @@ class Auth extends Controller
             'last_name' => esc($this->request->getPost('last_name', FILTER_SANITIZE_STRING)),
             'email' => filter_var($this->request->getPost('email'), FILTER_SANITIZE_EMAIL),
             'password' => $this->request->getPost('password'), // Don't sanitize password, it will be hashed
+            'wedding_role' => $this->request->getPost('wedding_role'),
             'role' => 'user',
             'is_active' => true,
             'is_email_verified' => false

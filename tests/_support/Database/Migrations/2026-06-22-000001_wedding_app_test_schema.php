@@ -37,6 +37,7 @@ class WeddingAppTestSchema extends Migration
             'email'                 => ['type' => 'varchar', 'constraint' => 255],
             'phone'                 => ['type' => 'varchar', 'constraint' => 30, 'null' => true],
             'password'              => ['type' => 'varchar', 'constraint' => 255],
+            'wedding_role'          => ['type' => 'varchar', 'constraint' => 20, 'null' => true],
             'role'                  => ['type' => 'varchar', 'constraint' => 20, 'default' => 'user'],
             'is_active'             => ['type' => 'integer', 'constraint' => 1, 'default' => 1],
             'is_email_verified'     => ['type' => 'integer', 'constraint' => 1, 'default' => 0],

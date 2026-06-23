@@ -94,6 +94,27 @@
                 <span class="field-error"></span>
             </div>
 
+            <div class="form-field wedding-role-field">
+                <span class="field-label">I am the</span>
+                <div class="role-options" role="radiogroup" aria-label="Wedding role">
+                    <label class="role-option">
+                        <input type="radio" name="wedding_role" value="bride" <?= old('wedding_role') === 'bride' ? 'checked' : '' ?> required>
+                        <span class="role-card">
+                            <i class="fas fa-ring"></i>
+                            <span>Bride</span>
+                        </span>
+                    </label>
+                    <label class="role-option">
+                        <input type="radio" name="wedding_role" value="groom" <?= old('wedding_role') === 'groom' ? 'checked' : '' ?> required>
+                        <span class="role-card">
+                            <i class="fas fa-user-tie"></i>
+                            <span>Groom</span>
+                        </span>
+                    </label>
+                </div>
+                <span class="field-error"></span>
+            </div>
+
             <div class="form-grid">
                 <div class="form-field">
                     <label for="password" class="field-label">
@@ -327,6 +348,58 @@
     .form-field.error .input-wrapper input {
         border-color: #dc3545;
         background: #fff5f5;
+    }
+
+    .role-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .role-option {
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .role-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .role-card {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 52px;
+        padding: 14px 16px;
+        border: 1.5px solid #dee2e6;
+        border-radius: 10px;
+        background: #ffffff;
+        color: #343a40;
+        font-size: 15px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .role-card i {
+        color: #008C15;
+    }
+
+    .role-option:hover .role-card {
+        border-color: #adb5bd;
+    }
+
+    .role-option input[type="radio"]:focus + .role-card {
+        border-color: #008C15;
+        box-shadow: 0 0 0 3px rgba(0, 140, 21, 0.1);
+    }
+
+    .role-option input[type="radio"]:checked + .role-card {
+        border-color: #008C15;
+        background: rgba(0, 140, 21, 0.08);
+        color: #006010;
     }
 
     /* CAPTCHA Styling */
@@ -596,6 +669,10 @@
         .form-grid {
             grid-template-columns: 1fr;
             gap: 20px;
+        }
+
+        .role-options {
+            grid-template-columns: 1fr;
         }
 
         .captcha-box {

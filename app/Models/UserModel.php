@@ -13,7 +13,7 @@ class UserModel extends Model
     protected $useSoftDeletes = false;
     protected $protectFields = true;
     protected $allowedFields = [
-        'first_name', 'last_name', 'email', 'phone', 'password', 
+        'first_name', 'last_name', 'email', 'phone', 'password', 'wedding_role',
         'role', 'is_active', 'is_email_verified', 'email_verified_at',
         'email_notifications', 'sms_notifications', 'marketing_emails', 
         'profile_visibility', 'password_changed_at'
@@ -33,6 +33,7 @@ class UserModel extends Model
         'email' => 'required|valid_email|is_unique[users.email,id,{id}]',
         // 'phone' => 'required|min_length[10]|max_length[20]',
         'password' => 'required|min_length[8]',
+        'wedding_role' => 'permit_empty|in_list[bride,groom]',
         'role' => 'required|in_list[user,admin]',
     ];
 
