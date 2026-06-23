@@ -50,7 +50,7 @@ class Dashboard extends Controller
                 if ($booking['status'] !== 'draft' && $booking['is_draft'] == 0) {
                     $hasSubmittedApplication = true;
                     $applicationStatus = $booking['status'];
-                    $currentStep = 5; // Application completed
+                    $currentStep = $this->getApplicationTotalSteps(); // Application completed
                     $progress = 100;
                     break;
                 }
@@ -64,7 +64,7 @@ class Dashboard extends Controller
             if ($draft) {
                 $hasDraftApplication = true;
                 $currentStep = $this->normalizeApplicationStep($draft->current_step ?? 1);
-                $progress = ($currentStep / 4) * 100;
+                $progress = ($currentStep / $this->getApplicationTotalSteps()) * 100;
                 $draftSummary = $this->buildApplicationDraftSummary($draft);
             }
         }
@@ -251,6 +251,10 @@ class Dashboard extends Controller
         
         // Get saved application data if any
         $savedApplication = $this->getSavedApplicationData($userId);
+        $requestedStep = $this->request->getGet('step');
+        if ($requestedStep !== null) {
+            $savedApplication['current_step'] = $this->normalizeApplicationStep($requestedStep);
+        }
         
         // Get minimum booking date (6 months from today)
         $minBookingDate = $this->bookingModel->getMinimumBookingDate();
@@ -260,9 +264,12 @@ class Dashboard extends Controller
             'user' => $user,
             'campuses' => $campuses,
             'saved_data' => $savedApplication,
+            'currentStep' => $savedApplication['current_step'] ?? 1,
             'countries' => $this->getWorldCountryNames(),
             'isSubmitted' => false,
             'minBookingDate' => $minBookingDate,
+            'requiredDocuments' => $this->getRequiredDocuments(),
+            'weddingFee' => $this->calculateWeddingCost(null, 100),
             'unreadMessagesCount' => $this->getUnreadMessagesCount($userId),
             'paymentStatus' => $this->getPaymentStatus($userId)
         ];
@@ -283,7 +290,7 @@ class Dashboard extends Controller
         $documents = $this->getUploadedDocuments($userId);
         
         $data = [
-            'title' => 'Documents - Watoto Church Wedding Booking',
+            'title' => 'Step 4: Documents - Watoto Church Wedding Booking',
             'user' => $user,
             'documents' => $documents,
             'required_documents' => $this->getRequiredDocuments(),
@@ -729,8 +736,10 @@ class Dashboard extends Controller
         return [
             1 => 'Venue & Date',
             2 => 'Personal Details',
-            3 => 'Additional Info',
-            4 => 'Review & Submit',
+            3 => 'Witnesses',
+            4 => 'Documents',
+            5 => 'Payment',
+            6 => 'Review & Submit',
         ];
     }
 
@@ -745,7 +754,12 @@ class Dashboard extends Controller
     {
         $step = (int) $step;
 
-        return max(1, min(4, $step));
+        return max(1, min($this->getApplicationTotalSteps(), $step));
+    }
+
+    private function getApplicationTotalSteps(): int
+    {
+        return 6;
     }
 
     private function buildApplicationDraftSummary(object $draft): array
@@ -1988,7 +2002,7 @@ class Dashboard extends Controller
         $hasUnpaidFees = ($totalPaid + $pendingAmount) < $weddingFee;
 
         $data = [
-            'title' => 'Payment',
+            'title' => 'Step 5: Payment',
             'user' => $this->userModel->find($userId),
             'booking' => $booking,
             'weddingFee' => $weddingFee,

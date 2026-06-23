@@ -24,8 +24,9 @@
 }
 
 .step-indicator {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(90px, 1fr));
+    gap: 10px;
     align-items: center;
     position: relative;
 }
@@ -50,7 +51,7 @@
     background: #f8f9fa;
     padding: 10px;
     border-radius: 8px;
-    min-width: 120px;
+    min-width: 0;
 }
 
 .step-circle {
@@ -81,6 +82,16 @@
     text-align: center;
     color: var(--gray);
     font-weight: 500;
+}
+
+@media (max-width: 900px) {
+    .step-indicator {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .step-indicator::before {
+        display: none;
+    }
 }
 
 /* Application Form Container */
@@ -230,10 +241,18 @@
         </div>
         <div class="step" data-step="3">
             <div class="step-circle">3</div>
-            <span class="step-label">Additional Info</span>
+            <span class="step-label">Witnesses</span>
         </div>
         <div class="step" data-step="4">
             <div class="step-circle">4</div>
+            <span class="step-label">Documents</span>
+        </div>
+        <div class="step" data-step="5">
+            <div class="step-circle">5</div>
+            <span class="step-label">Payment</span>
+        </div>
+        <div class="step" data-step="6">
+            <div class="step-circle">6</div>
             <span class="step-label">Review & Submit</span>
         </div>
     </div>
@@ -407,10 +426,22 @@
             'countries' => $countries ?? [],
         ]) ?>
         
-        <!-- Step 3: Additional Information -->
+        <!-- Step 3: Witnesses -->
         <?= $this->include('user/dashboard/components/step3_additional_info', ['application' => $application]) ?>
         
-        <!-- Step 4: Review & Submit -->
+        <!-- Step 4: Documents -->
+        <?= $this->include('user/dashboard/components/step4_documents', [
+            'application' => $application,
+            'requiredDocuments' => $requiredDocuments ?? [],
+        ]) ?>
+
+        <!-- Step 5: Payment -->
+        <?= $this->include('user/dashboard/components/step5_payment', [
+            'application' => $application,
+            'weddingFee' => $weddingFee ?? 600000,
+        ]) ?>
+
+        <!-- Step 6: Review & Submit -->
         <?= $this->include('user/dashboard/components/step4_review_submit', ['application' => $application]) ?>
 
         <!-- Form Navigation -->

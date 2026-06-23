@@ -1372,7 +1372,7 @@ window.selectTime = selectTime;
 
 // Global step navigation variables
 let currentStep = 1;
-const totalSteps = 4;
+const totalSteps = 6;
 
 function setCurrentStep(step) {
     currentStep = Math.max(1, Math.min(totalSteps, parseInt(step, 10) || 1));
@@ -1393,15 +1393,8 @@ function goToApplicationStep(step, options = {}) {
     updateStepIndicators();
     updateNavigationButtons();
 
-    if (currentStep === 4) {
-        setTimeout(function() {
-            if (window.populateStep4Review) {
-                window.populateStep4Review();
-            } else if (window.populateReviewSummary) {
-                window.populateReviewSummary();
-            }
-            document.dispatchEvent(new Event('step4shown'));
-        }, 300);
+    if (currentStep === totalSteps) {
+        prepareReviewStep();
     }
 
     if (options.autoSave !== false) {
@@ -1415,6 +1408,17 @@ function goToApplicationStep(step, options = {}) {
 
 setCurrentStep(currentStep);
 window.goToApplicationStep = goToApplicationStep;
+
+function prepareReviewStep() {
+    setTimeout(function() {
+        if (window.populateStep4Review) {
+            window.populateStep4Review();
+        } else if (window.populateReviewSummary) {
+            window.populateReviewSummary();
+        }
+        document.dispatchEvent(new Event('step6shown'));
+    }, 300);
+}
 
 // Step navigation functions
 function nextStep() {
@@ -1436,7 +1440,15 @@ function nextStep() {
             if (!isValid) validationMessage = 'Please provide witness information.';
             break;
         case 4:
-            // Can't go beyond step 4
+            isValid = validateStep4();
+            if (!isValid) validationMessage = 'Please review the documents checklist before continuing.';
+            break;
+        case 5:
+            isValid = validateStep5();
+            if (!isValid) validationMessage = 'Please review the payment information before continuing.';
+            break;
+        case 6:
+            // Can't go beyond the final review step
             return;
     }
     
@@ -1472,18 +1484,9 @@ function nextStep() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         
         // Initialize step if needed
-        if (currentStep === 4) {
-            // Populate review summary when reaching step 4
-            // Use a longer delay to ensure all form fields are accessible
-            setTimeout(function() {
-                if (window.populateStep4Review) {
-                    window.populateStep4Review();
-                } else if (window.populateReviewSummary) {
-                    window.populateReviewSummary();
-                }
-                // Dispatch custom event for step 4 shown
-                document.dispatchEvent(new Event('step4shown'));
-            }, 300);
+        if (currentStep === totalSteps) {
+            // Populate review summary when reaching the final step.
+            prepareReviewStep();
         }
     }
 }
@@ -1571,6 +1574,10 @@ function isCurrentStepValid() {
         case 3:
             return validateStep3();
         case 4:
+            return validateStep4();
+        case 5:
+            return validateStep5();
+        case 6:
             return validateAllSteps();
         default:
             return false;
@@ -1674,6 +1681,16 @@ function validateStep3() {
     return witnessFieldsValid && parentsOk;
 }
 
+function validateStep4() {
+    const documentsAcknowledged = document.getElementById('documentsAcknowledged');
+    return !documentsAcknowledged || documentsAcknowledged.checked;
+}
+
+function validateStep5() {
+    const paymentAcknowledged = document.getElementById('paymentAcknowledged');
+    return !paymentAcknowledged || paymentAcknowledged.checked;
+}
+
 function validateAllSteps() {
     const acceptTerms = document.getElementById('acceptTerms');
     // Ensure age validation is also checked on final submission
@@ -1688,11 +1705,12 @@ function validateAllSteps() {
     if (brideAge && parseInt(brideAge.value) < 18) agesValid = false;
     if (groomAge && parseInt(groomAge.value) < 18) agesValid = false;
     
-    return validateStep1() && validateStep2() && validateStep3() && 
+    return validateStep1() && validateStep2() && validateStep3() &&
+           validateStep4() && validateStep5() &&
            acceptTerms && acceptTerms.checked;
 }
 
-// Populate review summary for step 4
+// Populate review summary for the final review step
 function populateReviewSummary() {
     // Campus info
     if (selectedCampusId && campusData) {
@@ -1738,7 +1756,7 @@ function populateReviewSummary() {
 // Submit application function
 function submitApplication() {
     if (!validateAllSteps()) {
-        alert('Please complete all required fields and accept the terms and conditions.');
+        alert('Please complete all required fields, review the documents and payment steps, and accept the terms and conditions.');
         return;
     }
     

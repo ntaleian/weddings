@@ -143,11 +143,11 @@ if ($gmp === '' && $legacyGroomFamily !== '') {
 }
 </style>
 
-<!-- Step 3: Additional Information -->
+<!-- Step 3: Witnesses -->
 <div class="form-section" data-step="3" style="display: none;">
     <div class="form-section-header">
-        <h2>Additional Information</h2>
-        <p>Wedding details and family information</p>
+        <h2>Witnesses</h2>
+        <p>Family representatives, best man, and matron details</p>
     </div>
     
     <div class="person-section">

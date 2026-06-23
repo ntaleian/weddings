@@ -2,7 +2,7 @@
     <!-- Payment Overview -->
     <div class="payment-card">
         <div class="payment-header">
-            <h2><i class="fas fa-money-bill-wave"></i> Wedding Fees</h2>
+            <h2><i class="fas fa-money-bill-wave"></i> Step 5: Payment</h2>
             <p>Complete your payment to confirm your wedding booking</p>
         </div>
 

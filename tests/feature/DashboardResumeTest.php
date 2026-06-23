@@ -30,11 +30,16 @@ final class DashboardResumeTest extends CIUnitTestCase
 
         $body = (string) $response->response()->getBody();
         $this->assertStringContainsString('Resume Application', $body);
-        $this->assertStringContainsString('Continue from Additional Info', $body);
+        $this->assertStringContainsString('Continue from Witnesses', $body);
+        $this->assertStringContainsString('Step 3 of 6', $body);
+        $this->assertStringContainsString('Step 4: Documents', $body);
+        $this->assertStringContainsString('Step 5: Payment', $body);
         $this->assertStringContainsString('Watoto Central', $body);
         $this->assertStringContainsString('Sat, Dec 12, 2026', $body);
         $this->assertStringContainsString('11:00 AM', $body);
         $this->assertStringContainsString('/dashboard/application?resume=1&amp;step=3', $body);
+        $this->assertStringContainsString('/dashboard/application?step=4', $body);
+        $this->assertStringContainsString('/dashboard/application?step=5', $body);
     }
 
     public function testApplicationPageReceivesSavedDraftStep(): void
@@ -48,7 +53,11 @@ final class DashboardResumeTest extends CIUnitTestCase
         $response = $this->withSession($this->userSession())->get('/dashboard/application');
 
         $response->assertOK();
-        $this->assertStringContainsString('"current_step":2', (string) $response->response()->getBody());
+        $body = (string) $response->response()->getBody();
+        $this->assertStringContainsString('"current_step":2', $body);
+        $this->assertStringContainsString('Witnesses', $body);
+        $this->assertStringContainsString('Documents', $body);
+        $this->assertStringContainsString('Payment', $body);
     }
 
     private function insertDraft(array $formData, int $currentStep): void

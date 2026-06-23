@@ -1,4 +1,20 @@
 <!-- Sidebar -->
+        <?php
+            $paymentStatusValue = $paymentStatus ?? 'no_booking';
+            $hasSubmittedBooking = $paymentStatusValue !== 'no_booking';
+            $request = service('request');
+            $stepQuery = (string) ($request->getGet('step') ?? '');
+            $documentsUrl = $hasSubmittedBooking
+                ? site_url('dashboard/documents')
+                : site_url('dashboard/application') . '?step=4';
+            $paymentUrl = $hasSubmittedBooking
+                ? site_url('dashboard/payment')
+                : site_url('dashboard/application') . '?step=5';
+            $documentsActive = uri_string() === 'dashboard/documents'
+                || (uri_string() === 'dashboard/application' && $stepQuery === '4');
+            $paymentActive = uri_string() === 'dashboard/payment'
+                || (uri_string() === 'dashboard/application' && $stepQuery === '5');
+        ?>
         <aside class="dashboard-sidebar">
             <div class="sidebar-header">
                 <h3>Your Wedding Journey</h3>
@@ -8,18 +24,18 @@
                     <i class="fas fa-home"></i>
                     <span>Overview</span>
                 </a>
-                <a href="<?= site_url('dashboard/application') ?>" class="nav-item <?= (uri_string() === 'dashboard/application') ? 'active' : '' ?>">
+                <a href="<?= site_url('dashboard/application') ?>" class="nav-item <?= (uri_string() === 'dashboard/application' && ! in_array($stepQuery, ['4', '5'], true)) ? 'active' : '' ?>">
                     <i class="fas fa-file-contract"></i>
                     <span>Application</span>
                     <!-- <span class="nav-badge">In Progress</span> -->
                 </a>
-                <a href="<?= site_url('dashboard/documents') ?>" class="nav-item <?= (uri_string() === 'dashboard/documents') ? 'active' : '' ?>">
+                <a href="<?= esc($documentsUrl) ?>" class="nav-item <?= $documentsActive ? 'active' : '' ?>">
                     <i class="fas fa-file-alt"></i>
-                    <span>Documents</span>
+                    <span>Step 4: Documents</span>
                 </a>
-                <a href="<?= site_url('dashboard/payment') ?>" class="nav-item <?= (uri_string() === 'dashboard/payment') ? 'active' : '' ?>">
+                <a href="<?= esc($paymentUrl) ?>" class="nav-item <?= $paymentActive ? 'active' : '' ?>">
                     <i class="fas fa-credit-card"></i>
-                    <span>Payment</span>
+                    <span>Step 5: Payment</span>
                     <?php if (isset($paymentStatus)): ?>
                         <?php if ($paymentStatus === 'required'): ?>
                             <span class="nav-badge nav-badge-danger">Required</span>

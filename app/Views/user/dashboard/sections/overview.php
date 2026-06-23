@@ -86,9 +86,12 @@ $bookings = $bookings ?? $userBookings ?? [];
 $applicationStepLabels = $applicationStepLabels ?? [
     1 => 'Venue & Date',
     2 => 'Personal Details',
-    3 => 'Additional Info',
-    4 => 'Review & Submit',
+    3 => 'Witnesses',
+    4 => 'Documents',
+    5 => 'Payment',
+    6 => 'Review & Submit',
 ];
+$applicationTotalSteps = count($applicationStepLabels);
 $currentStepLabel = $applicationStepLabels[$currentStep] ?? $applicationStepLabels[1];
 $resumeApplicationUrl = $resumeApplicationUrl ?? site_url('dashboard/application');
 $draftSummary = $draftSummary ?? [];
@@ -152,7 +155,7 @@ $draftSummary = $draftSummary ?? [];
     <div class="resume-summary__details">
         <div class="resume-detail">
             <span>Current step</span>
-            <strong>Step <?= esc((string) $currentStep) ?> of 4</strong>
+            <strong>Step <?= esc((string) $currentStep) ?> of <?= esc((string) $applicationTotalSteps) ?></strong>
         </div>
         <div class="resume-detail">
             <span>Venue</span>
@@ -659,12 +662,26 @@ $progress = isset($progress) ? $progress : 0;
         <div class="progress-step <?= ($currentStep === 3 && !$hasSubmitted) ? 'current' : '' ?> <?= ($currentStep > 3 || $hasSubmitted) ? 'completed' : '' ?>">
             <div class="step-icon"><?= ($currentStep > 3) ? '✓' : '3' ?></div>
             <div class="step-content">
-                <h5>Additional Info</h5>
-                <small>Family & witnesses</small>
+                <h5>Witnesses</h5>
+                <small>Family, best man & matron</small>
             </div>
         </div>
-        <div class="progress-step <?= ($currentStep === 4 && !$hasSubmitted) ? 'current' : '' ?> <?= $hasSubmitted ? 'completed' : '' ?>">
-            <div class="step-icon"><?= $hasSubmitted ? '✓' : '4' ?></div>
+        <div class="progress-step <?= ($currentStep === 4 && !$hasSubmitted) ? 'current' : '' ?> <?= ($currentStep > 4 || $hasSubmitted) ? 'completed' : '' ?>">
+            <div class="step-icon"><?= ($currentStep > 4 || $hasSubmitted) ? '✓' : '4' ?></div>
+            <div class="step-content">
+                <h5>Documents</h5>
+                <small>Required document checklist</small>
+            </div>
+        </div>
+        <div class="progress-step <?= ($currentStep === 5 && !$hasSubmitted) ? 'current' : '' ?> <?= ($currentStep > 5 || $hasSubmitted) ? 'completed' : '' ?>">
+            <div class="step-icon"><?= ($currentStep > 5 || $hasSubmitted) ? '✓' : '5' ?></div>
+            <div class="step-content">
+                <h5>Payment</h5>
+                <small>Fees and payment plan</small>
+            </div>
+        </div>
+        <div class="progress-step <?= ($currentStep === 6 && !$hasSubmitted) ? 'current' : '' ?> <?= $hasSubmitted ? 'completed' : '' ?>">
+            <div class="step-icon"><?= $hasSubmitted ? '✓' : '6' ?></div>
             <div class="step-content">
                 <h5>Review & Submit</h5>
                 <small>Final review</small>
@@ -727,7 +744,7 @@ $progress = isset($progress) ? $progress : 0;
             <i class="fas fa-credit-card"></i>
         </div>
         <div class="card-content">
-            <h4>Payment Status</h4>
+            <h4>Step 5: Payment</h4>
             <p>Track payments and balances</p>
             <a href="<?= site_url('dashboard/payment') ?>" class="btn btn-outline btn-sm">Open Payments</a>
         </div>
@@ -760,9 +777,9 @@ $progress = isset($progress) ? $progress : 0;
             <i class="fas fa-tasks"></i>
         </div>
         <div class="card-content">
-            <h4>Checklist</h4>
+            <h4>Step 4: Documents</h4>
             <p>Review what you will need</p>
-            <a href="<?= site_url('dashboard/download-checklist') ?>" class="btn btn-outline btn-sm">Download</a>
+            <a href="<?= site_url('dashboard/application') ?>?step=4" class="btn btn-outline btn-sm">Open Step 4</a>
         </div>
     </div>
     <div class="action-card">

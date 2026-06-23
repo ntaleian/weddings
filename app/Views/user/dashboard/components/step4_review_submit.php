@@ -1,5 +1,5 @@
-<!-- Step 4: Review & Submit -->
-<div class="form-section" data-step="4" style="display: none;">
+<!-- Step 6: Review & Submit -->
+<div class="form-section" data-step="6" style="display: none;">
     <div class="form-section-header">
         <h2>Review & Submit</h2>
         <p>Please review your information before submitting</p>
@@ -98,7 +98,7 @@
                 <i class="fas fa-sitemap"></i>
                 Family information
             </h3>
-            <p class="review-section-lead">Parents (from additional information)</p>
+            <p class="review-section-lead">Parents (from the witnesses step)</p>
             
             <h4 class="review-subheading">Bride's parents</h4>
             <div class="review-grid">
@@ -213,6 +213,23 @@
                 </div>
             </div>
         </div>
+
+        <div class="review-section">
+            <h3 class="section-title">
+                <i class="fas fa-file-alt"></i>
+                Documents & Payment
+            </h3>
+            <div class="review-grid">
+                <div class="review-item">
+                    <strong>Documents checklist:</strong>
+                    <span id="reviewDocumentsReady">-</span>
+                </div>
+                <div class="review-item">
+                    <strong>Payment step:</strong>
+                    <span id="reviewPaymentPlan">-</span>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- Terms and Conditions -->
@@ -242,7 +259,7 @@
 <script>
 // Comprehensive function to populate all review details
 function populateStep4Review() {
-    console.log('Populating step 4 review...');
+    console.log('Populating final review...');
     
     // Helper function to safely set text content
     function setReviewText(elementId, value) {
@@ -431,35 +448,50 @@ function populateStep4Review() {
     setReviewText('reviewWitness2Phone', witness2Phone ? witness2Phone.value : null);
     setReviewText('reviewWitness2Id', witness2IdNumber ? witness2IdNumber.value : null);
     setReviewText('reviewWitness2MaritalStatus', witness2MaritalStatus ? getSelectText(witness2MaritalStatus) : null);
+
+    const documentsAcknowledged = document.getElementById('documentsAcknowledged');
+    const paymentAcknowledged = document.getElementById('paymentAcknowledged');
+    setReviewText(
+        'reviewDocumentsReady',
+        documentsAcknowledged && documentsAcknowledged.checked
+            ? 'Reviewed and acknowledged'
+            : 'Not yet acknowledged'
+    );
+    setReviewText(
+        'reviewPaymentPlan',
+        paymentAcknowledged && paymentAcknowledged.checked
+            ? 'Reviewed and acknowledged'
+            : 'Not yet acknowledged'
+    );
     
-    console.log('Step 4 review populated');
+    console.log('Final review populated');
 }
 
 // Make function available globally
 window.populateStep4Review = populateStep4Review;
 
-// Auto-save for step 4 (terms acceptance)
+// Auto-save for final review (terms acceptance)
 document.addEventListener('DOMContentLoaded', function() {
     const acceptTerms = document.getElementById('acceptTerms');
     if (acceptTerms) {
         acceptTerms.addEventListener('change', function() {
             if (window.scheduleAutoSave) {
-                window.scheduleAutoSave();
+                window.scheduleAutoSave(6);
             }
         });
     }
     
-    // Populate review when step 4 is shown
-    const step4Section = document.querySelector('[data-step="4"]');
-    if (step4Section) {
-        // Use MutationObserver to detect when step 4 becomes visible
+    // Populate review when the final review step is shown
+    const reviewSection = document.querySelector('[data-step="6"]');
+    if (reviewSection) {
+        // Use MutationObserver to detect when review becomes visible
         const observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                    const display = step4Section.style.display;
-                    const computedStyle = window.getComputedStyle(step4Section);
+                    const display = reviewSection.style.display;
+                    const computedStyle = window.getComputedStyle(reviewSection);
                     if (display !== 'none' && computedStyle.display !== 'none') {
-                        // Step 4 is now visible, populate the review with a slight delay
+                        // Review is now visible, populate it with a slight delay
                         setTimeout(function() {
                             populateStep4Review();
                         }, 200);
@@ -468,21 +500,24 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        observer.observe(step4Section, {
+        observer.observe(reviewSection, {
             attributes: true,
             attributeFilter: ['style']
         });
         
-        // Also check on initial load if step 4 is already visible
-        const computedStyle = window.getComputedStyle(step4Section);
-        if (step4Section.style.display !== 'none' && computedStyle.display !== 'none') {
+        // Also check on initial load if review is already visible
+        const computedStyle = window.getComputedStyle(reviewSection);
+        if (reviewSection.style.display !== 'none' && computedStyle.display !== 'none') {
             setTimeout(function() {
                 populateStep4Review();
             }, 200);
         }
     }
     
-    // Also listen for custom event if navigation system uses it
+    // Also listen for custom events if navigation system uses them
+    document.addEventListener('step6shown', function() {
+        setTimeout(populateStep4Review, 200);
+    });
     document.addEventListener('step4shown', function() {
         setTimeout(populateStep4Review, 200);
     });

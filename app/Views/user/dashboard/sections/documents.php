@@ -367,7 +367,7 @@
 </style>
 
 <div class="section-header">
-    <h1>Documents</h1>
+    <h1>Step 4: Documents</h1>
     <p>Upload all required documents for your wedding application. Each document must be 1MB or less.</p>
 </div>
 
