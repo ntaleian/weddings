@@ -13,7 +13,7 @@ class BookingModel extends Model
     protected $useSoftDeletes = false;
     protected $protectFields = true;
     protected $allowedFields = [
-        'user_id', 'campus_id', 'pastor_id', 'wedding_date', 'wedding_time',
+        'user_id', 'campus_id', 'venue_type', 'outdoor_venue_name', 'outdoor_venue_address', 'pastor_id', 'wedding_date', 'wedding_time',
         'bride_name', 'bride_date_of_birth', 'bride_age', 'bride_birth_place', 'bride_email', 'bride_phone',
         'bride_occupation', 'bride_employer', 'bride_education_level', 'bride_nationality', 'bride_religion',
         'bride_marital_status', 'bride_address', 'bride_id_number', 'bride_id_type',

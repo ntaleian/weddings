@@ -145,6 +145,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers'], function($routes) {
 $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
     $routes->get('campuses/(:num)/availability/(:any)', 'API::checkAvailability/$1/$2');
     $routes->get('campuses/(:num)/pastors', 'API::getCampusPastors/$1');
+    $routes->get('pastors', 'API::getAllPastors');
     $routes->get('notifications', 'API::getNotifications');
     $routes->post('notifications/(:num)/read', 'API::markNotificationRead/$1');
     $routes->post('quick-availability-check', 'API::quickAvailabilityCheck');

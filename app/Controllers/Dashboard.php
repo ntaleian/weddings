@@ -1240,8 +1240,8 @@ class Dashboard extends Controller
         $validation = \Config\Services::validation();
 
         // Define validation rules
+        $venueType = $this->request->getPost('venue_type') ?: 'campus';
         $validationRules = [
-            'selectedCampus' => 'required|integer',
             'selectedDate' => 'required|valid_date',
             'selectedTime' => 'required',
             'bride_name' => 'required|max_length[100]',
@@ -1345,11 +1345,44 @@ class Dashboard extends Controller
             ]);
         }
 
-        // Validate booking date and time according to guidelines (advance days, Fri/Sat, time slots)
+        // Validate campus or outdoor venue fields depending on venue type
         $weddingDate = $this->request->getPost('selectedDate');
         $weddingTime = $this->request->getPost('selectedTime');
-        $campusId = $this->request->getPost('selectedCampus');
-        
+        $campusId = null;
+
+        if ($venueType === 'campus') {
+            $campusId = $this->request->getPost('selectedCampus');
+            if (empty($campusId) || !is_numeric($campusId)) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => ['selectedCampus' => 'Please select a campus.']
+                ]);
+            }
+        } else {
+            $outdoorVenueName    = trim((string) $this->request->getPost('outdoor_venue_name'));
+            $outdoorVenueAddress = trim((string) $this->request->getPost('outdoor_venue_address'));
+            $selectedPastor      = $this->request->getPost('selectedPastor');
+            $outdoorErrors = [];
+            if ($outdoorVenueName === '') {
+                $outdoorErrors['outdoor_venue_name'] = 'Outdoor venue name is required.';
+            }
+            if ($outdoorVenueAddress === '') {
+                $outdoorErrors['outdoor_venue_address'] = 'Outdoor venue address is required.';
+            }
+            if (empty($selectedPastor) || !is_numeric($selectedPastor)) {
+                $outdoorErrors['selectedPastor'] = 'Please select an officiating pastor.';
+            }
+            if ($outdoorErrors !== []) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $outdoorErrors
+                ]);
+            }
+        }
+
+        // Validate booking date and time according to guidelines (advance days, Fri/Sat, time slots)
         $dateTimeValidation = $this->bookingModel->validateBookingDateTime($weddingDate, $weddingTime);
         if (!$dateTimeValidation['valid']) {
             return $this->response->setJSON([
@@ -1359,8 +1392,8 @@ class Dashboard extends Controller
             ]);
         }
 
-        // Check if time slot is available for this date and campus
-        if (!$this->bookingModel->isTimeSlotAvailable($campusId, $weddingDate, $weddingTime)) {
+        // For campus bookings: check if time slot is available for this date and campus
+        if ($venueType === 'campus' && !$this->bookingModel->isTimeSlotAvailable($campusId, $weddingDate, $weddingTime)) {
             return $this->response->setJSON([
                 'success' => false,
                 'message' => 'The selected time slot is not available for this date and campus.',
@@ -1371,11 +1404,14 @@ class Dashboard extends Controller
         try {
             // Prepare booking data
             $bookingData = [
-                'user_id' => $userId,
-                'campus_id' => $campusId,
-                'pastor_id' => $this->request->getPost('selectedPastor') ?: 1, // Default pastor if not selected
-                'wedding_date' => $weddingDate,
-                'wedding_time' => $weddingTime,
+                'user_id'               => $userId,
+                'campus_id'             => $venueType === 'campus' ? $campusId : null,
+                'venue_type'            => $venueType,
+                'outdoor_venue_name'    => $venueType === 'outdoor' ? trim((string) $this->request->getPost('outdoor_venue_name')) : null,
+                'outdoor_venue_address' => $venueType === 'outdoor' ? trim((string) $this->request->getPost('outdoor_venue_address')) : null,
+                'pastor_id'             => $this->request->getPost('selectedPastor') ?: 1,
+                'wedding_date'          => $weddingDate,
+                'wedding_time'          => $weddingTime,
                 
                 // Bride information
                 'bride_name' => $this->request->getPost('bride_name'),
@@ -1490,7 +1526,7 @@ class Dashboard extends Controller
                 'application_step' => 4,
                 'is_draft' => 0,
                 'status' => 'pending',
-                'total_cost' => $this->calculateWeddingCost($this->request->getPost('selectedCampus'), $this->request->getPost('guest_count') ?: 100),
+                'total_cost' => $this->calculateWeddingCost($venueType === 'campus' ? $campusId : null, $this->request->getPost('guest_count') ?: 100),
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ];

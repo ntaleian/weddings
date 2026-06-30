@@ -131,6 +131,22 @@ class API extends Controller
         ]);
     }
 
+    public function getAllPastors()
+    {
+        if (!$this->session->get('user_id')) {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
+        }
+
+        $pastors = $this->pastorModel
+            ->where('is_available', 1)
+            ->findAll();
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'pastors' => $pastors
+        ]);
+    }
+
     public function getNotifications()
     {
         // Check if user is logged in

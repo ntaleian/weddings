@@ -11,16 +11,43 @@
     ?>
     <div class="form-section-header">
         <h2>Venue & Date Selection</h2>
-        <p>Choose your preferred campus and wedding date</p>
+        <p>Choose your wedding venue type and preferred date</p>
     </div>
-    
-    <!-- Campus Selection -->
-    <div class="campus-selection">
+
+    <!-- Venue Type Selection -->
+    <div class="venue-type-selection">
+        <h3 class="section-title">
+            <i class="fas fa-map-marker-alt"></i>
+            Venue Type
+        </h3>
+        <div class="venue-type-grid">
+            <div class="venue-type-card active" data-type="campus" onclick="selectVenueType('campus')">
+                <div class="venue-type-icon"><i class="fas fa-church"></i></div>
+                <div class="venue-type-info">
+                    <h4>Watoto Campus</h4>
+                    <p>Hold your wedding at one of our Watoto Church campuses</p>
+                </div>
+                <div class="venue-type-check"><i class="fas fa-check-circle"></i></div>
+            </div>
+            <div class="venue-type-card" data-type="outdoor" onclick="selectVenueType('outdoor')">
+                <div class="venue-type-icon"><i class="fas fa-tree"></i></div>
+                <div class="venue-type-info">
+                    <h4>Outdoor / External Venue</h4>
+                    <p>Hold your wedding at an outdoor or external location with a Watoto pastor officiating</p>
+                </div>
+                <div class="venue-type-check"><i class="fas fa-check-circle"></i></div>
+            </div>
+        </div>
+        <input type="hidden" id="venueType" name="venue_type" value="<?= old('venue_type', $application['venue_type'] ?? 'campus') ?>">
+    </div>
+
+    <!-- Campus Selection (shown when venue_type = campus) -->
+    <div class="campus-selection" id="campusSection">
         <h3 class="section-title">
             <i class="fas fa-church"></i>
             Select Campus
         </h3>
-        
+
         <div class="campus-grid">
             
             <?php foreach ($campuses as $campus): ?>
@@ -40,15 +67,42 @@
             <?php endforeach; ?>
         </div>
         
-        <input type="hidden" id="selectedCampus" name="selectedCampus" value="<?= old('selectedCampus', $application['selectedCampus'] ?? '') ?>" required>
-        <?php 
-        // Debug: Show what values are being set
-        echo "<!-- Debug - Campus value: '" . ($application['selectedCampus'] ?? 'NOT SET') . "' -->";
-        echo "<!-- Debug - Date value: '" . ($application['selectedDate'] ?? 'NOT SET') . "' -->";
-        echo "<!-- Debug - Time value: '" . ($application['selectedTime'] ?? 'NOT SET') . "' -->";
-        ?>
+        <input type="hidden" id="selectedCampus" name="selectedCampus" value="<?= old('selectedCampus', $application['selectedCampus'] ?? '') ?>">
     </div>
-    
+
+    <!-- Outdoor Venue Section (shown when venue_type = outdoor) -->
+    <div class="outdoor-venue-section" id="outdoorSection" style="display: none;">
+        <h3 class="section-title">
+            <i class="fas fa-map-marked-alt"></i>
+            Outdoor Venue Details
+        </h3>
+        <p class="outdoor-note">
+            <i class="fas fa-info-circle"></i>
+            A Watoto Church pastor will officiate your wedding at your chosen location. Please provide the venue details and select your preferred pastor below.
+        </p>
+        <div class="outdoor-fields">
+            <div class="form-group">
+                <label for="outdoorVenueName">Venue Name <span class="required">*</span></label>
+                <input type="text" id="outdoorVenueName" name="outdoor_venue_name"
+                       placeholder="e.g. Speke Resort Munyonyo, Private Garden, etc."
+                       value="<?= old('outdoor_venue_name', $application['outdoor_venue_name'] ?? '') ?>"
+                       oninput="document.getElementById('summaryCampus').textContent = this.value || '-'">
+            </div>
+            <div class="form-group">
+                <label for="outdoorVenueAddress">Venue Address / Location <span class="required">*</span></label>
+                <input type="text" id="outdoorVenueAddress" name="outdoor_venue_address"
+                       placeholder="Full address or location description"
+                       value="<?= old('outdoor_venue_address', $application['outdoor_venue_address'] ?? '') ?>">
+            </div>
+            <div class="form-group">
+                <label for="selectedPastor">Officiating Pastor <span class="required">*</span></label>
+                <select id="selectedPastor" name="selectedPastor">
+                    <option value="">— Select a pastor —</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
     <!-- Date & Time Selection -->
     <div class="datetime-selection" id="datetimeSection" style="display: none;">
         <h3 class="section-title">
@@ -127,8 +181,8 @@
         </h3>
         
         <div class="summary-card">
-            <div class="summary-item">
-                <strong>Campus:</strong>
+            <div class="summary-item" id="summaryVenueRow">
+                <strong id="summaryVenueLabel">Campus:</strong>
                 <span id="summaryCampus">-</span>
             </div>
             <div class="summary-item">
@@ -144,6 +198,122 @@
 </div>
 
 <style>
+/* Venue Type Selector */
+.venue-type-selection {
+    margin-bottom: 30px;
+}
+
+.venue-type-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 600px) {
+    .venue-type-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.venue-type-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    border: 2px solid var(--light-gray);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    background: var(--white);
+    position: relative;
+}
+
+.venue-type-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 16px rgba(0, 140, 21, 0.1);
+}
+
+.venue-type-card.active {
+    border-color: var(--primary-color);
+    background: rgba(0, 140, 21, 0.05);
+}
+
+.venue-type-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(0, 140, 21, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: var(--primary-color);
+    flex-shrink: 0;
+}
+
+.venue-type-info {
+    flex: 1;
+}
+
+.venue-type-info h4 {
+    margin: 0 0 4px 0;
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.venue-type-info p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--gray);
+    line-height: 1.4;
+}
+
+.venue-type-check {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.venue-type-card.active .venue-type-check {
+    opacity: 1;
+}
+
+/* Outdoor Venue Section */
+.outdoor-venue-section {
+    margin-bottom: 24px;
+}
+
+.outdoor-note {
+    background: rgba(52, 152, 219, 0.08);
+    color: #2980b9;
+    border-left: 3px solid #3498db;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+}
+
+.outdoor-note i {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.outdoor-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.outdoor-fields .form-group label .required {
+    color: #dc3545;
+}
+
 /* Campus Selection Styles */
 .campus-grid {
     display: grid;
@@ -558,6 +728,77 @@ let selectedCampusId = null;
 let selectedDate = null;
 let selectedTime = null;
 let campusData = <?= json_encode($campuses) ?>;
+let currentVenueType = document.getElementById('venueType')
+    ? (document.getElementById('venueType').value || 'campus')
+    : 'campus';
+
+// ─── Venue Type Toggle ──────────────────────────────────────────────────────
+
+function selectVenueType(type) {
+    currentVenueType = type;
+    document.getElementById('venueType').value = type;
+
+    document.querySelectorAll('.venue-type-card').forEach(function(card) {
+        card.classList.toggle('active', card.dataset.type === type);
+    });
+
+    const campusSection  = document.getElementById('campusSection');
+    const outdoorSection = document.getElementById('outdoorSection');
+
+    if (type === 'campus') {
+        if (campusSection)  campusSection.style.display  = '';
+        if (outdoorSection) outdoorSection.style.display = 'none';
+        const summaryLabel = document.getElementById('summaryVenueLabel');
+        if (summaryLabel) summaryLabel.textContent = 'Campus:';
+    } else {
+        if (campusSection)  campusSection.style.display  = 'none';
+        if (outdoorSection) outdoorSection.style.display = '';
+        const summaryLabel = document.getElementById('summaryVenueLabel');
+        if (summaryLabel) summaryLabel.textContent = 'Venue:';
+        loadOutdoorPastors();
+    }
+
+    handleSelectionChange();
+}
+
+let _pastorsLoaded = false;
+
+function loadOutdoorPastors() {
+    if (_pastorsLoaded) return;
+    const select = document.getElementById('selectedPastor');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">— Loading… —</option>';
+    fetch('<?= site_url('api/pastors') ?>', {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        select.innerHTML = '<option value="">— Select a pastor —</option>';
+        if (data.status === 'success' && data.pastors && data.pastors.length) {
+            data.pastors.forEach(function(p) {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = p.name + (p.campus_name ? ' (' + p.campus_name + ' Campus)' : '');
+                select.appendChild(opt);
+            });
+            _pastorsLoaded = true;
+
+            // Restore previously saved pastor
+            const savedPastor = '<?= old('selectedPastor', $application['pastor_id'] ?? '') ?>';
+            if (savedPastor) {
+                select.value = savedPastor;
+            }
+        } else {
+            select.innerHTML = '<option value="">— No pastors available —</option>';
+        }
+    })
+    .catch(function() {
+        select.innerHTML = '<option value="">— Failed to load pastors —</option>';
+    });
+}
+
+window.selectVenueType = selectVenueType;
 
 // Helper function to format date for API without timezone issues
 function formatDateForAPI(date) {
@@ -634,6 +875,8 @@ function selectCampus(campusId) {
         const campus = campusData.find(c => c.id == campusId);
         if (campus) {
             document.getElementById('summaryCampus').textContent = campus.name;
+            const summaryLabel = document.getElementById('summaryVenueLabel');
+            if (summaryLabel) summaryLabel.textContent = 'Campus:';
         }
         
         // Generate calendar for current month (only if not already generated)
@@ -917,6 +1160,12 @@ window.restoreVenueDateTimeFromDraft = async function(data) {
     const dateEl = document.getElementById('selectedDate');
     const timeEl = document.getElementById('selectedTime');
 
+    // Restore venue type first
+    const savedVenueType = data.venue_type || (campusEl && campusEl.value ? 'campus' : null);
+    if (savedVenueType) {
+        selectVenueType(savedVenueType);
+    }
+
     let campus = data.selectedCampus != null && String(data.selectedCampus).trim() !== ''
         ? String(data.selectedCampus).trim()
         : (campusEl && campusEl.value ? campusEl.value.trim() : '');
@@ -930,11 +1179,11 @@ window.restoreVenueDateTimeFromDraft = async function(data) {
     }
     const timeNorm = normalizeSlotTime(timeRaw);
 
-    if (!campus && !dateStr && !timeNorm) {
+    if (!campus && !dateStr && !timeNorm && !savedVenueType) {
         return;
     }
 
-    if (campus) {
+    if (campus && (currentVenueType === 'campus')) {
         selectCampus(String(campus));
     }
 
@@ -964,6 +1213,14 @@ window.restoreVenueDateTimeFromDraft = async function(data) {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
+    // Restore venue type from saved data
+    const venueTypeEl = document.getElementById('venueType');
+    if (venueTypeEl && venueTypeEl.value === 'outdoor') {
+        selectVenueType('outdoor');
+    } else {
+        selectVenueType('campus');
+    }
+
     console.log('Step 1 initializing...');
     
     // Set current month to minimum booking date month (from advance_booking_days)
@@ -997,7 +1254,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Check if we have all data and should auto-advance to step 2
-    const allDataPresent = existingCampus && existingDate && existingTime;
+    const existingVenueType = (document.getElementById('venueType') && document.getElementById('venueType').value) || 'campus';
+    const venueReady = existingVenueType === 'outdoor'
+        ? (!!(document.getElementById('outdoorVenueName') && document.getElementById('outdoorVenueName').value) &&
+           !!(document.getElementById('outdoorVenueAddress') && document.getElementById('outdoorVenueAddress').value))
+        : !!existingCampus;
+    const allDataPresent = venueReady && existingDate && existingTime;
     console.log('All step 1 data present:', allDataPresent);
     console.log('Available campuses:', campusData);
     console.log('Looking for campus ID:', existingCampus, 'Type:', typeof existingCampus);
@@ -1466,66 +1728,72 @@ function showStepError(message) {
 
 // Validation function
 function validateStep1() {
-    const campus = document.getElementById('selectedCampus').value;
+    const venueTypeVal = (document.getElementById('venueType') && document.getElementById('venueType').value) || currentVenueType || 'campus';
     const date = document.getElementById('selectedDate').value;
     const time = document.getElementById('selectedTime').value;
     let valid = true;
 
-    if (!campus) {
-        // Campus is selected via card click, highlight the campus grid
-        const grid = document.querySelector('.campus-grid');
-        if (grid) {
-            grid.classList.add('field-error-block');
+    if (venueTypeVal === 'campus') {
+        const campus = document.getElementById('selectedCampus').value;
+        if (!campus) {
+            const grid = document.querySelector('.campus-grid');
+            if (grid) grid.classList.add('field-error-block');
+            showStepError('Please select a campus.');
+            valid = false;
         }
-        showStepError('Please select a campus.');
-        valid = false;
+    } else {
+        const venueName    = (document.getElementById('outdoorVenueName') && document.getElementById('outdoorVenueName').value.trim()) || '';
+        const venueAddr    = (document.getElementById('outdoorVenueAddress') && document.getElementById('outdoorVenueAddress').value.trim()) || '';
+        const pastorSelect = document.getElementById('selectedPastor');
+        const pastorVal    = pastorSelect ? pastorSelect.value : '';
+
+        if (!venueName) {
+            markFieldError('outdoorVenueName', 'Venue name is required.');
+            valid = false;
+        } else {
+            clearFieldError('outdoorVenueName');
+        }
+        if (!venueAddr) {
+            markFieldError('outdoorVenueAddress', 'Venue address is required.');
+            valid = false;
+        } else {
+            clearFieldError('outdoorVenueAddress');
+        }
+        if (!pastorVal) {
+            markFieldError('selectedPastor', 'Please select an officiating pastor.');
+            valid = false;
+        } else {
+            clearFieldError('selectedPastor');
+        }
     }
+
     if (!date) {
         const calendar = document.querySelector('.calendar-container');
-        if (calendar) {
-            calendar.classList.add('field-error-block');
-        }
+        if (calendar) calendar.classList.add('field-error-block');
         showStepError('Please select a wedding date.');
         valid = false;
     } else {
         const calendar = document.querySelector('.calendar-container');
-        if (calendar) {
-            calendar.classList.remove('field-error-block');
-        }
+        if (calendar) calendar.classList.remove('field-error-block');
     }
     if (!time) {
         const timeSlots = document.querySelector('.time-slots');
-        if (timeSlots) {
-            timeSlots.classList.add('field-error-block');
-        }
+        if (timeSlots) timeSlots.classList.add('field-error-block');
         showStepError('Please select a time slot.');
         valid = false;
     } else {
         const timeSlots = document.querySelector('.time-slots');
-        if (timeSlots) {
-            timeSlots.classList.remove('field-error-block');
-        }
+        if (timeSlots) timeSlots.classList.remove('field-error-block');
     }
     return valid;
 }
 
 // Check if step 1 is complete and enable/disable next button accordingly
 function checkStep1Completion() {
-    const campus = document.getElementById('selectedCampus').value;
-    const date = document.getElementById('selectedDate').value;
-    const time = document.getElementById('selectedTime').value;
     const nextButton = document.getElementById('nextButton');
-    
     if (nextButton) {
         nextButton.disabled = false;
         nextButton.classList.remove('disabled');
-    }
-
-    if (campus && date && time) {
-        // Store data globally for the main navigation system
-        window.selectedCampusData = campus;
-        window.selectedDateData = date;
-        window.selectedTimeData = time;
     }
 }
 
@@ -2005,11 +2273,19 @@ function validateAllSteps() {
 
 // Populate review summary for the final review step
 function populateReviewSummary() {
-    // Campus info
-    if (selectedCampusId && campusData) {
-        const campus = campusData.find(c => c.id == selectedCampusId);
-        if (campus) {
-            document.getElementById('reviewCampus').textContent = campus.name;
+    // Venue info
+    const venueTypeVal = (document.getElementById('venueType') && document.getElementById('venueType').value) || 'campus';
+    const reviewCampusEl = document.getElementById('reviewCampus');
+    if (reviewCampusEl) {
+        if (venueTypeVal === 'campus') {
+            if (selectedCampusId && campusData) {
+                const campus = campusData.find(c => c.id == selectedCampusId);
+                if (campus) reviewCampusEl.textContent = campus.name;
+            }
+        } else {
+            const name = document.getElementById('outdoorVenueName') ? document.getElementById('outdoorVenueName').value : '';
+            const addr = document.getElementById('outdoorVenueAddress') ? document.getElementById('outdoorVenueAddress').value : '';
+            reviewCampusEl.textContent = name + (addr ? ' — ' + addr : '');
         }
     }
     
