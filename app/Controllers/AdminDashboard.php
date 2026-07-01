@@ -465,10 +465,64 @@ class AdminDashboard extends Controller
             return redirect()->to('/admin/login');
         }
 
-        $documents = $this->request->getPost('documents') ?: [];
+        $selectedDocuments = $this->request->getPost('documents') ?: [];
+        $booking = $this->bookingModel->find($id);
+        if (!$booking) {
+            session()->setFlashdata('error', 'Booking not found.');
+            return redirect()->to('/admin/bookings');
+        }
+
+        $existingDocuments = [];
+        if (!empty($booking['admin_documents_checklist'])) {
+            $decodedDocuments = json_decode($booking['admin_documents_checklist'], true);
+            if (is_array($decodedDocuments)) {
+                $existingDocuments = $decodedDocuments;
+            }
+        }
+
+        $managedDocumentIds = [
+            'letter_of_blessing',
+            'national_id_bride',
+            'national_id_groom',
+            'national_id_best_man',
+            'national_id_matron',
+            'marriage_certificate_best_man',
+            'marriage_certificate_matron',
+            'recommendation_bride_church',
+            'recommendation_groom_church',
+            'recommendation_best_man',
+            'recommendation_matron',
+            'premarital_counseling'
+        ];
+
+        foreach ($managedDocumentIds as $managedDocumentId) {
+            $isSelected = isset($selectedDocuments[$managedDocumentId]);
+            if (!$isSelected) {
+                if (isset($existingDocuments[$managedDocumentId]) && is_array($existingDocuments[$managedDocumentId])) {
+                    $existingDocuments[$managedDocumentId]['admin_verified'] = false;
+                    unset($existingDocuments[$managedDocumentId]['admin_verified_at']);
+                } elseif (isset($existingDocuments[$managedDocumentId])) {
+                    unset($existingDocuments[$managedDocumentId]);
+                }
+                continue;
+            }
+
+            $docId = $managedDocumentId;
+            if (isset($existingDocuments[$docId]) && is_array($existingDocuments[$docId])) {
+                $existingDocuments[$docId]['status'] = 'submitted';
+                $existingDocuments[$docId]['admin_verified'] = true;
+                $existingDocuments[$docId]['admin_verified_at'] = date('Y-m-d H:i:s');
+            } else {
+                $existingDocuments[$docId] = [
+                    'status' => 'submitted',
+                    'admin_verified' => true,
+                    'admin_verified_at' => date('Y-m-d H:i:s')
+                ];
+            }
+        }
         
         $data = [
-            'admin_documents_checklist' => json_encode($documents),
+            'admin_documents_checklist' => json_encode($existingDocuments),
             'updated_at' => date('Y-m-d H:i:s')
         ];
 

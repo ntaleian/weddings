@@ -380,7 +380,7 @@
     <h1>Documents uploaded</h1>
     <p>
         <?php if (! empty($hasActiveBooking)): ?>
-            Upload all required documents for your wedding application. Each document must be 1MB or less.
+            Upload all required documents for your wedding application. Each document must be 5MB or less.
         <?php else: ?>
             Review the required documents here. Uploads become available after your application has been submitted.
         <?php endif; ?>
@@ -410,12 +410,23 @@ if ($userBooking && !empty($userBooking['admin_documents_checklist'])) {
 $canUploadDocuments = ! empty($hasActiveBooking) && $userBooking !== null;
 
 // Calculate document upload progress
-$totalDocs = count($requiredDocs);
+$requiredDocIds = [];
+foreach ($requiredDocs as $requiredDoc) {
+    if (($requiredDoc['required'] ?? true) === true) {
+        $requiredDocIds[] = $requiredDoc['id'] ?? '';
+    }
+}
+
+$totalDocs = count($requiredDocIds);
 $uploadedCount = 0;
 $uploadedDocIds = [];
 
 if (!empty($checklistDocs)) {
     foreach ($checklistDocs as $docId => $docData) {
+        if (!in_array($docId, $requiredDocIds, true)) {
+            continue;
+        }
+
         if (is_array($docData) && isset($docData['status']) && $docData['status'] === 'submitted') {
             $uploadedCount++;
             $uploadedDocIds[] = $docId;
@@ -546,7 +557,7 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
             <?php if (count($requiredDocsList) > 0): ?>
             <button class="tab-button required-tab <?= count($uploadedDocsList) == 0 ? 'active' : '' ?>" onclick="switchTab('required', this)">
                 <i class="fas fa-exclamation-circle"></i>
-                Required Documents
+                Pending Documents
                 <span class="badge"><?= count($requiredDocsList) ?></span>
             </button>
             <?php endif; ?>
@@ -589,7 +600,7 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
                 <div class="upload-area" id="upload-area-<?= $docId ?>" onclick="document.getElementById('file-<?= $docId ?>').click()">
                     <i class="fas fa-cloud-upload-alt"></i>
                     <p>Click to upload</p>
-                    <small>PDF, JPG, PNG, DOC, DOCX (max 1MB)</small>
+                    <small>PDF, JPG, PNG, DOC, DOCX (max 5MB)</small>
                 </div>
                 <input type="file" 
                        id="file-<?= $docId ?>" 
@@ -685,7 +696,7 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
                     <div class="document-info">
                         <h3><?= esc($doc['name']) ?></h3>
                         <span class="document-status status-required">
-                            Required
+                            <?= ($doc['required'] ?? true) ? 'Required' : 'Optional' ?>
                         </span>
                     </div>
                 </div>
@@ -699,7 +710,7 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
                         <div class="upload-area" id="upload-area-<?= $docId ?>" onclick="document.getElementById('file-<?= $docId ?>').click()">
                             <i class="fas fa-cloud-upload-alt"></i>
                             <p>Click to upload</p>
-                            <small>PDF, JPG, PNG, DOC, DOCX (max 1MB)</small>
+                            <small>PDF, JPG, PNG, DOC, DOCX (max 5MB)</small>
                         </div>
                         <input type="file" 
                                id="file-<?= $docId ?>" 
@@ -755,18 +766,19 @@ function handleFileUpload(input, docId) {
     const file = input.files[0];
     if (!file) return;
     
-    // Validate file size (1MB = 1048576 bytes)
-    const maxSize = 1024 * 1024; // 1MB in bytes
+    // Validate file size (5MB = 5242880 bytes)
+    const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-        showError(docId, 'File size exceeds 1MB limit. Please choose a smaller file.');
+        showError(docId, 'File size exceeds 5MB limit. Please choose a smaller file.');
         input.value = '';
         return;
     }
     
-    // Validate file type
-    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png', 
-                         'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    if (!allowedTypes.includes(file.type)) {
+    // Validate file type using extension first (browser MIME can be unreliable on some devices)
+    const allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'];
+    const fileName = (file.name || '').toLowerCase();
+    const fileExtension = fileName.includes('.') ? fileName.split('.').pop() : '';
+    if (!allowedExtensions.includes(fileExtension)) {
         showError(docId, 'Invalid file type. Please upload PDF, JPG, PNG, DOC, or DOCX files only.');
         input.value = '';
         return;

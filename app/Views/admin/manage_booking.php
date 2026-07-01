@@ -284,24 +284,37 @@
                     <?php 
                     $documents = json_decode($booking['admin_documents_checklist'] ?? '{}', true);
                     $requiredDocs = [
-                        'national_ids' => 'National IDs (Bride & Groom)',
-                        'birth_certificates' => 'Birth Certificates',
-                        'baptism_certificates' => 'Baptism Certificates',
-                        'passport_photos' => 'Passport Photos',
-                        'introduction_letter' => 'Introduction Letter',
-                        'medical_certificates' => 'Medical Certificates',
-                        'affidavit_single_status' => 'Affidavit of Single Status',
-                        'witness_ids' => 'Best Man & Matron National IDs',
-                        'church_membership' => 'Church Membership Proof'
+                        'letter_of_blessing' => 'Letter of Blessing',
+                        'national_id_bride' => 'National ID - Bride',
+                        'national_id_groom' => 'National ID - Groom',
+                        'national_id_best_man' => 'National ID - Best Man',
+                        'national_id_matron' => 'National ID - Matron',
+                        'marriage_certificate_best_man' => 'Marriage Certificate - Best Man',
+                        'marriage_certificate_matron' => 'Marriage Certificate - Matron',
+                        'recommendation_bride_church' => 'Recommendation Letter - Bride\'s Church (if not Watoto member)',
+                        'recommendation_groom_church' => 'Recommendation Letter - Groom\'s Church (if not Watoto member)',
+                        'recommendation_best_man' => 'Recommendation Letter - Best Man (if not Watoto member)',
+                        'recommendation_matron' => 'Recommendation Letter - Matron (if not Watoto member)',
+                        'premarital_counseling' => 'Pre Marital Counselling Document (optional)'
                     ];
                     ?>
                     
                     <?php foreach ($requiredDocs as $key => $label): ?>
+                        <?php
+                        $isChecked = false;
+                        if (isset($documents[$key])) {
+                            if (is_array($documents[$key])) {
+                                $isChecked = ($documents[$key]['status'] ?? '') === 'submitted';
+                            } else {
+                                $isChecked = (bool) $documents[$key];
+                            }
+                        }
+                        ?>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" 
                                    name="documents[<?= $key ?>]" value="1" 
                                    id="doc_<?= $key ?>"
-                                   <?= isset($documents[$key]) && $documents[$key] ? 'checked' : '' ?>>
+                                   <?= $isChecked ? 'checked' : '' ?>>
                             <label class="form-check-label" for="doc_<?= $key ?>">
                                 <?= $label ?>
                             </label>

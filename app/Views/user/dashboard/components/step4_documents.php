@@ -50,6 +50,17 @@ $documentsAcknowledged = old(
     font-size: 0.78rem;
 }
 
+.form-section[data-step="4"] .document-card .doc-requirement {
+    background: #eef2ff;
+    border-radius: 999px;
+    color: #1e3a8a;
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    padding: 4px 10px;
+}
+
 .form-section[data-step="4"] .document-acknowledgement {
     background: var(--white);
     border: 2px solid var(--light-gray);
@@ -87,6 +98,9 @@ $documentsAcknowledged = old(
         <?php foreach ($requiredDocuments as $document): ?>
             <div class="document-card">
                 <h3><?= esc($document['name'] ?? 'Required document') ?></h3>
+                <span class="doc-requirement">
+                    <?= ($document['required'] ?? true) ? 'Required' : 'Optional' ?>
+                </span>
                 <p><?= esc($document['description'] ?? 'Prepare this document for review.') ?></p>
                 <?php if (! empty($document['max_size'])): ?>
                     <small>Maximum file size: <?= esc((string) $document['max_size']) ?> KB</small>

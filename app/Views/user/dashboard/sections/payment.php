@@ -1,3 +1,20 @@
+<?php
+$receiptByPaymentReference = [];
+if (!empty($booking['admin_documents_checklist'])) {
+    $checklistData = json_decode($booking['admin_documents_checklist'], true);
+    if (is_array($checklistData)) {
+        foreach ($checklistData as $docData) {
+            if (
+                is_array($docData)
+                && ($docData['type'] ?? '') === 'payment_receipt'
+                && !empty($docData['payment_reference'])
+            ) {
+                $receiptByPaymentReference[$docData['payment_reference']] = $docData;
+            }
+        }
+    }
+}
+?>
 <div class="payment-container">
     <?php $hasActiveBooking = (bool) ($hasActiveBooking ?? ! empty($booking)); ?>
     <!-- Payment Overview -->
@@ -94,6 +111,14 @@
                                 After paying, use the form to record your payment details for our records.
                             </div>
                         </div>
+                        <div class="alert alert-warning flash-alert">
+                            <div class="alert-icon">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="alert-content">
+                                The first 50% booking fee (UGX 300,000) is non-refundable. Attach your payment receipt when submitting payment details.
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -101,7 +126,7 @@
                 <div class="col-xl-6 col-lg-12">
                     <div class="payment-form">
                         <h3><i class="fas fa-receipt"></i> Record Payment</h3>
-                        <form action="<?= site_url('dashboard/payment/add') ?>" method="POST">
+                        <form action="<?= site_url('dashboard/payment/add') ?>" method="POST" enctype="multipart/form-data">
                             <?= csrf_field() ?>
                             
                             <div class="form-group">
@@ -149,6 +174,19 @@
                                           rows="2" 
                                           placeholder="Any additional details about this payment"></textarea>
                             </div>
+
+                            <div class="form-group">
+                                <label for="payment_receipt">Receipt Attachment (PDF/JPG/PNG, max 5MB)</label>
+                                <input type="file"
+                                       class="form-control"
+                                       id="payment_receipt"
+                                       name="payment_receipt"
+                                       accept=".pdf,.jpg,.jpeg,.png"
+                                       required>
+                                <small class="text-muted" style="font-size: 0.8rem; display: block; margin-top: 4px;">
+                                    <i class="fas fa-paperclip"></i> Attach the receipt for the non-refundable 50% booking fee payment.
+                                </small>
+                            </div>
                             
                             <button type="submit" class="btn btn-primary w-100">
                                 <i class="fas fa-save"></i>
@@ -183,6 +221,14 @@
                             <div class="payment-meta">
                                 <span><i class="fas fa-calendar"></i> <?= date('M d, Y', strtotime($payment['payment_date'])) ?></span>
                                 <span style="margin-left: 15px;"><i class="fas fa-receipt"></i> <?= esc($payment['transaction_reference']) ?></span>
+                                <?php if (!empty($receiptByPaymentReference[$payment['transaction_reference']]['file_path'])): ?>
+                                    <span style="margin-left: 15px;">
+                                        <i class="fas fa-paperclip"></i>
+                                        <a href="<?= base_url($receiptByPaymentReference[$payment['transaction_reference']]['file_path']) ?>" target="_blank" rel="noopener">
+                                            View receipt
+                                        </a>
+                                    </span>
+                                <?php endif; ?>
                                 <?php if (!empty($payment['notes'])): ?>
                                     <br><small><?= esc($payment['notes']) ?></small>
                                 <?php endif; ?>

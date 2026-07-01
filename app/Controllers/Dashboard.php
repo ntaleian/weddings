@@ -64,7 +64,7 @@ class Dashboard extends Controller
             if ($draft) {
                 $hasDraftApplication = true;
                 $currentStep = $this->normalizeApplicationStep($draft->current_step ?? 1);
-                $progress = ($currentStep / $this->getApplicationTotalSteps()) * 100;
+                $progress = round(($currentStep / $this->getApplicationTotalSteps()) * 100);
                 $draftSummary = $this->buildApplicationDraftSummary($draft);
             }
         }
@@ -946,17 +946,37 @@ class Dashboard extends Controller
     private function getDocumentUploadSummary($userId): array
     {
         $requiredDocuments = $this->getRequiredDocuments();
+        $requiredDocumentIds = array_map(static function ($document) {
+            return (string) ($document['id'] ?? '');
+        }, $requiredDocuments);
         $requiredCount = count(array_filter($requiredDocuments, static function ($document) {
             return ($document['required'] ?? true) === true;
         }));
-        $uploadedCount = count($this->getUploadedDocuments($userId));
+        $uploadedRequiredCount = 0;
+
+        foreach ($this->getUploadedDocuments($userId) as $uploadedDocument) {
+            $uploadedId = (string) ($uploadedDocument['id'] ?? '');
+            if (in_array($uploadedId, $requiredDocumentIds, true)) {
+                $isRequired = true;
+                foreach ($requiredDocuments as $requiredDocument) {
+                    if (($requiredDocument['id'] ?? '') === $uploadedId) {
+                        $isRequired = (bool) ($requiredDocument['required'] ?? true);
+                        break;
+                    }
+                }
+
+                if ($isRequired) {
+                    $uploadedRequiredCount++;
+                }
+            }
+        }
 
         return [
-            'uploaded' => $uploadedCount,
+            'uploaded' => $uploadedRequiredCount,
             'total' => $requiredCount,
-            'isComplete' => $requiredCount > 0 && $uploadedCount >= $requiredCount,
+            'isComplete' => $requiredCount > 0 && $uploadedRequiredCount >= $requiredCount,
             'label' => $requiredCount > 0
-                ? $uploadedCount . ' of ' . $requiredCount . ' uploaded'
+                ? $uploadedRequiredCount . ' of ' . $requiredCount . ' uploaded'
                 : 'Documents uploaded',
         ];
     }
@@ -965,102 +985,88 @@ class Dashboard extends Controller
     {
         return [
             [
-                'id' => 'premarital_counseling',
-                'name' => 'Pre Marital Counselling Document',
-                'description' => 'Document showing completion of pre-marital counseling',
-                'required' => true,
-                'max_size' => 1024 // 1MB in KB
-            ],
-            [
                 'id' => 'letter_of_blessing',
                 'name' => 'Letter of Blessing',
                 'description' => 'Official letter of blessing from your church',
                 'required' => true,
-                'max_size' => 1024
+                'max_size' => 5120
             ],
             [
                 'id' => 'national_id_bride',
                 'name' => 'National ID - Bride',
                 'description' => 'Clear copy of bride\'s national identification card',
                 'required' => true,
-                'max_size' => 1024
+                'max_size' => 5120
             ],
             [
                 'id' => 'national_id_groom',
                 'name' => 'National ID - Groom',
                 'description' => 'Clear copy of groom\'s national identification card',
                 'required' => true,
-                'max_size' => 1024
+                'max_size' => 5120
             ],
             [
                 'id' => 'national_id_best_man',
                 'name' => 'National ID - Best Man',
                 'description' => 'Clear copy of best man\'s national identification card',
                 'required' => true,
-                'max_size' => 1024
+                'max_size' => 5120
             ],
             [
                 'id' => 'national_id_matron',
                 'name' => 'National ID - Matron',
                 'description' => 'Clear copy of matron\'s national identification card',
                 'required' => true,
-                'max_size' => 1024
+                'max_size' => 5120
             ],
             [
-                'id' => 'national_id_bride_family',
-                'name' => 'National ID - Bride\'s Family Representative',
-                'description' => 'Clear copy of national ID for bride\'s family representative',
+                'id' => 'marriage_certificate_best_man',
+                'name' => 'Marriage Certificate - Best Man',
+                'description' => 'Marriage certificate for the best man',
                 'required' => true,
-                'max_size' => 1024
+                'max_size' => 5120
             ],
             [
-                'id' => 'national_id_groom_family',
-                'name' => 'National ID - Groom\'s Family Representative',
-                'description' => 'Clear copy of national ID for groom\'s family representative',
+                'id' => 'marriage_certificate_matron',
+                'name' => 'Marriage Certificate - Matron',
+                'description' => 'Marriage certificate for the matron',
                 'required' => true,
-                'max_size' => 1024
-            ],
-            [
-                'id' => 'certificate_bride',
-                'name' => 'Certificate - Bride',
-                'description' => 'Baptism or birth certificate for the bride',
-                'required' => true,
-                'max_size' => 1024
-            ],
-            [
-                'id' => 'certificate_groom',
-                'name' => 'Certificate - Groom',
-                'description' => 'Baptism or birth certificate for the groom',
-                'required' => true,
-                'max_size' => 1024
+                'max_size' => 5120
             ],
             [
                 'id' => 'recommendation_bride_church',
                 'name' => 'Recommendation Letter - Bride\'s Church',
-                'description' => 'Recommendation letter from the bride\'s church',
+                'description' => 'Recommendation letter from the bride\'s church if she is not a Watoto Church member',
                 'required' => true,
-                'max_size' => 1024
+                'max_size' => 5120
             ],
             [
                 'id' => 'recommendation_groom_church',
                 'name' => 'Recommendation Letter - Groom\'s Church',
-                'description' => 'Recommendation letter from the groom\'s church',
+                'description' => 'Recommendation letter from the groom\'s church if he is not a Watoto Church member',
                 'required' => true,
-                'max_size' => 1024
+                'max_size' => 5120
             ],
             [
                 'id' => 'recommendation_best_man',
                 'name' => 'Recommendation Letter - Best Man',
-                'description' => 'Recommendation letter for the best man',
+                'description' => 'Recommendation letter from the best man\'s church if he is not a Watoto Church member',
                 'required' => true,
-                'max_size' => 1024
+                'max_size' => 5120
             ],
             [
                 'id' => 'recommendation_matron',
                 'name' => 'Recommendation Letter - Matron',
-                'description' => 'Recommendation letter for the matron',
+                'description' => 'Recommendation letter from the matron\'s church if she is not a Watoto Church member',
                 'required' => true,
-                'max_size' => 1024
+                'max_size' => 5120
+            ],
+            [
+                'id' => 'premarital_counseling',
+                'name' => 'Pre Marital Counselling Document',
+                'description' => 'Document showing completion of pre-marital counseling',
+                'required' => false,
+                'max_size' => 5120
             ]
         ];
     }
@@ -1588,17 +1594,21 @@ class Dashboard extends Controller
         $file = $this->request->getFile('document');
         
         if (!$file->isValid()) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Invalid file']);
+            $errorMessage = $file->getErrorString();
+            if ($errorMessage === '') {
+                $errorMessage = 'Invalid file upload.';
+            }
+            return $this->response->setJSON(['success' => false, 'message' => $errorMessage]);
         }
 
         // Handle file upload
         $userId = session()->get('user_id');
         $documentType = $this->request->getPost('document_type');
         
-        // Validate file - 1MB max (1024 KB)
+        // Validate file - 5MB max (5120 KB)
         $validation = \Config\Services::validation();
         $validation->setRules([
-            'document' => 'uploaded[document]|max_size[document,1024]|ext_in[document,pdf,jpg,jpeg,png,doc,docx]',
+            'document' => 'uploaded[document]|max_size[document,5120]|ext_in[document,pdf,jpg,jpeg,png,doc,docx]',
             'document_type' => 'required|max_length[100]'
         ]);
         
@@ -2110,11 +2120,14 @@ class Dashboard extends Controller
             return redirect()->to('/dashboard')->with('error', 'No active booking found.');
         }
 
+        $receipt = $this->request->getFile('payment_receipt');
+
         // Validation rules
         $rules = [
             'amount' => 'required|decimal|greater_than[0]',
             'payment_reference' => 'required|min_length[3]|max_length[100]',
             'payment_date' => 'required|valid_date',
+            'payment_receipt' => 'uploaded[payment_receipt]|max_size[payment_receipt,5120]|ext_in[payment_receipt,pdf,jpg,jpeg,png]',
             'notes' => 'permit_empty|max_length[500]'
         ];
 
@@ -2182,6 +2195,30 @@ class Dashboard extends Controller
             'notes' => $this->request->getPost('notes')
         ];
 
+        // Upload and track payment receipt file in booking checklist metadata.
+        $receiptRelativePath = null;
+        $receiptOriginalName = null;
+        if ($receipt && $receipt->isValid()) {
+            $receiptUploadDir = FCPATH . 'uploads/payment-receipts/' . $userId . '/';
+            if (!is_dir($receiptUploadDir) && !mkdir($receiptUploadDir, 0755, true)) {
+                return redirect()->back()->withInput()->with('error', 'Failed to prepare receipt upload directory. Please try again.');
+            }
+
+            if (!is_writable($receiptUploadDir)) {
+                return redirect()->back()->withInput()->with('error', 'Receipt upload directory is not writable. Please contact support.');
+            }
+
+            $receiptExtension = strtolower((string) $receipt->getClientExtension());
+            $receiptOriginalName = (string) $receipt->getClientName();
+            $receiptFileName = 'payment_receipt_' . time() . '_' . uniqid() . '.' . $receiptExtension;
+
+            if (!$receipt->move($receiptUploadDir, $receiptFileName)) {
+                return redirect()->back()->withInput()->with('error', 'Failed to upload receipt. Please try again.');
+            }
+
+            $receiptRelativePath = 'uploads/payment-receipts/' . $userId . '/' . $receiptFileName;
+        }
+
         // Debug: Log the payment data being inserted
         log_message('info', 'Payment data to insert: ' . json_encode($paymentData));
 
@@ -2190,6 +2227,40 @@ class Dashboard extends Controller
             $insertResult = $this->paymentModel->insert($paymentData);
             
             if ($insertResult) {
+                if ($receiptRelativePath !== null) {
+                    $documentsChecklist = [];
+                    if (!empty($booking['admin_documents_checklist'])) {
+                        $decodedChecklist = json_decode($booking['admin_documents_checklist'], true);
+                        if (is_array($decodedChecklist)) {
+                            $documentsChecklist = $decodedChecklist;
+                        }
+                    }
+
+                    $referenceKey = preg_replace('/[^a-z0-9]/i', '_', (string) $this->request->getPost('payment_reference'));
+                    $referenceKey = strtolower(trim((string) $referenceKey, '_'));
+                    if ($referenceKey === '') {
+                        $referenceKey = (string) $insertResult;
+                    }
+
+                    $receiptDocumentId = 'payment_receipt_' . $referenceKey;
+
+                    $documentsChecklist[$receiptDocumentId] = [
+                        'status' => 'submitted',
+                        'type' => 'payment_receipt',
+                        'filename' => basename((string) $receiptRelativePath),
+                        'original_name' => $receiptOriginalName ?? basename((string) $receiptRelativePath),
+                        'uploaded_at' => date('Y-m-d H:i:s'),
+                        'file_path' => $receiptRelativePath,
+                        'payment_id' => (int) $insertResult,
+                        'payment_reference' => (string) $this->request->getPost('payment_reference'),
+                        'payment_amount' => $newAmount
+                    ];
+
+                    $this->bookingModel->update($booking['id'], [
+                        'admin_documents_checklist' => json_encode($documentsChecklist)
+                    ]);
+                }
+
                 log_message('info', 'Payment inserted successfully with ID: ' . $insertResult);
                 return redirect()->to('dashboard/payment')
                                ->with('success', 'Payment record added successfully! Your payment is pending verification by our admin team.');

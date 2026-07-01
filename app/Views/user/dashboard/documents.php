@@ -25,17 +25,4 @@
 
 <?= $this->section('scripts') ?>
     <script src="<?= asset_url('assets/js/dashboard.js') ?>"></script>
-    <script>
-        // Initialize document upload functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle file uploads
-            document.querySelectorAll('input[type="file"]').forEach(input => {
-                input.addEventListener('change', function() {
-                    if (window.dashboard) {
-                        dashboard.handleFileUpload(this);
-                    }
-                });
-            });
-        });
-    </script>
 <?= $this->endSection() ?>

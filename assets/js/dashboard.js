@@ -600,6 +600,9 @@ class WeddingDashboard {
 
         // File upload handlers
         document.querySelectorAll('input[type="file"]').forEach(input => {
+            if (input.closest('.upload-form')) {
+                return;
+            }
             input.addEventListener('change', () => {
                 this.handleFileUpload(input);
             });
