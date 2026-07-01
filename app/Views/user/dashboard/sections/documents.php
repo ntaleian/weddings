@@ -194,6 +194,16 @@
     color: var(--error-color);
 }
 
+.status-conditional {
+    background: rgba(245, 158, 11, 0.12);
+    color: #92400e;
+}
+
+.status-optional {
+    background: rgba(99, 102, 241, 0.1);
+    color: #3730a3;
+}
+
 .status-uploaded {
     background: rgba(0, 140, 21, 0.1);
     color: var(--success-color);
@@ -695,8 +705,13 @@ $progressPercentage = $totalDocs > 0 ? round(($uploadedCount / $totalDocs) * 100
                     </div>
                     <div class="document-info">
                         <h3><?= esc($doc['name']) ?></h3>
-                        <span class="document-status status-required">
-                            <?= ($doc['required'] ?? true) ? 'Required' : 'Optional' ?>
+                        <?php
+                        $docIsRequired    = ($doc['required'] ?? true) === true;
+                        $docIsConditional = !$docIsRequired && str_contains(strtolower($doc['description'] ?? ''), 'if ');
+                        $docStatusLabel   = $docIsRequired ? 'Required' : ($docIsConditional ? 'Conditional' : 'Optional');
+                        ?>
+                        <span class="document-status status-<?= $docIsRequired ? 'required' : ($docIsConditional ? 'conditional' : 'optional') ?>">
+                            <?= $docStatusLabel ?>
                         </span>
                     </div>
                 </div>

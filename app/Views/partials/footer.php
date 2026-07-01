@@ -10,13 +10,6 @@
                 <p>Where love meets faith, and dreams become reality.</p>
             </div>
             <div class="footer-section">
-                <h4>Quick Links</h4>
-                <ul>
-                    <li><a href="<?= base_url('/') ?>">Home</a></li>
-                    <li><a href="<?= base_url('/#contact') ?>">Contact</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
                 <h4>Contact Info</h4>
                 <ul>
                     <li><i class="fas fa-phone"></i> +256 778 208 159</li>
@@ -26,7 +19,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2025 Watoto Church. All rights reserved.</p>
+            <p>&copy; <?= date('Y') ?> Watoto Church. All rights reserved.</p>
             <div class="admin-access">
                 <a href="<?= base_url('admin/login') ?>" class="admin-link" title="Admin Access" target="_blank">
                     <i class="fas fa-user-shield"></i>

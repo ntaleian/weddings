@@ -1036,29 +1036,29 @@ class Dashboard extends Controller
             [
                 'id' => 'recommendation_bride_church',
                 'name' => 'Recommendation Letter - Bride\'s Church',
-                'description' => 'Recommendation letter from the bride\'s church if she is not a Watoto Church member',
-                'required' => true,
+                'description' => 'Required if bride is not a Watoto Church member. Obtain from her home church.',
+                'required' => false,
                 'max_size' => 5120
             ],
             [
                 'id' => 'recommendation_groom_church',
                 'name' => 'Recommendation Letter - Groom\'s Church',
-                'description' => 'Recommendation letter from the groom\'s church if he is not a Watoto Church member',
-                'required' => true,
+                'description' => 'Required if groom is not a Watoto Church member. Obtain from his home church.',
+                'required' => false,
                 'max_size' => 5120
             ],
             [
                 'id' => 'recommendation_best_man',
                 'name' => 'Recommendation Letter - Best Man',
-                'description' => 'Recommendation letter from the best man\'s church if he is not a Watoto Church member',
-                'required' => true,
+                'description' => 'Required if best man is not a Watoto Church member. Obtain from his home church.',
+                'required' => false,
                 'max_size' => 5120
             ],
             [
                 'id' => 'recommendation_matron',
                 'name' => 'Recommendation Letter - Matron',
-                'description' => 'Recommendation letter from the matron\'s church if she is not a Watoto Church member',
-                'required' => true,
+                'description' => 'Required if matron is not a Watoto Church member. Obtain from her home church.',
+                'required' => false,
                 'max_size' => 5120
             ],
             [
@@ -1592,11 +1592,19 @@ class Dashboard extends Controller
         }
 
         $file = $this->request->getFile('document');
-        
+
+        // Detect when PHP silently drops the file because it exceeds upload_max_filesize
+        if (!$file || $file->getError() === UPLOAD_ERR_INI_SIZE || $file->getError() === UPLOAD_ERR_FORM_SIZE) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'The file is too large for the server to accept. Please compress it below 5 MB and try again.',
+            ]);
+        }
+
         if (!$file->isValid()) {
             $errorMessage = $file->getErrorString();
             if ($errorMessage === '') {
-                $errorMessage = 'Invalid file upload.';
+                $errorMessage = 'Invalid file upload. Please try again.';
             }
             return $this->response->setJSON(['success' => false, 'message' => $errorMessage]);
         }
@@ -2122,14 +2130,25 @@ class Dashboard extends Controller
 
         $receipt = $this->request->getFile('payment_receipt');
 
-        // Validation rules
+        // Detect PHP silently dropping an oversized receipt before CodeIgniter sees it
+        if ($receipt && ($receipt->getError() === UPLOAD_ERR_INI_SIZE || $receipt->getError() === UPLOAD_ERR_FORM_SIZE)) {
+            return redirect()->back()->withInput()
+                ->with('error', 'The receipt file is too large. Please compress it below 5 MB and try again.');
+        }
+
+        $hasReceipt = $receipt && $receipt->isValid() && !$receipt->hasMoved();
+
+        // Validation rules — receipt is optional but validated when provided
         $rules = [
             'amount' => 'required|decimal|greater_than[0]',
             'payment_reference' => 'required|min_length[3]|max_length[100]',
             'payment_date' => 'required|valid_date',
-            'payment_receipt' => 'uploaded[payment_receipt]|max_size[payment_receipt,5120]|ext_in[payment_receipt,pdf,jpg,jpeg,png]',
             'notes' => 'permit_empty|max_length[500]'
         ];
+
+        if ($hasReceipt) {
+            $rules['payment_receipt'] = 'max_size[payment_receipt,5120]|ext_in[payment_receipt,pdf,jpg,jpeg,png]';
+        }
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
@@ -2198,7 +2217,7 @@ class Dashboard extends Controller
         // Upload and track payment receipt file in booking checklist metadata.
         $receiptRelativePath = null;
         $receiptOriginalName = null;
-        if ($receipt && $receipt->isValid()) {
+        if ($hasReceipt) {
             $receiptUploadDir = FCPATH . 'uploads/payment-receipts/' . $userId . '/';
             if (!is_dir($receiptUploadDir) && !mkdir($receiptUploadDir, 0755, true)) {
                 return redirect()->back()->withInput()->with('error', 'Failed to prepare receipt upload directory. Please try again.');

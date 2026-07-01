@@ -45,6 +45,9 @@
     <!-- Mobile Menu Overlay -->
     <div class="main-mobile-menu" id="main-mobile-menu">
         <div class="main-mobile-menu-content">
+            <button class="main-mobile-close" id="main-mobile-close" aria-label="Close menu">
+                <i class="fas fa-times"></i>
+            </button>
             <a href="<?= base_url('/') ?>" class="main-mobile-link">
                 <i class="fas fa-home"></i>
                 <span>Home</span>

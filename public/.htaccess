@@ -40,5 +40,17 @@ Options -Indexes
 	ErrorDocument 404 index.php
 </IfModule>
 
+# ----------------------------------------------------------------------
+# PHP upload limits (override php.ini for file uploads)
+# ----------------------------------------------------------------------
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+</IfModule>
+<IfModule mod_php8.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+</IfModule>
+
 # ServerSignature: do not set here — many hosts forbid it in .htaccess (causes 500).
 # Configure in the main Apache vhost if needed.

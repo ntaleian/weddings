@@ -176,15 +176,14 @@ if (!empty($booking['admin_documents_checklist'])) {
                             </div>
 
                             <div class="form-group">
-                                <label for="payment_receipt">Receipt Attachment (PDF/JPG/PNG, max 5MB)</label>
+                                <label for="payment_receipt">Payment Receipt <small style="color:#6c757d;font-weight:400;">(PDF/JPG/PNG, max 5 MB — optional but recommended)</small></label>
                                 <input type="file"
                                        class="form-control"
                                        id="payment_receipt"
                                        name="payment_receipt"
-                                       accept=".pdf,.jpg,.jpeg,.png"
-                                       required>
+                                       accept=".pdf,.jpg,.jpeg,.png">
                                 <small class="text-muted" style="font-size: 0.8rem; display: block; margin-top: 4px;">
-                                    <i class="fas fa-paperclip"></i> Attach the receipt for the non-refundable 50% booking fee payment.
+                                    <i class="fas fa-paperclip"></i> Attach the bank receipt for your payment. You can also upload it later from the Documents section.
                                 </small>
                             </div>
                             

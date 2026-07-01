@@ -51,14 +51,24 @@ $documentsAcknowledged = old(
 }
 
 .form-section[data-step="4"] .document-card .doc-requirement {
-    background: #eef2ff;
     border-radius: 999px;
-    color: #1e3a8a;
     display: inline-block;
     font-size: 0.72rem;
     font-weight: 600;
     margin-bottom: 8px;
     padding: 4px 10px;
+}
+.form-section[data-step="4"] .document-card .doc-requirement.req-required {
+    background: #fee2e2;
+    color: #991b1b;
+}
+.form-section[data-step="4"] .document-card .doc-requirement.req-conditional {
+    background: #fef3c7;
+    color: #92400e;
+}
+.form-section[data-step="4"] .document-card .doc-requirement.req-optional {
+    background: #eef2ff;
+    color: #1e3a8a;
 }
 
 .form-section[data-step="4"] .document-acknowledgement {
@@ -98,8 +108,14 @@ $documentsAcknowledged = old(
         <?php foreach ($requiredDocuments as $document): ?>
             <div class="document-card">
                 <h3><?= esc($document['name'] ?? 'Required document') ?></h3>
-                <span class="doc-requirement">
-                    <?= ($document['required'] ?? true) ? 'Required' : 'Optional' ?>
+                <?php
+                $isRequired  = ($document['required'] ?? true) === true;
+                $isConditional = !$isRequired && str_contains(strtolower($document['description'] ?? ''), 'if ');
+                $reqClass    = $isRequired ? 'req-required' : ($isConditional ? 'req-conditional' : 'req-optional');
+                $reqLabel    = $isRequired ? 'Required' : ($isConditional ? 'Conditional' : 'Optional');
+                ?>
+                <span class="doc-requirement <?= $reqClass ?>">
+                    <?= $reqLabel ?>
                 </span>
                 <p><?= esc($document['description'] ?? 'Prepare this document for review.') ?></p>
                 <?php if (! empty($document['max_size'])): ?>

@@ -1615,32 +1615,18 @@
         const hamburger = document.getElementById('main-hamburger');
         const mobileMenu = document.getElementById('main-mobile-menu');
         
-        if (!hamburger) {
-            console.error('Hamburger button not found');
-            return;
-        }
-        
-        if (!mobileMenu) {
-            console.error('Mobile menu not found');
-            return;
-        }
+        if (!hamburger || !mobileMenu) return;
         
         function toggleMenu() {
             const isOpen = mobileMenu.classList.contains('show');
-            console.log('Toggle menu - isOpen:', isOpen);
-            
             if (isOpen) {
-                // Close menu
                 hamburger.classList.remove('active');
                 mobileMenu.classList.remove('show');
                 document.body.style.overflow = '';
-                console.log('Menu closed');
             } else {
-                // Open menu
                 hamburger.classList.add('active');
                 mobileMenu.classList.add('show');
                 document.body.style.overflow = 'hidden';
-                console.log('Menu opened');
             }
         }
         
@@ -1650,12 +1636,23 @@
             document.body.style.overflow = '';
         }
         
-        // Toggle on hamburger click
         hamburger.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('Hamburger clicked');
             toggleMenu();
+        });
+
+        // Close button inside menu
+        const closeBtn = document.getElementById('main-mobile-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeMenu);
+        }
+
+        // Close menu when resizing to desktop
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                closeMenu();
+            }
         });
         
         // Close when clicking menu links
