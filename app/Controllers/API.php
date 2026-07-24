@@ -137,9 +137,10 @@ class API extends Controller
             return $this->response->setJSON(['status' => 'error', 'message' => 'Unauthorized']);
         }
 
-        $pastors = $this->pastorModel
-            ->where('is_available', 1)
-            ->findAll();
+        $pastors = $this->pastorModel->getPastorsWithCampus();
+        $pastors = array_values(array_filter($pastors, static function ($pastor) {
+            return !empty($pastor['is_available']);
+        }));
 
         return $this->response->setJSON([
             'status' => 'success',

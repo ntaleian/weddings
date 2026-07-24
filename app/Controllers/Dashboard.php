@@ -1368,13 +1368,17 @@ class Dashboard extends Controller
         } else {
             $outdoorVenueName    = trim((string) $this->request->getPost('outdoor_venue_name'));
             $outdoorVenueAddress = trim((string) $this->request->getPost('outdoor_venue_address'));
+            $outdoorDistanceBand = (string) $this->request->getPost('outdoor_distance_band');
             $selectedPastor      = $this->request->getPost('selectedPastor');
             $outdoorErrors = [];
             if ($outdoorVenueName === '') {
-                $outdoorErrors['outdoor_venue_name'] = 'Outdoor venue name is required.';
+                $outdoorErrors['outdoor_venue_name'] = 'Gazetted venue name is required.';
             }
             if ($outdoorVenueAddress === '') {
-                $outdoorErrors['outdoor_venue_address'] = 'Outdoor venue address is required.';
+                $outdoorErrors['outdoor_venue_address'] = 'Gazetted venue address is required.';
+            }
+            if (!in_array($outdoorDistanceBand, ['within_20km', '20_50km'], true)) {
+                $outdoorErrors['outdoor_distance_band'] = 'Please select the venue distance from Kampala.';
             }
             if (empty($selectedPastor) || !is_numeric($selectedPastor)) {
                 $outdoorErrors['selectedPastor'] = 'Please select an officiating pastor.';
@@ -1415,6 +1419,7 @@ class Dashboard extends Controller
                 'venue_type'            => $venueType,
                 'outdoor_venue_name'    => $venueType === 'outdoor' ? trim((string) $this->request->getPost('outdoor_venue_name')) : null,
                 'outdoor_venue_address' => $venueType === 'outdoor' ? trim((string) $this->request->getPost('outdoor_venue_address')) : null,
+                'outdoor_distance_band' => $venueType === 'outdoor' ? (string) $this->request->getPost('outdoor_distance_band') : null,
                 'pastor_id'             => $this->request->getPost('selectedPastor') ?: 1,
                 'wedding_date'          => $weddingDate,
                 'wedding_time'          => $weddingTime,
@@ -1532,7 +1537,12 @@ class Dashboard extends Controller
                 'application_step' => 4,
                 'is_draft' => 0,
                 'status' => 'pending',
-                'total_cost' => $this->calculateWeddingCost($venueType === 'campus' ? $campusId : null, $this->request->getPost('guest_count') ?: 100),
+                'total_cost' => $this->calculateWeddingCost(
+                    $venueType === 'campus' ? $campusId : null,
+                    $this->request->getPost('guest_count') ?: 100,
+                    $venueType,
+                    $venueType === 'outdoor' ? (string) $this->request->getPost('outdoor_distance_band') : null
+                ),
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s')
             ];
@@ -1573,16 +1583,26 @@ class Dashboard extends Controller
         }
     }
 
-    private function calculateWeddingCost($campusId, $guestCount)
+    private function calculateWeddingCost($campusId, $guestCount, string $venueType = 'campus', ?string $distanceBand = null)
     {
         // According to guidelines: Church Service fee is UGX 600,000
         // (UGX 450,000 admin + UGX 150,000 Worship/Tech Team)
         $settingsModel = new \App\Models\SettingsModel();
-        $baseWeddingFee = $settingsModel->getSetting('base_wedding_fee', 600000);
-        
-        // For now, use the fixed fee from guidelines
-        // Future: Add gazetted venue fees if applicable
-        return $baseWeddingFee;
+        $baseWeddingFee = (float) $settingsModel->getSetting('base_wedding_fee', 600000);
+
+        if ($venueType !== 'outdoor') {
+            return $baseWeddingFee;
+        }
+
+        // Gazetted venue surcharge by distance (guidelines)
+        $gazettedFee = 0.0;
+        if ($distanceBand === 'within_20km') {
+            $gazettedFee = (float) $settingsModel->getSetting('gazetted_venue_fee_20km', 200000);
+        } elseif ($distanceBand === '20_50km') {
+            $gazettedFee = (float) $settingsModel->getSetting('gazetted_venue_fee_20_50km', 300000);
+        }
+
+        return $baseWeddingFee + $gazettedFee;
     }
 
     public function uploadDocument()

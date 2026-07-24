@@ -13,7 +13,8 @@ class BookingModel extends Model
     protected $useSoftDeletes = false;
     protected $protectFields = true;
     protected $allowedFields = [
-        'user_id', 'campus_id', 'venue_type', 'outdoor_venue_name', 'outdoor_venue_address', 'pastor_id', 'wedding_date', 'wedding_time',
+        'user_id', 'campus_id', 'venue_type', 'outdoor_venue_name', 'outdoor_venue_address', 'outdoor_distance_band',
+        'pastor_id', 'wedding_date', 'wedding_time',
         'bride_name', 'bride_date_of_birth', 'bride_age', 'bride_birth_place', 'bride_email', 'bride_phone',
         'bride_occupation', 'bride_employer', 'bride_education_level', 'bride_nationality', 'bride_religion',
         'bride_marital_status', 'bride_address', 'bride_id_number', 'bride_id_type',
@@ -65,7 +66,7 @@ class BookingModel extends Model
                       ->select('bookings.*, campuses.name as campus_name, campuses.location as campus_location, 
                                pastors.name as pastor_name,
                                users.first_name as user_first_name, users.last_name as user_last_name, users.email as user_email')
-                      ->join('campuses', 'campuses.id = bookings.campus_id')
+                      ->join('campuses', 'campuses.id = bookings.campus_id', 'left')
                       ->join('pastors', 'pastors.id = bookings.pastor_id', 'left')
                       ->join('users', 'users.id = bookings.user_id')
                       ->where('bookings.id', $bookingId)
@@ -79,7 +80,7 @@ class BookingModel extends Model
                          ->select('bookings.*, campuses.name as campus_name, campuses.location as campus_location, 
                                   pastors.name as pastor_name,
                                   users.first_name as user_first_name, users.last_name as user_last_name, users.email as user_email')
-                         ->join('campuses', 'campuses.id = bookings.campus_id')
+                         ->join('campuses', 'campuses.id = bookings.campus_id', 'left')
                          ->join('pastors', 'pastors.id = bookings.pastor_id', 'left')
                          ->join('users', 'users.id = bookings.user_id');
 
@@ -110,7 +111,7 @@ class BookingModel extends Model
         return $this->db->table('bookings')
                       ->select('bookings.*, campuses.name as campus_name, campuses.location as campus_location, 
                                pastors.name as pastor_name')
-                      ->join('campuses', 'campuses.id = bookings.campus_id')
+                      ->join('campuses', 'campuses.id = bookings.campus_id', 'left')
                       ->join('pastors', 'pastors.id = bookings.pastor_id', 'left')
                       ->where('bookings.user_id', $userId)
                       ->orderBy('bookings.wedding_date', 'ASC')

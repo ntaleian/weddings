@@ -104,6 +104,38 @@ $this->setData([
                     <span style="margin-left: 0.5rem;"><?= date('l, F j, Y', strtotime($booking['wedding_date'])) ?></span>
                 </div>
                 <?php endif; ?>
+                <?php
+                $isGazetted = ($booking['venue_type'] ?? 'campus') === 'outdoor';
+                $venueLabel = $isGazetted
+                    ? trim((string) ($booking['outdoor_venue_name'] ?? 'Gazetted venue'))
+                    : ($booking['campus_name'] ?? 'Not assigned');
+                $distanceLabels = [
+                    'within_20km' => 'Within 20km (+UGX 200,000)',
+                    '20_50km' => 'Between 20–50km (+UGX 300,000)',
+                ];
+                ?>
+                <div style="margin-bottom: 0.5rem;">
+                    <span style="color: #6c757d; font-size: 0.9rem;"><?= $isGazetted ? 'Gazetted Venue:' : 'Campus:' ?></span>
+                    <span style="margin-left: 0.5rem;"><?= esc($venueLabel) ?></span>
+                </div>
+                <?php if ($isGazetted && !empty($booking['outdoor_venue_address'])): ?>
+                <div style="margin-bottom: 0.5rem;">
+                    <span style="color: #6c757d; font-size: 0.9rem;">Venue Address:</span>
+                    <span style="margin-left: 0.5rem;"><?= esc($booking['outdoor_venue_address']) ?></span>
+                </div>
+                <?php endif; ?>
+                <?php if ($isGazetted && !empty($booking['outdoor_distance_band'])): ?>
+                <div style="margin-bottom: 0.5rem;">
+                    <span style="color: #6c757d; font-size: 0.9rem;">Distance Band:</span>
+                    <span style="margin-left: 0.5rem;"><?= esc($distanceLabels[$booking['outdoor_distance_band']] ?? $booking['outdoor_distance_band']) ?></span>
+                </div>
+                <?php endif; ?>
+                <?php if (!empty($booking['pastor_name'])): ?>
+                <div style="margin-bottom: 0.5rem;">
+                    <span style="color: #6c757d; font-size: 0.9rem;">Officiating Pastor:</span>
+                    <span style="margin-left: 0.5rem;"><?= esc($booking['pastor_name']) ?></span>
+                </div>
+                <?php endif; ?>
                 <?php if (isset($booking['wedding_time'])): ?>
                 <div>
                     <span style="color: #6c757d; font-size: 0.9rem;">Ceremony Time:</span>
@@ -1587,7 +1619,7 @@ function generatePDF() {
     doc.setLineWidth(0.3);
     doc.roundedRect(15, yPos - 3, 180, 25, 2, 2, 'D');
     
-    yPos = addLabelValue('Campus/Venue', '<?= esc($booking["campus_name"] ?? "Not assigned") ?>', 20, yPos, 150);
+    yPos = addLabelValue('Campus/Venue', '<?= esc((($booking["venue_type"] ?? "campus") === "outdoor") ? (($booking["outdoor_venue_name"] ?? "Gazetted venue") . (!empty($booking["outdoor_venue_address"]) ? " — " . $booking["outdoor_venue_address"] : "")) : ($booking["campus_name"] ?? "Not assigned")) ?>', 20, yPos, 150);
     yPos = addLabelValue('Wedding Date', '<?= isset($booking["wedding_date"]) ? date("l, F j, Y", strtotime($booking["wedding_date"])) : "Not scheduled" ?>', 20, yPos, 150);
     yPos = addLabelValue('Ceremony Time', '<?= isset($booking["wedding_time"]) ? date("g:i A", strtotime($booking["wedding_time"])) : "Not scheduled" ?>', 20, yPos, 150);
     yPos += 5;

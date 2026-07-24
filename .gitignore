@@ -69,3 +69,5 @@ config.php
 .Trashes
 ehthumbs.db
 Desktop.ini
+.agents/*
+skills-lock.json

@@ -14,8 +14,20 @@
             </h3>
             <div class="review-grid">
                 <div class="review-item">
-                    <strong>Campus:</strong>
+                    <strong id="reviewVenueLabel">Campus:</strong>
                     <span id="reviewCampus">-</span>
+                </div>
+                <div class="review-item" id="reviewGazettedExtras" style="display: none;">
+                    <strong>Distance band:</strong>
+                    <span id="reviewDistanceBand">-</span>
+                </div>
+                <div class="review-item" id="reviewGazettedAddressRow" style="display: none;">
+                    <strong>Venue address:</strong>
+                    <span id="reviewVenueAddress">-</span>
+                </div>
+                <div class="review-item" id="reviewPastorRow" style="display: none;">
+                    <strong>Officiating pastor:</strong>
+                    <span id="reviewPastor">-</span>
                 </div>
                 <div class="review-item">
                     <strong>Date:</strong>
@@ -287,19 +299,52 @@ function populateStep4Review() {
     }
     
     // 1. Venue & Date Selection
-    // Campus info - check global variables first
-    if (typeof selectedCampusId !== 'undefined' && typeof campusData !== 'undefined' && campusData) {
-        const campus = campusData.find(c => c.id == selectedCampusId);
-        if (campus) {
-            setReviewText('reviewCampus', campus.name);
-        }
+    const venueTypeEl = document.getElementById('venueType');
+    const venueType = (venueTypeEl && venueTypeEl.value) || (typeof currentVenueType !== 'undefined' ? currentVenueType : 'campus');
+    const reviewVenueLabel = document.getElementById('reviewVenueLabel');
+    const reviewGazettedExtras = document.getElementById('reviewGazettedExtras');
+    const reviewGazettedAddressRow = document.getElementById('reviewGazettedAddressRow');
+    const reviewPastorRow = document.getElementById('reviewPastorRow');
+
+    if (venueType === 'outdoor') {
+        if (reviewVenueLabel) reviewVenueLabel.textContent = 'Gazetted venue:';
+        const venueName = document.getElementById('outdoorVenueName');
+        setReviewText('reviewCampus', venueName && venueName.value ? venueName.value : '-');
+
+        const bandEl = document.getElementById('outdoorDistanceBand');
+        const bandText = bandEl && bandEl.value
+            ? (bandEl.options[bandEl.selectedIndex] ? bandEl.options[bandEl.selectedIndex].text : bandEl.value)
+            : '-';
+        setReviewText('reviewDistanceBand', bandText);
+        if (reviewGazettedExtras) reviewGazettedExtras.style.display = '';
+
+        const addrEl = document.getElementById('outdoorVenueAddress');
+        setReviewText('reviewVenueAddress', addrEl && addrEl.value ? addrEl.value : '-');
+        if (reviewGazettedAddressRow) reviewGazettedAddressRow.style.display = '';
+
+        const pastorEl = document.getElementById('selectedPastor');
+        setReviewText('reviewPastor', getSelectText(pastorEl));
+        if (reviewPastorRow) reviewPastorRow.style.display = '';
     } else {
-        // Fallback: check if there's a selected campus in the form
-        const campusSelect = document.querySelector('[name="campus_id"]');
-        if (campusSelect && campusSelect.value) {
-            const campusOption = campusSelect.options[campusSelect.selectedIndex];
-            if (campusOption) {
-                setReviewText('reviewCampus', campusOption.text);
+        if (reviewVenueLabel) reviewVenueLabel.textContent = 'Campus:';
+        if (reviewGazettedExtras) reviewGazettedExtras.style.display = 'none';
+        if (reviewGazettedAddressRow) reviewGazettedAddressRow.style.display = 'none';
+        if (reviewPastorRow) reviewPastorRow.style.display = 'none';
+
+        // Campus info - check global variables first
+        if (typeof selectedCampusId !== 'undefined' && typeof campusData !== 'undefined' && campusData) {
+            const campus = campusData.find(c => c.id == selectedCampusId);
+            if (campus) {
+                setReviewText('reviewCampus', campus.name);
+            }
+        } else {
+            // Fallback: check if there's a selected campus in the form
+            const campusSelect = document.querySelector('[name="campus_id"]');
+            if (campusSelect && campusSelect.value) {
+                const campusOption = campusSelect.options[campusSelect.selectedIndex];
+                if (campusOption) {
+                    setReviewText('reviewCampus', campusOption.text);
+                }
             }
         }
     }

@@ -30,10 +30,10 @@
                 <div class="venue-type-check"><i class="fas fa-check-circle"></i></div>
             </div>
             <div class="venue-type-card" data-type="outdoor" onclick="selectVenueType('outdoor')">
-                <div class="venue-type-icon"><i class="fas fa-tree"></i></div>
+                <div class="venue-type-icon"><i class="fas fa-map-marked-alt"></i></div>
                 <div class="venue-type-info">
-                    <h4>Outdoor / External Venue</h4>
-                    <p>Hold your wedding at an outdoor or external location with a Watoto pastor officiating</p>
+                    <h4>Gazetted Venue</h4>
+                    <p>Hold your wedding at a gazetted / external location with a Watoto pastor officiating</p>
                 </div>
                 <div class="venue-type-check"><i class="fas fa-check-circle"></i></div>
             </div>
@@ -70,15 +70,15 @@
         <input type="hidden" id="selectedCampus" name="selectedCampus" value="<?= old('selectedCampus', $application['selectedCampus'] ?? '') ?>">
     </div>
 
-    <!-- Outdoor Venue Section (shown when venue_type = outdoor) -->
+    <!-- Gazetted Venue Section (shown when venue_type = outdoor) -->
     <div class="outdoor-venue-section" id="outdoorSection" style="display: none;">
         <h3 class="section-title">
             <i class="fas fa-map-marked-alt"></i>
-            Outdoor Venue Details
+            Gazetted Venue Details
         </h3>
         <p class="outdoor-note">
             <i class="fas fa-info-circle"></i>
-            A Watoto Church pastor will officiate your wedding at your chosen location. Please provide the venue details and select your preferred pastor below.
+            A Watoto Church pastor will officiate at your gazetted venue. Provide the venue details, distance band (fee applies), and preferred pastor. If overnight stay is required for the pastor, the couple covers accommodation.
         </p>
         <div class="outdoor-fields">
             <div class="form-group">
@@ -93,6 +93,20 @@
                 <input type="text" id="outdoorVenueAddress" name="outdoor_venue_address"
                        placeholder="Full address or location description"
                        value="<?= old('outdoor_venue_address', $application['outdoor_venue_address'] ?? '') ?>">
+            </div>
+            <div class="form-group">
+                <label for="outdoorDistanceBand">Distance from Kampala <span class="required">*</span></label>
+                <select id="outdoorDistanceBand" name="outdoor_distance_band">
+                    <?php $savedBand = old('outdoor_distance_band', $application['outdoor_distance_band'] ?? ''); ?>
+                    <option value="">— Select distance band —</option>
+                    <option value="within_20km" <?= $savedBand === 'within_20km' ? 'selected' : '' ?>>
+                        Within 20km (+ UGX 200,000 gazetted fee)
+                    </option>
+                    <option value="20_50km" <?= $savedBand === '20_50km' ? 'selected' : '' ?>>
+                        Between 20–50km (+ UGX 300,000 gazetted fee)
+                    </option>
+                </select>
+                <small class="field-hint">Gazetted venue fees are in addition to the UGX 600,000 church service fee.</small>
             </div>
             <div class="form-group">
                 <label for="selectedPastor">Officiating Pastor <span class="required">*</span></label>
@@ -312,6 +326,13 @@
 
 .outdoor-fields .form-group label .required {
     color: #dc3545;
+}
+
+.outdoor-fields .field-hint {
+    color: #6c757d;
+    display: block;
+    font-size: 0.8rem;
+    margin-top: 6px;
 }
 
 /* Campus Selection Styles */
@@ -744,18 +765,41 @@ function selectVenueType(type) {
 
     const campusSection  = document.getElementById('campusSection');
     const outdoorSection = document.getElementById('outdoorSection');
+    const datetimeSection = document.getElementById('datetimeSection');
 
     if (type === 'campus') {
         if (campusSection)  campusSection.style.display  = '';
         if (outdoorSection) outdoorSection.style.display = 'none';
         const summaryLabel = document.getElementById('summaryVenueLabel');
         if (summaryLabel) summaryLabel.textContent = 'Campus:';
+        // Keep datetime hidden until a campus is chosen
+        if (datetimeSection && !document.getElementById('selectedCampus').value) {
+            datetimeSection.style.display = 'none';
+        }
     } else {
         if (campusSection)  campusSection.style.display  = 'none';
         if (outdoorSection) outdoorSection.style.display = '';
         const summaryLabel = document.getElementById('summaryVenueLabel');
-        if (summaryLabel) summaryLabel.textContent = 'Venue:';
+        if (summaryLabel) summaryLabel.textContent = 'Gazetted venue:';
+
+        // Clear campus selection so campus-slot checks don't apply
+        selectedCampusId = null;
+        const campusInput = document.getElementById('selectedCampus');
+        if (campusInput) campusInput.value = '';
+        document.querySelectorAll('.campus-card').forEach(function(card) {
+            card.classList.remove('selected');
+        });
+
+        if (datetimeSection) {
+            datetimeSection.style.display = 'block';
+        }
+        generateCalendar();
         loadOutdoorPastors();
+
+        const venueNameEl = document.getElementById('outdoorVenueName');
+        if (venueNameEl && venueNameEl.value) {
+            document.getElementById('summaryCampus').textContent = venueNameEl.value;
+        }
     }
 
     handleSelectionChange();
@@ -1257,7 +1301,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const existingVenueType = (document.getElementById('venueType') && document.getElementById('venueType').value) || 'campus';
     const venueReady = existingVenueType === 'outdoor'
         ? (!!(document.getElementById('outdoorVenueName') && document.getElementById('outdoorVenueName').value) &&
-           !!(document.getElementById('outdoorVenueAddress') && document.getElementById('outdoorVenueAddress').value))
+           !!(document.getElementById('outdoorVenueAddress') && document.getElementById('outdoorVenueAddress').value) &&
+           !!(document.getElementById('outdoorDistanceBand') && document.getElementById('outdoorDistanceBand').value) &&
+           !!(document.getElementById('selectedPastor') && document.getElementById('selectedPastor').value))
         : !!existingCampus;
     const allDataPresent = venueReady && existingDate && existingTime;
     console.log('All step 1 data present:', allDataPresent);
@@ -1406,7 +1452,13 @@ function checkTimeSlotAvailability(campusId, date, options) {
     options = options || {};
     const suppressErrorUI = !!options.suppressErrorUI;
 
-    if (!campusId || !date) {
+    // Gazetted venues are not tied to a campus time-slot calendar
+    if (!campusId || currentVenueType === 'outdoor') {
+        resetTimeSlotAvailability();
+        return Promise.resolve();
+    }
+
+    if (!date) {
         return Promise.resolve();
     }
 
@@ -1744,6 +1796,7 @@ function validateStep1() {
     } else {
         const venueName    = (document.getElementById('outdoorVenueName') && document.getElementById('outdoorVenueName').value.trim()) || '';
         const venueAddr    = (document.getElementById('outdoorVenueAddress') && document.getElementById('outdoorVenueAddress').value.trim()) || '';
+        const distanceBand = (document.getElementById('outdoorDistanceBand') && document.getElementById('outdoorDistanceBand').value) || '';
         const pastorSelect = document.getElementById('selectedPastor');
         const pastorVal    = pastorSelect ? pastorSelect.value : '';
 
@@ -1758,6 +1811,12 @@ function validateStep1() {
             valid = false;
         } else {
             clearFieldError('outdoorVenueAddress');
+        }
+        if (!distanceBand) {
+            markFieldError('outdoorDistanceBand', 'Please select the venue distance band.');
+            valid = false;
+        } else {
+            clearFieldError('outdoorDistanceBand');
         }
         if (!pastorVal) {
             markFieldError('selectedPastor', 'Please select an officiating pastor.');
@@ -2232,7 +2291,7 @@ function validateFinalTerms() {
 function validationMessageForStep(step) {
     switch (step) {
         case 1:
-            return 'Please select a campus, date, and time slot.';
+            return 'Please complete venue details (campus or gazetted venue), date, and time.';
         case 2:
             return 'Please complete all required personal details for both bride and groom.';
         case 3:
