@@ -142,6 +142,25 @@ $filterContent = ob_get_clean();
                                 }
                                 ?>
                                 <span class="badge <?= $statusBadgeClass ?>"><?= ucfirst($booking['status'] ?? 'unknown') ?></span>
+                                <?php
+                                $dateHeld = ! empty($booking['date_held']) || ! empty($booking['payment_status']['date_held']);
+                                $dateHoldLabel = $booking['payment_status']['date_hold_label']
+                                    ?? ($dateHeld ? 'Date held' : 'Awaiting deposit');
+                                $depositRequired = (float) ($booking['payment_status']['deposit_required'] ?? 300000);
+                                $depositPaid = (float) ($booking['payment_status']['total_paid'] ?? 0);
+                                ?>
+                                <?php if (($booking['status'] ?? '') === 'pending'): ?>
+                                    <small class="d-block mt-1">
+                                        <span class="badge <?= $dateHeld ? 'badge-success' : 'badge-warning' ?>">
+                                            <?= esc($dateHoldLabel) ?>
+                                        </span>
+                                    </small>
+                                    <?php if (! $dateHeld): ?>
+                                        <small class="d-block mt-1 text-muted">
+                                            Deposit UGX <?= number_format(min($depositPaid, $depositRequired), 0) ?>/<?= number_format($depositRequired, 0) ?>
+                                        </small>
+                                    <?php endif; ?>
+                                <?php endif; ?>
                             </td>
                             <td>
                                 <?php 

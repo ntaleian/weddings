@@ -271,8 +271,9 @@ class Dashboard extends Controller
             'countries' => $this->getWorldCountryNames(),
             'isSubmitted' => false,
             'minBookingDate' => $minBookingDate,
-            'requiredDocuments' => $this->getRequiredDocuments(),
+            'requiredDocuments' => $this->getRequiredDocuments($savedApplication ?? []),
             'weddingFee' => $this->calculateWeddingCost(null, 100),
+            'depositAmount' => (new \App\Models\SettingsModel())->getSetting('deposit_amount', 300000),
             'unreadMessagesCount' => $this->getUnreadMessagesCount($userId),
             'paymentStatus' => $this->getPaymentStatus($userId),
             'documentSummary' => $this->getDocumentUploadSummary($userId),
@@ -292,12 +293,16 @@ class Dashboard extends Controller
         
         // Get uploaded documents
         $documents = $this->getUploadedDocuments($userId);
-        
+        $activeBooking = $this->bookingModel->where('user_id', $userId)
+            ->where('is_draft', 0)
+            ->orderBy('created_at', 'DESC')
+            ->first();
+
         $data = [
             'title' => 'Documents Uploaded - Watoto Church Wedding Booking',
             'user' => $user,
             'documents' => $documents,
-            'required_documents' => $this->getRequiredDocuments(),
+            'required_documents' => $this->getRequiredDocuments($activeBooking ?: []),
             'hasActiveBooking' => $this->getPaymentStatus($userId) !== 'no_booking',
             'unreadMessagesCount' => $this->getUnreadMessagesCount($userId),
             'paymentStatus' => $this->getPaymentStatus($userId),
@@ -945,29 +950,24 @@ class Dashboard extends Controller
 
     private function getDocumentUploadSummary($userId): array
     {
-        $requiredDocuments = $this->getRequiredDocuments();
+        $booking = $this->bookingModel->where('user_id', $userId)
+            ->where('is_draft', 0)
+            ->orderBy('created_at', 'DESC')
+            ->first();
+
+        $requiredDocuments = $this->getRequiredDocuments($booking ?: []);
         $requiredDocumentIds = array_map(static function ($document) {
             return (string) ($document['id'] ?? '');
-        }, $requiredDocuments);
-        $requiredCount = count(array_filter($requiredDocuments, static function ($document) {
+        }, array_filter($requiredDocuments, static function ($document) {
             return ($document['required'] ?? true) === true;
         }));
+        $requiredCount = count($requiredDocumentIds);
         $uploadedRequiredCount = 0;
 
         foreach ($this->getUploadedDocuments($userId) as $uploadedDocument) {
             $uploadedId = (string) ($uploadedDocument['id'] ?? '');
             if (in_array($uploadedId, $requiredDocumentIds, true)) {
-                $isRequired = true;
-                foreach ($requiredDocuments as $requiredDocument) {
-                    if (($requiredDocument['id'] ?? '') === $uploadedId) {
-                        $isRequired = (bool) ($requiredDocument['required'] ?? true);
-                        break;
-                    }
-                }
-
-                if ($isRequired) {
-                    $uploadedRequiredCount++;
-                }
+                $uploadedRequiredCount++;
             }
         }
 
@@ -981,8 +981,11 @@ class Dashboard extends Controller
         ];
     }
 
-    private function getRequiredDocuments()
+    private function getRequiredDocuments(array $booking = [])
     {
+        $brideMember = (string) ($booking['bride_church_member'] ?? '');
+        $groomMember = (string) ($booking['groom_church_member'] ?? '');
+
         return [
             [
                 'id' => 'letter_of_blessing',
@@ -1034,17 +1037,31 @@ class Dashboard extends Controller
                 'max_size' => 5120
             ],
             [
+                'id' => 'cell_leader_letter_bride',
+                'name' => 'Cell Leader Letter - Bride',
+                'description' => 'Required if the bride is a Watoto Church member. Letter from her cell leader confirming membership.',
+                'required' => $brideMember === 'yes',
+                'max_size' => 5120
+            ],
+            [
+                'id' => 'cell_leader_letter_groom',
+                'name' => 'Cell Leader Letter - Groom',
+                'description' => 'Required if the groom is a Watoto Church member. Letter from his cell leader confirming membership.',
+                'required' => $groomMember === 'yes',
+                'max_size' => 5120
+            ],
+            [
                 'id' => 'recommendation_bride_church',
                 'name' => 'Recommendation Letter - Bride\'s Church',
                 'description' => 'Required if bride is not a Watoto Church member. Obtain from her home church.',
-                'required' => false,
+                'required' => in_array($brideMember, ['other', 'no'], true),
                 'max_size' => 5120
             ],
             [
                 'id' => 'recommendation_groom_church',
                 'name' => 'Recommendation Letter - Groom\'s Church',
                 'description' => 'Required if groom is not a Watoto Church member. Obtain from his home church.',
-                'required' => false,
+                'required' => in_array($groomMember, ['other', 'no'], true),
                 'max_size' => 5120
             ],
             [
@@ -1537,6 +1554,8 @@ class Dashboard extends Controller
                 'application_step' => 4,
                 'is_draft' => 0,
                 'status' => 'pending',
+                'date_held' => 0,
+                'date_held_at' => null,
                 'total_cost' => $this->calculateWeddingCost(
                     $venueType === 'campus' ? $campusId : null,
                     $this->request->getPost('guest_count') ?: 100,
@@ -2030,6 +2049,9 @@ class Dashboard extends Controller
         $remainingBalance = max(0, $totalCost - $totalPaid - $pendingAmount);
         $isFullyPaid = ($totalPaid + $pendingAmount) >= $totalCost;
 
+        $depositRequired = $this->bookingModel->getRequiredDepositAmount($booking);
+        $dateHeld = ! empty($booking['date_held']);
+
         return [
             'totalCost' => $totalCost,
             'totalPaid' => $totalPaid,
@@ -2037,7 +2059,11 @@ class Dashboard extends Controller
             'remainingBalance' => $remainingBalance,
             'hasPendingPayments' => $hasPendingPayments,
             'isFullyPaid' => $isFullyPaid,
-            'status' => $this->getPaymentStatus($userId)
+            'status' => $this->getPaymentStatus($userId),
+            'depositRequired' => $depositRequired,
+            'depositOutstanding' => max(0, $depositRequired - $totalPaid - $pendingAmount),
+            'dateHeld' => $dateHeld,
+            'dateHoldLabel' => $dateHeld ? 'Date held' : 'Awaiting deposit',
         ];
     }
 
@@ -2073,10 +2099,12 @@ class Dashboard extends Controller
                                      ->orderBy('created_at', 'DESC')
                                      ->first();
 
-        // Get wedding fee from settings
+        // Get wedding fee from booking total (includes gazetted fees) or settings
         $settingsModel = new \App\Models\SettingsModel();
         $weddingFeeSetting = $settingsModel->getSetting('base_wedding_fee');
-        $weddingFee = $weddingFeeSetting ? (float)$weddingFeeSetting : 600000;
+        $weddingFee = $booking
+            ? (float) ($booking['total_cost'] ?? ($weddingFeeSetting ? (float) $weddingFeeSetting : 600000))
+            : ($weddingFeeSetting ? (float) $weddingFeeSetting : 600000);
 
         $payments = [];
         $totalPaid = 0;
@@ -2100,6 +2128,12 @@ class Dashboard extends Controller
 
         // Calculate remaining balance (accounting for both completed and pending payments)
         $remainingBalance = max(0, $weddingFee - $totalPaid - $pendingAmount);
+        $depositRequired = $this->bookingModel->getRequiredDepositAmount($booking ?: null);
+        $depositOutstanding = max(0, $depositRequired - $totalPaid - $pendingAmount);
+        $dateHeld = ! empty($booking['date_held']);
+        $suggestedPayment = $dateHeld
+            ? $remainingBalance
+            : ($depositOutstanding > 0 ? $depositOutstanding : $remainingBalance);
 
         // Get unread messages count for sidebar
         $unreadMessagesCount = $this->getUnreadMessagesCount($userId);
@@ -2118,6 +2152,10 @@ class Dashboard extends Controller
             'pendingAmount' => $pendingAmount,
             'remainingBalance' => $remainingBalance,
             'hasUnpaidFees' => $hasUnpaidFees,
+            'depositRequired' => $depositRequired,
+            'depositOutstanding' => $depositOutstanding,
+            'dateHeld' => $dateHeld,
+            'suggestedPayment' => $suggestedPayment,
             'unreadMessagesCount' => $unreadMessagesCount,
             'paymentStatus' => $this->getPaymentStatus($userId),
             'documentSummary' => $this->getDocumentUploadSummary($userId),
@@ -2174,10 +2212,10 @@ class Dashboard extends Controller
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // Get wedding fee from settings
+        // Get wedding fee from booking total (includes gazetted fees) or settings
         $settingsModel = new \App\Models\SettingsModel();
         $weddingFeeSetting = $settingsModel->getSetting('base_wedding_fee');
-        $weddingFee = $weddingFeeSetting ? (float)$weddingFeeSetting : 600000;
+        $weddingFee = (float) ($booking['total_cost'] ?? ($weddingFeeSetting ? (float) $weddingFeeSetting : 600000));
 
         // Calculate current total paid (including pending payments for balance calculation)
         $existingPayments = $this->paymentModel->where('booking_id', $booking['id'])
@@ -2196,24 +2234,22 @@ class Dashboard extends Controller
         $newAmount = (float)$this->request->getPost('amount');
         // Remaining balance should account for both completed and pending payments
         $remainingBalance = max(0, $weddingFee - $totalPaid - $pendingAmount);
-        
-        // Validate that the amount matches the remaining balance (since field is readonly)
-        // Allow small rounding differences (within 1 UGX)
-        if (abs($newAmount - $remainingBalance) > 1) {
-            return redirect()->back()->withInput()
-                           ->with('error', 'Payment amount must match the remaining balance of UGX ' . number_format($remainingBalance) . '. Please do not modify the amount field.');
-        }
-        
-        // Check if the new payment doesn't exceed the required fee
-        if (($totalPaid + $newAmount) > $weddingFee) {
-            return redirect()->back()->withInput()
-                           ->with('error', 'Payment amount exceeds the remaining balance. Remaining balance: UGX ' . number_format($remainingBalance));
-        }
-        
-        // Ensure amount is positive
+
+        // Allow partial payments (deposit first); must not exceed remaining balance
         if ($newAmount <= 0) {
             return redirect()->back()->withInput()
                            ->with('error', 'Payment amount must be greater than zero.');
+        }
+
+        if ($newAmount - $remainingBalance > 1) {
+            return redirect()->back()->withInput()
+                           ->with('error', 'Payment amount exceeds the remaining balance of UGX ' . number_format($remainingBalance) . '.');
+        }
+
+        // Check if the new payment doesn't exceed the required fee
+        if (($totalPaid + $newAmount) > $weddingFee + 1) {
+            return redirect()->back()->withInput()
+                           ->with('error', 'Payment amount exceeds the remaining balance. Remaining balance: UGX ' . number_format($remainingBalance));
         }
 
         // Check for duplicate payment reference

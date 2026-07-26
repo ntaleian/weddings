@@ -85,11 +85,15 @@ class API extends Controller
             ],
         ];
 
-        // Get existing bookings for this campus and date
+        // Get existing bookings that actually hold this campus date
         $existingBookings = $this->bookingModel
             ->where('campus_id', $campusId)
             ->where('wedding_date', $date)
-            ->whereIn('status', ['pending', 'approved'])
+            ->groupStart()
+                ->where('date_held', 1)
+                ->orWhere('status', 'approved')
+            ->groupEnd()
+            ->whereNotIn('status', ['rejected', 'cancelled', 'draft'])
             ->findAll();
 
         // echo "<pre>"; print_r($existingBookings); echo "</pre>"; exit;
@@ -275,11 +279,15 @@ class API extends Controller
                 ],
             ];
 
-            // Get existing bookings for this campus and date
+            // Get existing bookings that actually hold this campus date
             $existingBookings = $this->bookingModel
                 ->where('campus_id', $campusId)
                 ->where('wedding_date', $date)
-                ->whereIn('status', ['pending', 'approved'])
+                ->groupStart()
+                    ->where('date_held', 1)
+                    ->orWhere('status', 'approved')
+                ->groupEnd()
+                ->whereNotIn('status', ['rejected', 'cancelled', 'draft'])
                 ->findAll();
 
             // Mark time slots as unavailable if already booked

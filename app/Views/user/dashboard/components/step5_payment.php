@@ -96,7 +96,7 @@ $paymentAcknowledged = old(
             Wedding fee
         </h3>
         <div class="payment-step-amount">UGX <?= number_format($weddingFee, 0) ?></div>
-        <p>This fee is recorded against your submitted application. You will be able to add payment details from the Payment status section once the application is submitted.</p>
+        <p>This fee is recorded against your submitted application. Pay the non-refundable deposit (UGX <?= number_format((float) ($depositAmount ?? 300000), 0) ?>) after submission so admin can verify it and hold your preferred date. Your preferred date is <strong>not confirmed</strong> until that deposit is verified.</p>
 
         <div class="payment-details-grid">
             <div class="payment-detail">
@@ -119,8 +119,8 @@ $paymentAcknowledged = old(
     </div>
 
     <div class="payment-note">
-        Please complete payment at least 2 months before your wedding date. After paying,
-        submit the payment reference in your dashboard so the admin team can verify it.
+        Please pay at least the non-refundable deposit soon after submitting, then complete the remaining balance at least 2 months before your wedding date.
+        Record each payment reference in your dashboard so the admin team can verify it. If you are a Watoto member, also upload your cell leader letter under Documents.
     </div>
 
     <div class="payment-acknowledgement">
@@ -132,7 +132,7 @@ $paymentAcknowledged = old(
                 value="1"
                 <?= (string) $paymentAcknowledged === '1' ? 'checked' : '' ?>
             >
-            <span>I understand the payment amount and that payment details are recorded after this application is submitted.</span>
+            <span>I understand the fee, that my preferred date is held only after the non-refundable deposit is verified, and that payment details are recorded after this application is submitted.</span>
         </label>
     </div>
 </div>

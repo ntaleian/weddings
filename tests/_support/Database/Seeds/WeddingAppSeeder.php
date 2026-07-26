@@ -80,6 +80,16 @@ class WeddingAppSeeder extends Seeder
                 'created_at'    => $now,
                 'updated_at'    => $now,
             ],
+            [
+                'setting_key'   => 'deposit_amount',
+                'setting_value' => '300000',
+                'setting_type'  => 'number',
+                'description'   => 'Non-refundable deposit required to hold preferred date',
+                'category'      => 'wedding',
+                'is_active'     => 1,
+                'created_at'    => $now,
+                'updated_at'    => $now,
+            ],
         ]);
     }
 }

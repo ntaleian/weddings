@@ -357,6 +357,11 @@ class AdminDashboard extends Controller
                 return redirect()->to('/admin/booking/' . $id);
             }
 
+            if (empty($booking['date_held'])) {
+                session()->setFlashdata('error', 'Cannot approve booking until the preferred date is held (deposit verified).');
+                return redirect()->to('/admin/booking/' . $id);
+            }
+
             $this->bookingModel->updateBookingStatus($id, 'approved');
             session()->setFlashdata('success', 'Booking approved successfully.');
         } catch (DatabaseException $e) {
@@ -488,6 +493,8 @@ class AdminDashboard extends Controller
             'national_id_matron',
             'marriage_certificate_best_man',
             'marriage_certificate_matron',
+            'cell_leader_letter_bride',
+            'cell_leader_letter_groom',
             'recommendation_bride_church',
             'recommendation_groom_church',
             'recommendation_best_man',
@@ -2367,9 +2374,26 @@ class AdminDashboard extends Controller
             }
 
             if ($this->paymentModel->update($paymentId, $updateData)) {
+                $message = 'Payment status updated successfully to ' . ucfirst($newStatus);
+
+                if ($newStatus === 'completed') {
+                    $holdResult = $this->bookingModel->tryHoldDateAfterDeposit((int) $payment['booking_id']);
+                    if ($holdResult['held'] && str_contains($holdResult['message'], 'now held')) {
+                        $message .= ' ' . $holdResult['message'];
+                    } elseif ($holdResult['conflict']) {
+                        return $this->response->setJSON([
+                            'success' => true,
+                            'message' => $message . ' Warning: ' . $holdResult['message'],
+                            'date_hold' => $holdResult,
+                        ]);
+                    } elseif (! $holdResult['held'] && ! empty($holdResult['message'])) {
+                        $message .= ' ' . $holdResult['message'];
+                    }
+                }
+
                 return $this->response->setJSON([
-                    'success' => true, 
-                    'message' => 'Payment status updated successfully to ' . ucfirst($newStatus)
+                    'success' => true,
+                    'message' => $message,
                 ]);
             } else {
                 return $this->response->setJSON(['success' => false, 'message' => 'Failed to update payment status']);
@@ -2421,6 +2445,8 @@ class AdminDashboard extends Controller
         
         // Payment is complete if total (completed + pending) covers the cost
         $isComplete = ($totalPaid + $pendingAmount) >= $totalCost;
+        $depositRequired = $this->bookingModel->getRequiredDepositAmount($booking);
+        $depositMet = $totalPaid + 0.01 >= $depositRequired;
 
         return [
             'is_complete' => $isComplete,
@@ -2428,7 +2454,11 @@ class AdminDashboard extends Controller
             'total_paid' => $totalPaid,
             'pending_amount' => $pendingAmount,
             'remaining_balance' => $remainingBalance,
-            'payment_percentage' => $totalCost > 0 ? round((($totalPaid + $pendingAmount) / $totalCost) * 100, 1) : 0
+            'payment_percentage' => $totalCost > 0 ? round((($totalPaid + $pendingAmount) / $totalCost) * 100, 1) : 0,
+            'deposit_required' => $depositRequired,
+            'deposit_met' => $depositMet,
+            'date_held' => ! empty($booking['date_held']),
+            'date_hold_label' => ! empty($booking['date_held']) ? 'Date held' : 'Awaiting deposit',
         ];
     }
 

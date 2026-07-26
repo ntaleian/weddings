@@ -91,6 +91,28 @@ $this->setData([
                     <span class="badge <?= $statusBadgeClass ?>" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
                         <i class="fas <?= $statusIcon ?>"></i> <?= ucfirst($booking['status']) ?>
                     </span>
+                    <?php
+                    $paymentStatus = $paymentStatus ?? [];
+                    $dateHeld = ! empty($booking['date_held']) || ! empty($paymentStatus['date_held']);
+                    $dateHoldLabel = $paymentStatus['date_hold_label'] ?? ($dateHeld ? 'Date held' : 'Awaiting deposit');
+                    $depositRequired = (float) ($paymentStatus['deposit_required'] ?? 300000);
+                    $depositPaid = (float) ($paymentStatus['total_paid'] ?? 0);
+                    ?>
+                    <?php if (($booking['status'] ?? '') === 'pending'): ?>
+                        <span class="badge <?= $dateHeld ? 'badge-success' : 'badge-warning' ?>" style="font-size: 0.85rem; padding: 0.4rem 0.85rem; margin-left: 0.35rem;">
+                            <i class="fas <?= $dateHeld ? 'fa-calendar-check' : 'fa-hourglass-half' ?>"></i>
+                            <?= esc($dateHoldLabel) ?>
+                        </span>
+                        <?php if (! $dateHeld): ?>
+                            <div style="margin-top: 0.4rem; color: #6c757d; font-size: 0.85rem;">
+                                Deposit verified: UGX <?= number_format(min($depositPaid, $depositRequired), 0) ?> / <?= number_format($depositRequired, 0) ?>
+                            </div>
+                        <?php elseif (! empty($booking['date_held_at'])): ?>
+                            <div style="margin-top: 0.4rem; color: #6c757d; font-size: 0.85rem;">
+                                Held since <?= date('M j, Y g:i A', strtotime($booking['date_held_at'])) ?>
+                            </div>
+                        <?php endif; ?>
+                    <?php endif; ?>
                 </div>
             </div>
             <div>

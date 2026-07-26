@@ -23,7 +23,7 @@ if (!empty($booking['admin_documents_checklist'])) {
             <h2><i class="fas fa-money-bill-wave"></i> Payment status</h2>
             <p>
                 <?php if ($hasActiveBooking): ?>
-                    Complete your payment to confirm your wedding booking.
+                    Pay the non-refundable deposit to hold your preferred date, then complete the remaining balance.
                 <?php else: ?>
                     Payment becomes available after your application has been submitted.
                 <?php endif; ?>
@@ -34,6 +34,22 @@ if (!empty($booking['admin_documents_checklist'])) {
         <div class="payment-amount">
             UGX <?= number_format($weddingFee) ?>
         </div>
+
+        <?php if ($hasActiveBooking): ?>
+        <div class="text-center" style="margin-bottom: 12px;">
+            <?php if (! empty($dateHeld)): ?>
+                <span class="payment-status status-paid">
+                    <i class="fas fa-calendar-check"></i>
+                    Date held
+                </span>
+            <?php else: ?>
+                <span class="payment-status status-pending">
+                    <i class="fas fa-hourglass-half"></i>
+                    Awaiting deposit (UGX <?= number_format($depositRequired ?? 300000) ?> non-refundable)
+                </span>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
 
         <!-- Payment Status -->
         <div class="text-center">
@@ -116,7 +132,13 @@ if (!empty($booking['admin_documents_checklist'])) {
                                 <i class="fas fa-exclamation-circle"></i>
                             </div>
                             <div class="alert-content">
-                                The first 50% booking fee (UGX 300,000) is non-refundable. Attach your payment receipt when submitting payment details.
+                                <?php if (empty($dateHeld)): ?>
+                                    Your preferred date is <strong>not held</strong> until the non-refundable deposit
+                                    (UGX <?= number_format($depositRequired ?? 300000) ?>) is paid and verified by admin.
+                                    If you are a Watoto member, also upload your cell leader letter under Documents.
+                                <?php else: ?>
+                                    Deposit verified — your preferred date is held. Complete the remaining balance before final approval.
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -136,13 +158,19 @@ if (!empty($booking['admin_documents_checklist'])) {
                                        id="amount" 
                                        name="amount" 
                                        min="1000" 
-                                       max="<?= $remainingBalance ?? ($weddingFee - $totalPaid - ($pendingAmount ?? 0)) ?>"
-                                       value="<?= $remainingBalance ?? ($weddingFee - $totalPaid - ($pendingAmount ?? 0)) ?>"
-                                       readonly
+                                       max="<?= (float) ($remainingBalance ?? 0) ?>"
+                                       step="1"
+                                       value="<?= (float) ($suggestedPayment ?? $remainingBalance ?? 0) ?>"
                                        required
-                                       title="This amount is automatically calculated based on your remaining balance">
+                                       title="Enter the amount you paid (deposit or remaining balance)">
                                 <small class="text-muted" style="font-size: 0.8rem; display: block; margin-top: 4px;">
-                                    <i class="fas fa-info-circle"></i> This is the exact amount you need to pay (remaining balance)
+                                    <i class="fas fa-info-circle"></i>
+                                    <?php if (empty($dateHeld) && ($depositOutstanding ?? 0) > 0): ?>
+                                        Suggested deposit now: UGX <?= number_format($suggestedPayment ?? 0) ?>.
+                                        You may pay any amount up to the remaining balance of UGX <?= number_format($remainingBalance ?? 0) ?>.
+                                    <?php else: ?>
+                                        Remaining balance: UGX <?= number_format($remainingBalance ?? 0) ?>.
+                                    <?php endif; ?>
                                 </small>
                             </div>
                             

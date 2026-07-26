@@ -115,6 +115,8 @@ class WeddingAppTestSchema extends Migration
             'status'           => ['type' => 'varchar', 'constraint' => 20, 'default' => 'draft'],
             'total_cost'       => ['type' => 'decimal', 'constraint' => '10,2', 'default' => 0],
             'payment_status'   => ['type' => 'varchar', 'constraint' => 20, 'default' => 'pending'],
+            'date_held'        => ['type' => 'integer', 'constraint' => 1, 'default' => 0],
+            'date_held_at'     => ['type' => 'datetime', 'null' => true],
             'admin_notes'      => ['type' => 'text', 'null' => true],
             'created_at'       => ['type' => 'datetime', 'null' => true],
             'updated_at'       => ['type' => 'datetime', 'null' => true],

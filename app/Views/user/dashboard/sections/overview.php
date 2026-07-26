@@ -1,5 +1,13 @@
 <!-- Payment Pending Alert -->
 <?php if (isset($paymentInfo) && $paymentInfo && !$paymentInfo['isFullyPaid'] && ($hasSubmittedApplication ?? false)): ?>
+<?php
+$dateHeld = ! empty($paymentInfo['dateHeld']);
+$depositRequired = (float) ($paymentInfo['depositRequired'] ?? 300000);
+$alertTitle = $dateHeld ? 'Complete Remaining Payment' : 'Deposit Required to Hold Date';
+$ctaLabel = $dateHeld
+    ? ($paymentInfo['totalPaid'] > 0 ? 'Complete Payment' : 'Make Payment')
+    : 'Pay Deposit';
+?>
 <div class="payment-alert" style="background: #c0392b; color: white; padding: 25px 30px; border-radius: 16px; margin-bottom: 30px; box-shadow: 0 4px 20px rgba(192, 57, 43, 0.35); display: flex; align-items: center; justify-content: space-between; gap: 20px; animation: pulse 2s infinite;">
     <div style="flex: 1;">
         <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
@@ -7,14 +15,17 @@
                 <i class="fas fa-exclamation-triangle"></i>
             </div>
             <div>
-                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 700;">Payment Required</h3>
+                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 700;"><?= esc($alertTitle) ?></h3>
                 <p style="margin: 5px 0 0 0; opacity: 0.95; font-size: 1rem;">
                     <?php if ($paymentInfo['status'] === 'pending_verification'): ?>
-                        Your payment is pending verification. Once verified, your application will proceed.
+                        Your payment is pending verification.
+                        <?= $dateHeld ? 'Once verified, your balance will update.' : 'Once the deposit is verified, your preferred date will be held.' ?>
+                    <?php elseif ($dateHeld): ?>
+                        Deposit verified — your preferred date is held. Please complete the remaining balance.
                     <?php elseif ($paymentInfo['status'] === 'partial'): ?>
-                        You have made a partial payment. Please complete your payment to proceed.
+                        Partial payment received. Pay the remaining deposit (UGX <?= number_format($depositRequired, 0) ?> total non-refundable) so your preferred date can be held.
                     <?php else: ?>
-                        Payment is required to proceed with your application approval.
+                        Pay the non-refundable deposit (UGX <?= number_format($depositRequired, 0) ?>). Your preferred date is not held until this is verified.
                     <?php endif; ?>
                 </p>
             </div>
@@ -23,6 +34,10 @@
             <div>
                 <span style="opacity: 0.9; font-size: 0.9rem;">Total Amount:</span>
                 <strong style="font-size: 1.1rem; margin-left: 8px;">UGX <?= number_format($paymentInfo['totalCost'], 0) ?></strong>
+            </div>
+            <div>
+                <span style="opacity: 0.9; font-size: 0.9rem;">Date status:</span>
+                <strong style="font-size: 1.1rem; margin-left: 8px;"><?= esc($paymentInfo['dateHoldLabel'] ?? ($dateHeld ? 'Date held' : 'Awaiting deposit')) ?></strong>
             </div>
             <?php if ($paymentInfo['totalPaid'] > 0): ?>
             <div>
@@ -36,6 +51,12 @@
                 <strong style="font-size: 1.1rem; margin-left: 8px; color: #f1c40f;">UGX <?= number_format($paymentInfo['pendingAmount'], 0) ?></strong>
             </div>
             <?php endif; ?>
+            <?php if (! $dateHeld): ?>
+            <div>
+                <span style="opacity: 0.9; font-size: 0.9rem;">Deposit:</span>
+                <strong style="font-size: 1.1rem; margin-left: 8px;">UGX <?= number_format($paymentInfo['totalPaid'], 0) ?> / <?= number_format($depositRequired, 0) ?></strong>
+            </div>
+            <?php endif; ?>
             <div>
                 <span style="opacity: 0.9; font-size: 0.9rem;">Remaining Balance:</span>
                 <strong style="font-size: 1.2rem; margin-left: 8px;">UGX <?= number_format($paymentInfo['remainingBalance'], 0) ?></strong>
@@ -45,7 +66,7 @@
     <div>
         <a href="<?= site_url('dashboard/payment') ?>" class="btn" style="background: white; color: #008C15; padding: 12px 30px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.3s ease; white-space: nowrap; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);">
             <i class="fas fa-credit-card" style="margin-right: 8px;"></i>
-            <?= $paymentInfo['totalPaid'] > 0 ? 'Complete Payment' : 'Make Payment' ?>
+            <?= esc($ctaLabel) ?>
         </a>
     </div>
 </div>
@@ -115,6 +136,11 @@ $paymentStatusLabel = [
             <div class="status-badge status-<?= $applicationStatus ?? 'pending' ?>">
                 Status: <?= ucfirst($applicationStatus ?? 'Pending') ?>
             </div>
+            <?php if (($applicationStatus ?? 'pending') === 'pending' && ! empty($paymentInfo)): ?>
+                <div class="status-badge <?= ! empty($paymentInfo['dateHeld']) ? 'status-approved' : 'status-pending' ?>" style="margin-top: 8px;">
+                    <?= esc($paymentInfo['dateHoldLabel'] ?? (! empty($paymentInfo['dateHeld']) ? 'Date held' : 'Awaiting deposit')) ?>
+                </div>
+            <?php endif; ?>
         <?php elseif ($hasDraft): ?>
             <p>Your application is saved. Resume from step <?= esc((string) $currentStep) ?>: <?= esc($currentStepLabel) ?>.</p>
         <?php else: ?>
@@ -754,7 +780,12 @@ $progress = isset($progress) ? $progress : 0;
         </div>
         <div class="card-content">
             <h4>Payment status</h4>
-            <p><?= esc($paymentStatusLabel) ?></p>
+            <p>
+                <?= esc($paymentStatusLabel) ?>
+                <?php if (! empty($paymentInfo) && ($applicationStatus ?? 'pending') === 'pending'): ?>
+                    · <?= esc($paymentInfo['dateHoldLabel'] ?? (! empty($paymentInfo['dateHeld']) ? 'Date held' : 'Awaiting deposit')) ?>
+                <?php endif; ?>
+            </p>
             <a href="<?= site_url('dashboard/payment') ?>" class="btn btn-outline btn-sm">Open Payments</a>
         </div>
     </div>

@@ -34,7 +34,8 @@ class BookingModel extends Model
         'witness1_name', 'witness1_phone', 'witness1_occupation', 'witness1_id_number', 'witness1_marital_status',
         'witness2_name', 'witness2_phone', 'witness2_occupation', 'witness2_id_number', 'witness2_marital_status',
         'premarital_counseling', 'counseling_pastor', 'pastor_recommendation',
-        'accept_terms', 'application_step', 'is_draft', 'status', 'total_cost', 'payment_status', 'admin_notes',
+        'accept_terms', 'application_step', 'is_draft', 'status', 'total_cost', 'payment_status',
+        'date_held', 'date_held_at', 'admin_notes',
         // Admin-managed fields
         'admin_counseling_status', 'admin_counseling_pastor_id', 'admin_counseling_sessions',
         'admin_counseling_completion_date', 'admin_counseling_notes', 'admin_documents_checklist',
@@ -142,9 +143,14 @@ class BookingModel extends Model
 
     public function isDateAvailable($campusId, $date, $excludeBookingId = null)
     {
+        // Only date-held or approved bookings lock a campus date for others.
         $query = $this->where('campus_id', $campusId)
                      ->where('wedding_date', $date)
-                     ->whereIn('status', ['pending', 'approved']);
+                     ->groupStart()
+                        ->where('date_held', 1)
+                        ->orWhere('status', 'approved')
+                     ->groupEnd()
+                     ->whereNotIn('status', ['rejected', 'cancelled', 'draft']);
 
         if ($excludeBookingId) {
             $query->where('id !=', $excludeBookingId);
@@ -476,18 +482,100 @@ class BookingModel extends Model
         if (!$this->isDateAvailable($campusId, $date, $excludeBookingId)) {
             return false;
         }
-        
-        // Check if time slot is already booked
+
+        // Check if time slot is already held/approved
         $query = $this->where('campus_id', $campusId)
                      ->where('wedding_date', $date)
                      ->where('wedding_time', $time)
-                     ->whereIn('status', ['pending', 'approved']);
-        
+                     ->groupStart()
+                        ->where('date_held', 1)
+                        ->orWhere('status', 'approved')
+                     ->groupEnd()
+                     ->whereNotIn('status', ['rejected', 'cancelled', 'draft']);
+
         if ($excludeBookingId) {
             $query->where('id !=', $excludeBookingId);
         }
-        
+
         return $query->countAllResults() === 0;
+    }
+
+    /**
+     * Non-refundable deposit required before preferred date is held.
+     */
+    public function getRequiredDepositAmount(?array $booking = null): float
+    {
+        $settingsModel = new \App\Models\SettingsModel();
+        $fallback = (float) $settingsModel->getSetting('deposit_amount', 300000);
+
+        if (!$booking || empty($booking['total_cost'])) {
+            return $fallback;
+        }
+
+        $halfCost = round(((float) $booking['total_cost']) * 0.5, 2);
+
+        return max($fallback, $halfCost);
+    }
+
+    /**
+     * Attempt to hold the preferred date after verified deposit payments meet the threshold.
+     *
+     * @return array{held: bool, message: string, conflict: bool}
+     */
+    public function tryHoldDateAfterDeposit(int $bookingId): array
+    {
+        $booking = $this->find($bookingId);
+        if (!$booking) {
+            return ['held' => false, 'message' => 'Booking not found.', 'conflict' => false];
+        }
+
+        if (! empty($booking['date_held'])) {
+            return ['held' => true, 'message' => 'Date is already held.', 'conflict' => false];
+        }
+
+        if (in_array(($booking['status'] ?? ''), ['rejected', 'cancelled'], true)) {
+            return ['held' => false, 'message' => 'Cannot hold date for a rejected or cancelled booking.', 'conflict' => false];
+        }
+
+        $paymentModel = new \App\Models\PaymentModel();
+        $totalPaid = (float) $paymentModel->getTotalPaid($bookingId);
+        $depositRequired = $this->getRequiredDepositAmount($booking);
+
+        if ($totalPaid + 0.01 < $depositRequired) {
+            return [
+                'held' => false,
+                'message' => 'Deposit not yet met. Verified payments: UGX ' . number_format($totalPaid)
+                    . ' of UGX ' . number_format($depositRequired) . ' required.',
+                'conflict' => false,
+            ];
+        }
+
+        $venueType = $booking['venue_type'] ?? 'campus';
+        if ($venueType === 'campus' && ! empty($booking['campus_id']) && ! empty($booking['wedding_date'])) {
+            $time = $booking['wedding_time'] ?? null;
+            $available = $time
+                ? $this->isTimeSlotAvailable($booking['campus_id'], $booking['wedding_date'], $time, $bookingId)
+                : $this->isDateAvailable($booking['campus_id'], $booking['wedding_date'], $bookingId);
+
+            if (! $available) {
+                return [
+                    'held' => false,
+                    'message' => 'Deposit verified, but the preferred campus date/time is no longer available. Ask the couple to choose another date.',
+                    'conflict' => true,
+                ];
+            }
+        }
+
+        $this->update($bookingId, [
+            'date_held' => 1,
+            'date_held_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        return [
+            'held' => true,
+            'message' => 'Deposit verified. Preferred wedding date is now held.',
+            'conflict' => false,
+        ];
     }
 
     /**

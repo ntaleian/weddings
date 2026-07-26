@@ -60,10 +60,19 @@ class PaymentModel extends Model
 
     protected function updateBookingPaymentStatusCallback(array $data)
     {
-        if (isset($data['data']['booking_id'])) {
-            $bookingId = $data['data']['booking_id'];
-            $this->updateBookingPaymentStatus($bookingId);
+        $bookingId = $data['data']['booking_id'] ?? null;
+
+        // Updates often only include status — resolve booking_id from the payment row.
+        if ($bookingId === null && ! empty($data['id'])) {
+            $ids = is_array($data['id']) ? $data['id'] : [$data['id']];
+            $payment = $this->find($ids[0] ?? null);
+            $bookingId = $payment['booking_id'] ?? null;
         }
+
+        if ($bookingId) {
+            $this->updateBookingPaymentStatus((int) $bookingId);
+        }
+
         return $data;
     }
 
@@ -151,6 +160,7 @@ class PaymentModel extends Model
             }
 
             $bookingModel->update($bookingId, ['payment_status' => $paymentStatus]);
+            $bookingModel->tryHoldDateAfterDeposit((int) $bookingId);
         } catch (\Exception $e) {
             log_message('error', 'Error updating booking payment status: ' . $e->getMessage());
             // Don't throw the exception - just log it so the payment insert doesn't fail

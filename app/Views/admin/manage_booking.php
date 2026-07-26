@@ -49,7 +49,15 @@
                                 <tr>
                                     <td><strong>Status:</strong></td>
                                     <td>
-                                        <span class="badge badge-success"><?= ucfirst($booking['status']) ?></span>
+                                        <span class="badge badge-<?= ($booking['status'] ?? '') === 'approved' ? 'success' : 'warning' ?>">
+                                            <?= ucfirst($booking['status']) ?>
+                                        </span>
+                                        <?php if (($booking['status'] ?? '') === 'pending'): ?>
+                                            <?php $dateHeld = ! empty($booking['date_held']); ?>
+                                            <span class="badge badge-<?= $dateHeld ? 'success' : 'warning' ?>" style="margin-left: 4px;">
+                                                <?= $dateHeld ? 'Date held' : 'Awaiting deposit' ?>
+                                            </span>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                                 <tr>
@@ -291,6 +299,8 @@
                         'national_id_matron' => 'National ID - Matron',
                         'marriage_certificate_best_man' => 'Marriage Certificate - Best Man',
                         'marriage_certificate_matron' => 'Marriage Certificate - Matron',
+                        'cell_leader_letter_bride' => 'Cell Leader Letter - Bride (if Watoto member)',
+                        'cell_leader_letter_groom' => 'Cell Leader Letter - Groom (if Watoto member)',
                         'recommendation_bride_church' => 'Recommendation Letter - Bride\'s Church (if not Watoto member)',
                         'recommendation_groom_church' => 'Recommendation Letter - Groom\'s Church (if not Watoto member)',
                         'recommendation_best_man' => 'Recommendation Letter - Best Man (if not Watoto member)',

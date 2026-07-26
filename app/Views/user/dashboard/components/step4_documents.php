@@ -101,7 +101,8 @@ $documentsAcknowledged = old(
 
     <div class="documents-intro">
         Document uploads are completed after submission because uploads are attached to your
-        submitted booking record. Use this step to confirm you know what to prepare.
+        submitted booking record. Watoto members must upload a cell leader letter; non-members need a church recommendation letter.
+        Use this step to confirm you know what to prepare.
     </div>
 
     <div class="documents-grid">
