@@ -28,9 +28,6 @@
                     <i class="fas fa-sign-in-alt"></i>
                     <span>Login</span>
                 </a>
-                <a href="<?= base_url('admin/login') ?>" class="main-nav-icon" title="Admin Login" target="_blank">
-                    <i class="fas fa-user-shield"></i>
-                </a>
             <?php endif; ?>
         </div>
         
@@ -69,10 +66,6 @@
                 <a href="<?= base_url('login') ?>" class="main-mobile-link main-mobile-btn main-mobile-btn-primary">
                     <i class="fas fa-sign-in-alt"></i>
                     <span>Login</span>
-                </a>
-                <a href="<?= base_url('admin/login') ?>" class="main-mobile-link" title="Admin Login" target="_blank">
-                    <i class="fas fa-user-shield"></i>
-                    <span>Admin Login</span>
                 </a>
             <?php endif; ?>
         </div>

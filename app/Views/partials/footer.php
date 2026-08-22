@@ -20,11 +20,6 @@
         </div>
         <div class="footer-bottom">
             <p>&copy; <?= date('Y') ?> Watoto Church. All rights reserved.</p>
-            <div class="admin-access">
-                <a href="<?= base_url('admin/login') ?>" class="admin-link" title="Admin Access" target="_blank">
-                    <i class="fas fa-user-shield"></i>
-                </a>
-            </div>
         </div>
     </div>
 </footer>
