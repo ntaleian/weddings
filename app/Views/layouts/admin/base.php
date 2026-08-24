@@ -25,6 +25,7 @@
     <?= $this->renderSection('styles') ?>
 </head>
 <body>
+    <?= $this->include('partials/test_site_banner') ?>
     <?= $this->renderSection('content') ?>
     
     <?= $this->renderSection('scripts') ?>

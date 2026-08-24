@@ -25,6 +25,7 @@
     </style>
 </head>
 <body>
+    <?= $this->include('partials/test_site_banner') ?>
     <?= $this->renderSection('content') ?>
     
     <!-- Bootstrap JS -->

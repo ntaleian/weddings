@@ -426,6 +426,7 @@
     </style>
 </head>
 <body>
+    <?= $this->include('partials/test_site_banner') ?>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <?= $this->renderSection('content') ?>
     
