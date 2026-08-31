@@ -28,7 +28,7 @@
         <!-- Flash Messages -->
         <?= $this->include('partials/flash_messages') ?>
 
-        <form class="register-form" method="post" action="<?= base_url('register') ?>" autocomplete="off" id="registerForm">
+        <form class="register-form" method="post" action="" autocomplete="off" id="registerForm">
             <?= csrf_field() ?>
 
             <div class="form-field wedding-role-field">
@@ -767,7 +767,8 @@
                 headers[csrfHeader] = csrfValue;
             }
             
-            fetch('<?= site_url('refresh-captcha') ?>', {
+            // Relative URL keeps captcha refresh on the same host/path as this page.
+            fetch('refresh-captcha', {
                 method: 'POST',
                 headers: headers,
                 body: formData,

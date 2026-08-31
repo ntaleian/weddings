@@ -63,7 +63,7 @@ Verify Your Email - Watoto Church Wedding Booking
         <!-- Flash Messages -->
         <?= $this->include('partials/flash_messages') ?>
 
-        <form class="verify-form" action="<?= site_url('process-email-verification') ?>" method="POST" autocomplete="off" id="verification-form">
+        <form class="verify-form" action="process-email-verification" method="POST" autocomplete="off" id="verification-form">
             <?= csrf_field() ?>
 
             <div class="form-field">
@@ -100,7 +100,7 @@ Verify Your Email - Watoto Church Wedding Booking
             </div>
             <div class="resend-section">
                 <span class="resend-text">Didn't receive the code?</span>
-                <form action="<?= site_url('resend-otp') ?>" method="POST" class="resend-form">
+                <form action="resend-otp" method="POST" class="resend-form">
                     <?= csrf_field() ?>
                     <button type="submit" class="resend-btn">
                         <i class="fas fa-paper-plane"></i>

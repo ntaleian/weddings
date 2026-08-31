@@ -82,5 +82,6 @@ class Security extends BaseConfig
      *
      * @see https://codeigniter4.github.io/userguide/libraries/security.html#redirection-on-failure
      */
-    public bool $redirect = false; // Don't redirect on AJAX requests, throw exception instead
+    // CSRF filter still throws on AJAX; non-AJAX form posts get a friendly redirect.
+    public bool $redirect = true;
 }

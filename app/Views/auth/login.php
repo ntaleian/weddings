@@ -59,7 +59,7 @@
         <!-- Flash Messages -->
         <?= $this->include('partials/flash_messages') ?>
 
-        <form class="login-form" method="post" action="<?= base_url('login') ?>" autocomplete="off" id="loginForm">
+        <form class="login-form" method="post" action="" autocomplete="off" id="loginForm">
             <?= csrf_field() ?>
             
             <div class="form-field">

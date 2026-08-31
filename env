@@ -57,6 +57,15 @@ app.baseURL = 'http://localhost/weddings/public/'
 # encryption.key =
 
 #--------------------------------------------------------------------
+# COOKIE
+#--------------------------------------------------------------------
+# Production tip: set app.baseURL to the canonical host users should use.
+# Session/CSRF cookies auto-use ".{apex}" from that host (www + apex share them).
+# Override explicitly if needed:
+# cookie.domain = '.watotochurch.com'
+# cookie.secure = true
+
+#--------------------------------------------------------------------
 # SESSION
 #--------------------------------------------------------------------
 

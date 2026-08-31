@@ -17,7 +17,7 @@
         <!-- Flash Messages -->
         <?= $this->include('partials/flash_messages') ?>
 
-        <form class="admin-login-form" method="post" action="<?= base_url('admin/login') ?>" autocomplete="off">
+        <form class="admin-login-form" method="post" action="" autocomplete="off">
             <?= csrf_field() ?>
             
             <div class="form-field">

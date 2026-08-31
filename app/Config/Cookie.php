@@ -44,6 +44,7 @@ class Cookie extends BaseConfig
      * --------------------------------------------------------------------------
      *
      * Set to `.your-domain.com` for site-wide cookies.
+     * Override via cookie.domain in .env when needed.
      */
     public string $domain = '';
 
@@ -55,6 +56,30 @@ class Cookie extends BaseConfig
      * Cookie will only be set if a secure HTTPS connection exists.
      */
     public bool $secure = false;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $baseURL = config(App::class)->baseURL ?? '';
+        $host    = parse_url($baseURL, PHP_URL_HOST) ?: '';
+
+        // Share session/CSRF cookies across www + apex after domain cutovers.
+        // ponytail: skip testing/localhost; set cookie.domain in .env for multi-tenant hosts.
+        if (
+            $this->domain === ''
+            && ENVIRONMENT !== 'testing'
+            && $host !== ''
+            && ! str_contains($host, 'localhost')
+            && filter_var($host, FILTER_VALIDATE_IP) === false
+        ) {
+            $this->domain = '.' . preg_replace('/^www\./i', '', $host);
+        }
+
+        if (! $this->secure && ENVIRONMENT !== 'testing' && str_starts_with($baseURL, 'https://')) {
+            $this->secure = true;
+        }
+    }
 
     /**
      * --------------------------------------------------------------------------
