@@ -78,7 +78,7 @@
                             <td>
                                 <div class="user-info">
                                     <div class="user-avatar">
-                                        <img src="<?= base_url('public/images/avatars/' . ($user['avatar'] ?? 'default-avatar.png')) ?>" alt="Avatar">
+                                        <img src="<?= base_url('images/avatars/' . ($user['avatar'] ?? 'default-avatar.png')) ?>" alt="Avatar">
                                     </div>
                                     <div class="user-details">
                                         <strong><?= esc($user['first_name'] . ' ' . $user['last_name']) ?></strong>

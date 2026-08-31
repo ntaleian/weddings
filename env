@@ -21,6 +21,9 @@
 #--------------------------------------------------------------------
 
 # app.baseURL = ''
+# Local WAMP: http://localhost/weddings/public/
+# Local spark: http://localhost:8888/
+# Production:  https://watotochurch.com/weddings/public/
 app.baseURL = 'http://localhost/weddings/public/'
 # If you have trouble with `.`, you could also use `_`.
 # app_baseURL = ''

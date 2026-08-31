@@ -1,5 +1,7 @@
 # Disable directory browsing
+# MARKER: weddings-path-v2 (no RewriteBase — works for /weddings/public and /public)
 Options -Indexes
+DirectoryIndex index.php
 
 # ----------------------------------------------------------------------
 # Rewrite engine (CodeIgniter front controller)
@@ -7,40 +9,26 @@ Options -Indexes
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 
-	# RewriteBase must match the URL path to THIS folder (not a nested public/).
-	#
-	# Production (stated URLs include /public):
+	# Omit RewriteBase so both URL shapes work:
+	#   https://watotochurch.com/weddings/public/
 	#   https://weddings.watotochurch.com/public/
-	#   https://weddings.watotochurch.net/public/
-	#   → RewriteBase /public/
-	#   app.baseURL must match, e.g. https://weddings.watotochurch.com/public/
-	#
-	# If DocumentRoot IS this public/ folder (URL has NO /public segment):
-	#   → RewriteBase /   (or omit RewriteBase)
-	#
-	# Local WAMP http://localhost/weddings/public/... :
-	#   → RewriteBase /weddings/public/
-	#
-	# NEVER RewriteRule/Redirect to /public/ from this file — that yields
-	# /public/public/public… and 500. Parent-of-public redirect lives in ../.htaccess.
-	RewriteBase /public/
+	# NEVER redirect to public/ from this file.
 
-	# Redirect Trailing Slashes...
+	# Skip rewrite engine for the exact app root (prevents dir↔slash self-loops)
+	RewriteRule ^$ index.php [L]
+
+	# Trailing-slash redirect — never for the app web root
+	RewriteCond %{REQUEST_URI} !^/weddings/public/?$ [NC]
+	RewriteCond %{REQUEST_URI} !^/public/?$ [NC]
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteCond %{REQUEST_URI} (.+)/$
 	RewriteRule ^ %1 [L,R=301]
 
-	# Optional: canonical host (enable only if you want www stripped; use https on production)
-	# RewriteCond %{HTTPS} =on
-	# RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
-	# RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
-
-	# Existing files/dirs are served as-is; else route to index.php
+	# Existing files/dirs as-is; else front controller
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteRule ^([\s\S]*)$ index.php/$1 [L,NC,QSA]
 
-	# Pass Authorization header to PHP (APIs, basic auth)
 	RewriteCond %{HTTP:Authorization} .
 	RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 </IfModule>
@@ -49,9 +37,6 @@ Options -Indexes
 	ErrorDocument 404 index.php
 </IfModule>
 
-# ----------------------------------------------------------------------
-# PHP upload limits (override php.ini for file uploads)
-# ----------------------------------------------------------------------
 <IfModule mod_php.c>
     php_value upload_max_filesize 10M
     php_value post_max_size 12M
@@ -60,6 +45,3 @@ Options -Indexes
     php_value upload_max_filesize 10M
     php_value post_max_size 12M
 </IfModule>
-
-# ServerSignature: do not set here — many hosts forbid it in .htaccess (causes 500).
-# Configure in the main Apache vhost if needed.

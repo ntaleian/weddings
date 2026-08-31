@@ -91,7 +91,7 @@
                         <label for="pastor_image">Pastor Photo</label>
                         <?php if (!empty($pastor['image_path'])): ?>
                             <div class="current-image mb-2">
-                                <img src="<?= base_url('public/images/pastors/' . $pastor['image_path']) ?>" 
+                                <img src="<?= base_url('images/pastors/' . $pastor['image_path']) ?>" 
                                      alt="Current Pastor Photo" class="img-thumbnail" style="max-width: 150px; border-radius: 8px;">
                                 <p class="text-muted mt-1">Current photo</p>
                             </div>

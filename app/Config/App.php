@@ -15,8 +15,12 @@ class App extends BaseConfig
      * WITH a trailing slash:
      *
      * E.g., http://example.com/
+     *
+     * Overridden by .env `app.baseURL` (do not hardcode production here).
+     * Production path install: https://watotochurch.com/weddings/public/
+     * Local spark serve:       http://localhost:8888/
      */
-    public string $baseURL = 'http://localhost:8888/wedding/public/';
+    public string $baseURL = 'http://localhost/weddings/public/';
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.
@@ -29,7 +33,10 @@ class App extends BaseConfig
      *
      * @var list<string>
      */
-    public array $allowedHostnames = [];
+    public array $allowedHostnames = [
+        'weddings.watotochurch.com',
+        'weddings.watotochurch.net',
+    ];
 
     /**
      * --------------------------------------------------------------------------
@@ -40,7 +47,22 @@ class App extends BaseConfig
      * something else. If you have configured your web server to remove this file
      * from your site URIs, set this variable to an empty string.
      */
-    public string $indexPage = 'index.php';
+    public string $indexPage = '';
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        // ponytail: shared .env may target apex https://watotochurch.com/weddings/public/
+        // while this vhost is weddings.*. /public/. Force host-matched baseURL so
+        // generated links are not /weddings/public/public/...
+        $host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+        $host = preg_replace('/:\\d+$/', '', $host) ?: $host;
+        if ($host === 'weddings.watotochurch.com' || $host === 'weddings.watotochurch.net') {
+            $this->baseURL   = 'https://' . $host . '/public/';
+            $this->indexPage = '';
+        }
+    }
 
     /**
      * --------------------------------------------------------------------------

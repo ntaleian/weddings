@@ -22,7 +22,7 @@ $pageActions = ob_get_clean();
     <!-- Campus Information Card -->
     <div class="card campus-info-card mb-3">
         <div class="campus-image-section">
-            <img src="<?= base_url('public/images/campuses/' . ($campus['image_path'] ?? 'default-campus.jpg')) ?>" 
+            <img src="<?= base_url('images/campuses/' . ($campus['image_path'] ?? 'default-campus.jpg')) ?>" 
                  alt="<?= esc($campus['name']) ?>" class="campus-detail-image">
             <div class="campus-status-overlay">
                 <span class="badge <?= $campus['is_active'] ? 'badge-success' : 'badge-secondary' ?>">

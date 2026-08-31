@@ -53,7 +53,7 @@
             <?php foreach ($campuses as $campus): ?>
             <div class="campus-card" data-campus="<?= $campus['id'] ?>" onclick="selectCampus('<?= $campus['id'] ?>')">
                 <div class="campus-image">
-                    <img src="<?= base_url('public/images/campuses/' . $campus['image_path']) ?>" alt="<?= $campus['name'] ?>">
+                    <img src="<?= base_url('images/campuses/' . $campus['image_path']) ?>" alt="<?= $campus['name'] ?>">
                 </div>
                 <div class="campus-info">
                     <h4><?= $campus['name'] ?></h4>

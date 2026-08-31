@@ -1139,7 +1139,7 @@
                     <div class="venue-card">
                         <div class="venue-image">
                             <?php if (!empty($campus['image_path'])): ?>
-                                <img src="<?= base_url('public/images/campuses/'.$campus['image_path']) ?>" alt="<?= esc($campus['name']) ?>">
+                                <img src="<?= base_url('images/campuses/' . $campus['image_path']) ?>" alt="<?= esc($campus['name']) ?>">
                             <?php else: ?>
                                 <img src="<?= base_url('images/no-img.png') ?>" alt="<?= esc($campus['name']) ?>">
                             <?php endif; ?>

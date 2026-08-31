@@ -1,15 +1,23 @@
-# Parent of public/ — only applies when DocumentRoot is THIS project folder
-# (so the site is reached as https://host/public/...).
+# Parent of public/ — DocumentRoot is THIS project folder.
+# MARKER: weddings-path-v3-apex
 #
-# php spark serve ignores .htaccess — safe for local spark.
-# Do NOT copy the / → public/ redirect into public/.htaccess (causes /public/public/…).
-#
-# Local WAMP at http://localhost/weddings/ : relative "public/" → /weddings/public/
-# Production docroot = project root: "/" → "/public/"
+# Absolute [R] paths only — relative "public/" leaks filesystem paths.
+# Host-aware: apex path install vs subdomain /public/.
 
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 
-	# Bare site root → CI4 web root (one hop; relative so subfolder installs work)
-	RewriteRule ^$ public/ [R=302,L]
+	# --- https://watotochurch.com/weddings/... ---
+	RewriteCond %{HTTP_HOST} ^(www\.)?watotochurch\.com$ [NC]
+	RewriteRule ^public/public(?:/(.*))?$ /weddings/public/$1 [R=301,L]
+
+	RewriteCond %{HTTP_HOST} ^(www\.)?watotochurch\.com$ [NC]
+	RewriteRule ^$ /weddings/public/ [R=302,L]
+
+	# --- https://weddings.watotochurch.com|net/... ---
+	RewriteCond %{HTTP_HOST} ^weddings\.watotochurch\.(com|net)$ [NC]
+	RewriteRule ^public/public(?:/(.*))?$ /public/$1 [R=301,L]
+
+	RewriteCond %{HTTP_HOST} ^weddings\.watotochurch\.(com|net)$ [NC]
+	RewriteRule ^$ /public/ [R=302,L]
 </IfModule>

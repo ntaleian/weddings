@@ -1,11 +1,22 @@
 <?php
+/**
+ * Toast on *.watotochurch.net → live site on watotochurch.com/weddings/public/
+ * MARKER: toast-v5-apex
+ */
 $host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+$host = preg_replace('/:\d+$/', '', $host) ?? $host;
 if ($host === '' || ! str_contains($host, 'watotochurch.net')) {
     return;
 }
 
-$requestUri = (string) ($_SERVER['REQUEST_URI'] ?? '/weddings/public/');
-$liveUrl = 'https://weddings.watotochurch.com' . $requestUri;
+$path = (string) (parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/');
+// Test: /public/...  Live: /weddings/public/...
+if (str_starts_with($path, '/public')) {
+    $path = '/weddings' . $path;
+} elseif (! str_starts_with($path, '/weddings/')) {
+    $path = '/weddings/public/' . ltrim($path, '/');
+}
+$liveUrl = 'https://watotochurch.com' . $path;
 ?>
 <style>
 .test-site-toast {

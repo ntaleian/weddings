@@ -39,7 +39,7 @@
                     <div class="current-image mb-4">
                         <h3 class="form-section-title">Current Image</h3>
                         <div class="image-preview-container">
-                            <img src="<?= base_url('public/images/campuses/' . ($campus['image_path'] ?? 'default-campus.jpg')) ?>" 
+                            <img src="<?= base_url('images/campuses/' . ($campus['image_path'] ?? 'default-campus.jpg')) ?>" 
                                  alt="<?= esc($campus['name']) ?>" 
                                  class="current-campus-image" 
                                  id="imagePreview">
