@@ -1,0 +1,15 @@
+# Parent of public/ — only applies when DocumentRoot is THIS project folder
+# (so the site is reached as https://host/public/...).
+#
+# php spark serve ignores .htaccess — safe for local spark.
+# Do NOT copy the / → public/ redirect into public/.htaccess (causes /public/public/…).
+#
+# Local WAMP at http://localhost/weddings/ : relative "public/" → /weddings/public/
+# Production docroot = project root: "/" → "/public/"
+
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+
+	# Bare site root → CI4 web root (one hop; relative so subfolder installs work)
+	RewriteRule ^$ public/ [R=302,L]
+</IfModule>

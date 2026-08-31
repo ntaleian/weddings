@@ -7,14 +7,23 @@ Options -Indexes
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 
-	# RewriteBase: ONLY if routes/CSS return 404 or you see 500/rewrite loops.
+	# RewriteBase must match the URL path to THIS folder (not a nested public/).
 	#
-	# Production (DocumentRoot = this public/ folder, URL like https://weddings.watotochurch.net/...):
-	#   Leave the next line commented out (Apache infers the base), OR use:
-	#   RewriteBase /
+	# Production (stated URLs include /public):
+	#   https://weddings.watotochurch.com/public/
+	#   https://weddings.watotochurch.net/public/
+	#   → RewriteBase /public/
+	#   app.baseURL must match, e.g. https://weddings.watotochurch.com/public/
 	#
-	# Local WAMP with URL http://localhost/weddings/public/... uncomment:
-	#   RewriteBase /weddings/public/
+	# If DocumentRoot IS this public/ folder (URL has NO /public segment):
+	#   → RewriteBase /   (or omit RewriteBase)
+	#
+	# Local WAMP http://localhost/weddings/public/... :
+	#   → RewriteBase /weddings/public/
+	#
+	# NEVER RewriteRule/Redirect to /public/ from this file — that yields
+	# /public/public/public… and 500. Parent-of-public redirect lives in ../.htaccess.
+	RewriteBase /public/
 
 	# Redirect Trailing Slashes...
 	RewriteCond %{REQUEST_FILENAME} !-d

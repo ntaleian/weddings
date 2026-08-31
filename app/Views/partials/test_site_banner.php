@@ -5,7 +5,7 @@ if ($host === '' || ! str_contains($host, 'watotochurch.net')) {
 }
 
 $requestUri = (string) ($_SERVER['REQUEST_URI'] ?? '/weddings/public/');
-$liveUrl = 'https://watotochurch.com' . $requestUri;
+$liveUrl = 'https://weddings.watotochurch.com' . $requestUri;
 ?>
 <style>
 .test-site-toast {
