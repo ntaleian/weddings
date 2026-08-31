@@ -422,49 +422,126 @@ class BookingModel extends Model
     }
 
     /**
-     * Check if time slot is valid (9 AM, 11 AM, or 1 PM)
-     * @param string $time Time in H:i format
-     * @return array ['valid' => bool, 'message' => string]
+     * Normalize a time string to H:i (zero-padded).
      */
-    public function isTimeSlotValid($time)
+    public function normalizeWeddingTime(string $time): string
+    {
+        $parts = explode(':', $time);
+
+        return sprintf('%02d:%02d', (int) ($parts[0] ?? 0), (int) ($parts[1] ?? 0));
+    }
+
+    /**
+     * Human-readable ceremony start label, e.g. "9:00 AM".
+     */
+    public function formatTimeSlotDisplay(string $slot): string
+    {
+        $normalized = $this->normalizeWeddingTime($slot);
+        [$hour, $minute] = array_map('intval', explode(':', $normalized));
+        $ampm        = $hour >= 12 ? 'PM' : 'AM';
+        $displayHour = $hour % 12;
+        if ($displayHour === 0) {
+            $displayHour = 12;
+        }
+
+        return sprintf('%d:%02d %s', $displayHour, $minute, $ampm);
+    }
+
+    /**
+     * Configured ceremony start times from settings (H:i).
+     *
+     * @return list<string>
+     */
+    public function getConfiguredTimeSlots(): array
     {
         $settingsModel = new \App\Models\SettingsModel();
-        $timeSlots = $settingsModel->getSetting('wedding_time_slots', ['09:00', '11:00', '13:00']);
-        
-        // If it's already an array (from castSettingValue), use it directly
-        // Otherwise, try to decode it (for backward compatibility)
+        $timeSlots     = $settingsModel->getSetting('wedding_time_slots', ['09:00', '11:00', '13:00']);
+
         if (is_array($timeSlots)) {
             $allowedSlots = $timeSlots;
         } else {
-            $allowedSlots = json_decode($timeSlots, true);
-            if (!is_array($allowedSlots)) {
+            $allowedSlots = json_decode((string) $timeSlots, true);
+            if (! is_array($allowedSlots)) {
                 $allowedSlots = ['09:00', '11:00', '13:00'];
             }
         }
-        
-        // Normalize time format (handle H:i:s or H:i)
-        $timeParts = explode(':', $time);
-        $normalizedTime = $timeParts[0] . ':' . $timeParts[1];
-        
-        if (!in_array($normalizedTime, $allowedSlots)) {
-            $formattedSlots = implode(', ', array_map(function($slot) {
-                $hour = (int)$slot;
-                $ampm = $hour >= 12 ? 'PM' : 'AM';
-                $displayHour = $hour > 12 ? $hour - 12 : ($hour == 0 ? 12 : $hour);
-                return $displayHour . ':00 ' . $ampm;
-            }, $allowedSlots));
-            
+
+        return array_values(array_map([$this, 'normalizeWeddingTime'], $allowedSlots));
+    }
+
+    /**
+     * True when $date is the last Saturday of its calendar month (National Cleaning Day in Uganda).
+     */
+    public function isLastSaturdayOfMonth(string $date): bool
+    {
+        $dt = new \DateTime($date . ' 00:00:00');
+        if ((int) $dt->format('w') !== 6) {
+            return false;
+        }
+
+        $lastSaturday = new \DateTime('last saturday of ' . $dt->format('F Y'));
+
+        return $dt->format('Y-m-d') === $lastSaturday->format('Y-m-d');
+    }
+
+    /**
+     * Ceremony start times bookable on a given date (H:i).
+     * Last Saturday of the month: mornings before 12:00 are excluded (National Cleaning Day).
+     *
+     * @return list<string>
+     */
+    public function getBookableTimeSlotsForDate(string $date): array
+    {
+        $slots = $this->getConfiguredTimeSlots();
+
+        if (! $this->isLastSaturdayOfMonth($date)) {
+            return $slots;
+        }
+
+        // ponytail: filter only; if settings later add 12:00 it becomes the earliest last-Saturday option automatically
+        return array_values(array_filter(
+            $slots,
+            static fn (string $slot): bool => $slot >= '12:00'
+        ));
+    }
+
+    /**
+     * Check if time slot is valid against configured slots (and date rules when $date given).
+     *
+     * @param string      $time Time in H:i or H:i:s format
+     * @param string|null $date Optional Y-m-d — applies last-Saturday morning block when set
+     *
+     * @return array{valid: bool, message: string, allowed_slots: list<string>}
+     */
+    public function isTimeSlotValid($time, $date = null)
+    {
+        $normalizedTime = $this->normalizeWeddingTime((string) $time);
+        $allowedSlots   = $date !== null
+            ? $this->getBookableTimeSlotsForDate($date)
+            : $this->getConfiguredTimeSlots();
+
+        if ($date !== null && $this->isLastSaturdayOfMonth($date) && $normalizedTime < '12:00') {
             return [
-                'valid' => false,
-                'message' => "Invalid time slot. Available times are: {$formattedSlots}",
-                'allowed_slots' => $allowedSlots
+                'valid'         => false,
+                'message'       => 'On the last Saturday of the month, ceremonies start from 12:00 PM due to National Cleaning Day.',
+                'allowed_slots' => $allowedSlots,
             ];
         }
-        
+
+        if (! in_array($normalizedTime, $allowedSlots, true)) {
+            $formattedSlots = implode(', ', array_map([$this, 'formatTimeSlotDisplay'], $allowedSlots));
+
+            return [
+                'valid'         => false,
+                'message'       => "Invalid time slot. Available times are: {$formattedSlots}",
+                'allowed_slots' => $allowedSlots,
+            ];
+        }
+
         return [
-            'valid' => true,
-            'message' => 'Time slot is valid',
-            'allowed_slots' => $allowedSlots
+            'valid'         => true,
+            'message'       => 'Time slot is valid',
+            'allowed_slots' => $allowedSlots,
         ];
     }
 
@@ -478,6 +555,10 @@ class BookingModel extends Model
      */
     public function isTimeSlotAvailable($campusId, $date, $time, $excludeBookingId = null)
     {
+        if (! $this->isTimeSlotValid($time, $date)['valid']) {
+            return false;
+        }
+
         // First check if date is available
         if (!$this->isDateAvailable($campusId, $date, $excludeBookingId)) {
             return false;
@@ -579,6 +660,32 @@ class BookingModel extends Model
     }
 
     /**
+     * Validate booking date rules only (advance window + allowed weekdays).
+     *
+     * @return array{valid: bool, errors: list<string>}
+     */
+    public function validateBookingDateRules(string $date): array
+    {
+        $errors = [];
+
+        $dateValidation = $this->isBookingDateValid($date);
+        if (! $dateValidation['valid']) {
+            $errors[] = $dateValidation['message'];
+        }
+
+        if (! $this->isAllowedWeddingWeekday($date)) {
+            $allowed  = $this->getAllowedWeddingWeekdayNames();
+            $label    = $this->formatAllowedDaysLabel($allowed);
+            $errors[] = "Weddings can only be booked on {$label}. Please select an allowed day.";
+        }
+
+        return [
+            'valid'  => $errors === [],
+            'errors' => $errors,
+        ];
+    }
+
+    /**
      * Validate booking date and time according to guidelines
      * @param string $date Date in Y-m-d format
      * @param string $time Time in H:i format
@@ -586,29 +693,17 @@ class BookingModel extends Model
      */
     public function validateBookingDateTime($date, $time)
     {
-        $errors = [];
-        
-        // Check 6-month advance requirement
-        $dateValidation = $this->isBookingDateValid($date);
-        if (!$dateValidation['valid']) {
-            $errors[] = $dateValidation['message'];
-        }
-        
-        if (! $this->isAllowedWeddingWeekday($date)) {
-            $allowed = $this->getAllowedWeddingWeekdayNames();
-            $label   = $this->formatAllowedDaysLabel($allowed);
-            $errors[] = "Weddings can only be booked on {$label}. Please select an allowed day.";
-        }
-        
-        // Check time slot
-        $timeValidation = $this->isTimeSlotValid($time);
-        if (!$timeValidation['valid']) {
+        $errors = $this->validateBookingDateRules($date)['errors'];
+
+        // Check time slot (includes last-Saturday morning block when applicable)
+        $timeValidation = $this->isTimeSlotValid($time, $date);
+        if (! $timeValidation['valid']) {
             $errors[] = $timeValidation['message'];
         }
-        
+
         return [
-            'valid' => empty($errors),
-            'errors' => $errors
+            'valid'  => $errors === [],
+            'errors' => $errors,
         ];
     }
 }
