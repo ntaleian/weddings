@@ -154,6 +154,9 @@
                 <i class="fas fa-info-circle"></i>
                 Time slots marked as "Booked" or "Pending" are not available for selection.
             </p>
+            <div id="cleaningDayNotice" style="display: none; margin-bottom: 15px; padding: 10px 14px; background: #eef7ee; border-left: 4px solid #008c15; border-radius: 6px; font-size: 0.9em; color: #1e3a1e;">
+                <i class="fas fa-info-circle mr-1"></i> <span id="cleaningDayNoticeText"></span>
+            </div>
             <div class="time-slots">
                 <div class="time-slot" data-time="09:00" onclick="selectTime('09:00')">
                     <i class="fas fa-clock"></i>
@@ -1523,6 +1526,17 @@ function checkTimeSlotAvailability(campusId, date, options) {
                 return;
             }
 
+            const cleaningNotice = document.getElementById('cleaningDayNotice');
+            const cleaningNoticeText = document.getElementById('cleaningDayNoticeText');
+            if (cleaningNotice && cleaningNoticeText) {
+                if (data.cleaning_day_note) {
+                    cleaningNoticeText.textContent = data.cleaning_day_note;
+                    cleaningNotice.style.display = 'block';
+                } else {
+                    cleaningNotice.style.display = 'none';
+                }
+            }
+
             if (data.status === 'success' && data.time_slots) {
                 data.time_slots.forEach(timeSlotData => {
                     const slotTime = normalizeSlotTime(timeSlotData.time) || timeSlotData.time;
@@ -1537,15 +1551,18 @@ function checkTimeSlotAvailability(campusId, date, options) {
                             timeSlot.onclick = () => selectTime(slotTime);
                             timeSlot.style.cursor = 'pointer';
                             timeSlot.classList.remove('unavailable');
+                            timeSlot.removeAttribute('title');
                         } else {
                             const status = timeSlotData.booking_status || 'booked';
                             availability.textContent = status === 'pending' ? 'Pending' : 'Booked';
+                            availability.textContent = status === 'pending' ? 'Pending' : (status === 'cleaning_day' ? 'Unavailable' : 'Booked');
                             availability.className = 'availability unavailable';
                             timeSlot.style.opacity = '0.5';
                             timeSlot.onclick = null;
                             timeSlot.style.cursor = 'not-allowed';
                             timeSlot.classList.add('unavailable');
                             timeSlot.title = `This time slot is ${status === 'pending' ? 'pending approval' : 'already booked'}`;
+                            timeSlot.title = timeSlotData.reason || (status === 'cleaning_day' ? 'On the last Saturday of the month, ceremonies start from 12:00 PM due to National Cleaning Day.' : (status === 'pending' ? 'This time slot is pending approval' : 'This time slot is already booked'));
                         }
                     }
                 });
@@ -1624,6 +1641,10 @@ function checkTimeSlotAvailability(campusId, date, options) {
 
 	// Reset time slots to default available state
 function resetTimeSlotAvailability() {
+    const cleaningNotice = document.getElementById('cleaningDayNotice');
+    if (cleaningNotice) {
+        cleaningNotice.style.display = 'none';
+    }
     const timeSlots = document.querySelectorAll('.time-slot');
     timeSlots.forEach(slot => {
         const availability = slot.querySelector('.availability');

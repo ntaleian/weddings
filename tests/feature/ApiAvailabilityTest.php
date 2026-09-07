@@ -73,6 +73,52 @@ final class ApiAvailabilityTest extends CIUnitTestCase
         ]);
     }
 
+    public function testLastSaturdayExcludesMorningSlotsInCampusAvailability(): void
+    {
+        $date = $this->futureLastSaturday();
+
+        $response = $this->withSession([
+            'user_id'    => 1,
+            'user_role'  => 'user',
+            'isLoggedIn' => true,
+        ])->get('/api/campuses/1/availability/' . $date);
+
+        $response->assertOK();
+        $payload = json_decode($response->getJSON(), true);
+
+        $this->assertSame('success', $payload['status']);
+        $this->assertNotEmpty($payload['cleaning_day_note']);
+
+        $slots = array_column($payload['time_slots'], null, 'time');
+        $this->assertFalse($slots['09:00']['available']);
+        $this->assertSame('cleaning_day', $slots['09:00']['booking_status']);
+        $this->assertFalse($slots['11:00']['available']);
+        $this->assertSame('cleaning_day', $slots['11:00']['booking_status']);
+        $this->assertTrue($slots['13:00']['available']);
+    }
+
+    public function testLastSaturdayQuickAvailabilityCheckShowsOpenSlotFrom12PM(): void
+    {
+        $date = $this->futureLastSaturday();
+
+        $response = $this->post('/api/quick-availability-check', [
+            'date'      => $date,
+            'campus_id' => 1,
+        ]);
+
+        $response->assertOK();
+        $payload = json_decode($response->getJSON(), true);
+
+        $this->assertSame('available', $payload['status']);
+        $this->assertNotEmpty($payload['cleaning_day_note']);
+        $this->assertSame(1, $payload['available_slots']);
+
+        $slots = array_column($payload['time_slots'], null, 'time');
+        $this->assertFalse($slots['09:00']['available']);
+        $this->assertFalse($slots['11:00']['available']);
+        $this->assertTrue($slots['13:00']['available']);
+    }
+
     private function insertBooking(string $date, string $time): void
     {
         $now = date('Y-m-d H:i:s');
@@ -94,5 +140,16 @@ final class ApiAvailabilityTest extends CIUnitTestCase
     private function nextSaturday(): string
     {
         return date('Y-m-d', strtotime('next saturday'));
+    }
+
+    private function futureLastSaturday(): string
+    {
+        $dt = new \DateTime('last saturday of this month');
+        $today = new \DateTime('today');
+        if ($dt <= $today) {
+            $dt = new \DateTime('last saturday of next month');
+        }
+
+        return $dt->format('Y-m-d');
     }
 }

@@ -1439,10 +1439,16 @@
                     const loginUrl = data.login_url || '<?= base_url("login") ?>';
                     const registerUrl = data.register_url || ('<?= base_url("register") ?>?date=' + weddingDate + '&campus=' + campusId);
 
+                    let cleaningNoteHtml = '';
+                    if (data.cleaning_day_note) {
+                        cleaningNoteHtml = '<p class="availability-note" style="margin: 12px 0; padding: 10px 14px; background: #eef7ee; border-left: 4px solid #008c15; border-radius: 4px; font-size: 0.9em; color: #1e3a1e;">' + escapeHtml(data.cleaning_day_note) + '</p>';
+                    }
+
                     showAvailabilityModal({
                         eyebrow: 'Date available',
                         title: (data.campus || 'This campus') + ' has openings',
                         body: '<p><strong>' + escapeHtml(formatDate(data.date)) + '</strong> currently has available ceremony times.</p>' +
+                            cleaningNoteHtml +
                             slotList +
                             '<p>' + escapeHtml(data.next_step_message || 'Sign in or create an account to continue. Availability is not reserved until you submit your application.') + '</p>',
                         actions: [
@@ -1471,14 +1477,22 @@
                         if (unavailableSlots.length > 0) {
                             bookedSlots = '<ul class="availability-slot-list">' + unavailableSlots.map(function(slot) {
                                 return '<li><span>' + escapeHtml(slot.display) + '</span><span>' + escapeHtml(slot.booking_status || 'Booked') + '</span></li>';
+                                const statusLabel = slot.booking_status === 'cleaning_day' ? 'Cleaning Day' : (slot.booking_status || 'Booked');
+                                return '<li><span>' + escapeHtml(slot.display) + '</span><span>' + escapeHtml(statusLabel) + '</span></li>';
                             }).join('') + '</ul>';
                         }
+                    }
+
+                    let cleaningNoteHtml = '';
+                    if (data.cleaning_day_note) {
+                        cleaningNoteHtml = '<p class="availability-note" style="margin: 12px 0; padding: 10px 14px; background: #fdf2e9; border-left: 4px solid #e67e22; border-radius: 4px; font-size: 0.9em; color: #78340f;">' + escapeHtml(data.cleaning_day_note) + '</p>';
                     }
 
                     showAvailabilityModal({
                         eyebrow: 'Fully booked',
                         title: 'No open slots on this date',
                         body: '<p>' + escapeHtml(data.campus || 'This campus') + ' is fully booked on <strong>' + escapeHtml(formatDate(data.date)) + '</strong>.</p>' +
+                            cleaningNoteHtml +
                             bookedSlots +
                             '<p>Please select a different Friday or Saturday.</p>',
                         actions: [

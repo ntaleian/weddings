@@ -46,6 +46,7 @@ class API extends Controller
 
         // Validate date according to guidelines
         $dateValidation = $this->bookingModel->validateBookingDateTime($date, '09:00'); // Use any time for date validation
+        $dateValidation = $this->bookingModel->validateBookingDateRules($date);
         if (!$dateValidation['valid']) {
             return $this->response->setJSON([
                 'status' => 'error',
@@ -66,6 +67,8 @@ class API extends Controller
             ]);
         }
 
+        $isLastSaturday = $this->bookingModel->isLastSaturdayOfMonth($date);
+
         // Check existing bookings for each time slot (9 AM, 11 AM, 1 PM ceremony starts)
         $availableTimeSlots = [
             '09:00:00' => [
@@ -84,6 +87,16 @@ class API extends Controller
                 'available' => true,
             ],
         ];
+
+        if ($isLastSaturday) {
+            foreach ($availableTimeSlots as $slotKey => $slotData) {
+                if ($slotData['time'] < '12:00') {
+                    $availableTimeSlots[$slotKey]['available'] = false;
+                    $availableTimeSlots[$slotKey]['booking_status'] = 'cleaning_day';
+                    $availableTimeSlots[$slotKey]['reason'] = 'On the last Saturday of the month, ceremonies start from 12:00 PM due to National Cleaning Day.';
+                }
+            }
+        }
 
         // Get existing bookings that actually hold this campus date
         $existingBookings = $this->bookingModel
@@ -110,6 +123,7 @@ class API extends Controller
         return $this->response->setJSON([
             'status' => 'success', 
             'message' => 'Availability checked successfully',
+            'cleaning_day_note' => $isLastSaturday ? 'On the last Saturday of the month, ceremonies start from 12:00 PM due to National Cleaning Day.' : null,
             'date' => $date,
             'campus_id' => $campusId,
             'time_slots' => array_values($availableTimeSlots),
@@ -235,6 +249,8 @@ class API extends Controller
 
             // Validate date according to guidelines (advance booking, Fri/Sat only, time slots)
             $dateValidation = $this->bookingModel->validateBookingDateTime($date, '09:00'); // Use any time for date validation
+            // Validate date according to guidelines (advance booking, Fri/Sat only)
+            $dateValidation = $this->bookingModel->validateBookingDateRules($date);
             if (!$dateValidation['valid']) {
                 return $this->response->setJSON([
                     'status' => 'error',
@@ -260,6 +276,8 @@ class API extends Controller
                 ]);
             }
 
+            $isLastSaturday = $this->bookingModel->isLastSaturdayOfMonth($date);
+
             // Check existing bookings for time slots (9 AM, 11 AM, 1 PM ceremony starts)
             $availableTimeSlots = [
                 '09:00:00' => [
@@ -278,6 +296,16 @@ class API extends Controller
                     'available' => true,
                 ],
             ];
+
+            if ($isLastSaturday) {
+                foreach ($availableTimeSlots as $slotKey => $slotData) {
+                    if ($slotData['time'] < '12:00') {
+                        $availableTimeSlots[$slotKey]['available'] = false;
+                        $availableTimeSlots[$slotKey]['booking_status'] = 'cleaning_day';
+                        $availableTimeSlots[$slotKey]['reason'] = 'On the last Saturday of the month, ceremonies start from 12:00 PM due to National Cleaning Day.';
+                    }
+                }
+            }
 
             // Get existing bookings that actually hold this campus date
             $existingBookings = $this->bookingModel
@@ -306,6 +334,7 @@ class API extends Controller
                 return $this->response->setJSON([
                     'status' => 'unavailable',
                     'message' => 'No time slots available for this date',
+                    'cleaning_day_note' => $isLastSaturday ? 'On the last Saturday of the month, ceremonies start from 12:00 PM due to National Cleaning Day.' : null,
                     'date' => $date,
                     'campus' => $campus['name'],
                     'time_slots' => array_values($availableTimeSlots)
@@ -315,6 +344,7 @@ class API extends Controller
             return $this->response->setJSON([
                 'status' => 'available',
                 'message' => 'Date is available for booking',
+                'cleaning_day_note' => $isLastSaturday ? 'On the last Saturday of the month, ceremonies start from 12:00 PM due to National Cleaning Day.' : null,
                 'next_step_message' => 'Availability is not a reservation yet. Sign in or create an account to continue and save your wedding application.',
                 'login_url' => site_url('login'),
                 'register_url' => site_url('register') . '?date=' . rawurlencode($date) . '&campus=' . rawurlencode((string) $campusId),
