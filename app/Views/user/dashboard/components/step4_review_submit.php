@@ -366,7 +366,9 @@ function populateStep4Review() {
     const reviewTimeLabels = {
         '09:00': '9:00 AM',
         '11:00': '11:00 AM',
-        '13:00': '1:00 PM'
+        '12:00': '12:00 PM',
+        '13:00': '1:00 PM',
+        '14:00': '2:00 PM'
     };
     // Time - check global variable first
     if (typeof selectedTime !== 'undefined' && selectedTime) {

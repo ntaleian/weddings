@@ -42,6 +42,21 @@ final class BookingRulesTest extends CIUnitTestCase
         $this->assertFalse($model->isTimeSlotValid('10:00')['valid']);
     }
 
+    public function testLastSaturdayOfMonthHas12And14Slots(): void
+    {
+        $model = new BookingModel();
+        $date  = date('Y-m-d', strtotime('last saturday of this month'));
+
+        $slots = $model->getBookableTimeSlotsForDate($date);
+        $this->assertSame(['12:00', '14:00'], $slots);
+
+        $this->assertTrue($model->isTimeSlotValid('12:00', $date)['valid']);
+        $this->assertTrue($model->isTimeSlotValid('14:00', $date)['valid']);
+        $this->assertFalse($model->isTimeSlotValid('09:00', $date)['valid']);
+        $this->assertFalse($model->isTimeSlotValid('11:00', $date)['valid']);
+        $this->assertFalse($model->isTimeSlotValid('13:00', $date)['valid']);
+    }
+
     public function testUnpaidPendingBookingDoesNotBlockCampusDateAndTime(): void
     {
         $date = $this->nextWeekday('saturday');

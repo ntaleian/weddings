@@ -90,14 +90,15 @@ final class ApiAvailabilityTest extends CIUnitTestCase
         $this->assertNotEmpty($payload['cleaning_day_note']);
 
         $slots = array_column($payload['time_slots'], null, 'time');
-        $this->assertFalse($slots['09:00']['available']);
-        $this->assertSame('cleaning_day', $slots['09:00']['booking_status']);
-        $this->assertFalse($slots['11:00']['available']);
-        $this->assertSame('cleaning_day', $slots['11:00']['booking_status']);
-        $this->assertTrue($slots['13:00']['available']);
+        $this->assertArrayHasKey('12:00', $slots);
+        $this->assertArrayHasKey('14:00', $slots);
+        $this->assertArrayNotHasKey('09:00', $slots);
+        $this->assertArrayNotHasKey('11:00', $slots);
+        $this->assertTrue($slots['12:00']['available']);
+        $this->assertTrue($slots['14:00']['available']);
     }
 
-    public function testLastSaturdayQuickAvailabilityCheckShowsOpenSlotFrom12PM(): void
+    public function testLastSaturdayQuickAvailabilityCheckShows12And14Slots(): void
     {
         $date = $this->futureLastSaturday();
 
@@ -111,12 +112,13 @@ final class ApiAvailabilityTest extends CIUnitTestCase
 
         $this->assertSame('available', $payload['status']);
         $this->assertNotEmpty($payload['cleaning_day_note']);
-        $this->assertSame(1, $payload['available_slots']);
+        $this->assertSame(2, $payload['available_slots']);
 
         $slots = array_column($payload['time_slots'], null, 'time');
-        $this->assertFalse($slots['09:00']['available']);
-        $this->assertFalse($slots['11:00']['available']);
-        $this->assertTrue($slots['13:00']['available']);
+        $this->assertTrue($slots['12:00']['available']);
+        $this->assertTrue($slots['14:00']['available']);
+        $this->assertSame('12:00 PM', $slots['12:00']['display']);
+        $this->assertSame('2:00 PM', $slots['14:00']['display']);
     }
 
     private function insertBooking(string $date, string $time): void

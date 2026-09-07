@@ -1554,14 +1554,12 @@ function checkTimeSlotAvailability(campusId, date, options) {
                             timeSlot.removeAttribute('title');
                         } else {
                             const status = timeSlotData.booking_status || 'booked';
-                            availability.textContent = status === 'pending' ? 'Pending' : 'Booked';
                             availability.textContent = status === 'pending' ? 'Pending' : (status === 'cleaning_day' ? 'Unavailable' : 'Booked');
                             availability.className = 'availability unavailable';
                             timeSlot.style.opacity = '0.5';
                             timeSlot.onclick = null;
                             timeSlot.style.cursor = 'not-allowed';
                             timeSlot.classList.add('unavailable');
-                            timeSlot.title = `This time slot is ${status === 'pending' ? 'pending approval' : 'already booked'}`;
                             timeSlot.title = timeSlotData.reason || (status === 'cleaning_day' ? 'On the last Saturday of the month, ceremonies start from 12:00 PM due to National Cleaning Day.' : (status === 'pending' ? 'This time slot is pending approval' : 'This time slot is already booked'));
                         }
                     }

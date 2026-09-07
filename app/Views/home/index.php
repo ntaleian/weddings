@@ -1476,7 +1476,6 @@
 
                         if (unavailableSlots.length > 0) {
                             bookedSlots = '<ul class="availability-slot-list">' + unavailableSlots.map(function(slot) {
-                                return '<li><span>' + escapeHtml(slot.display) + '</span><span>' + escapeHtml(slot.booking_status || 'Booked') + '</span></li>';
                                 const statusLabel = slot.booking_status === 'cleaning_day' ? 'Cleaning Day' : (slot.booking_status || 'Booked');
                                 return '<li><span>' + escapeHtml(slot.display) + '</span><span>' + escapeHtml(statusLabel) + '</span></li>';
                             }).join('') + '</ul>';

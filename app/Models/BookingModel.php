@@ -141,16 +141,30 @@ class BookingModel extends Model
         return $stats;
     }
 
+    public function hasDateHeldColumn(): bool
+    {
+        static $hasColumn = null;
+        if ($hasColumn === null) {
+            $hasColumn = $this->db->fieldExists('date_held', 'bookings');
+        }
+        return $hasColumn;
+    }
+
     public function isDateAvailable($campusId, $date, $excludeBookingId = null)
     {
-        // Only date-held or approved bookings lock a campus date for others.
         $query = $this->where('campus_id', $campusId)
-                     ->where('wedding_date', $date)
-                     ->groupStart()
-                        ->where('date_held', 1)
-                        ->orWhere('status', 'approved')
-                     ->groupEnd()
-                     ->whereNotIn('status', ['rejected', 'cancelled', 'draft']);
+                     ->where('wedding_date', $date);
+
+        if ($this->hasDateHeldColumn()) {
+            $query->groupStart()
+                ->where('date_held', 1)
+                ->orWhere('status', 'approved')
+            ->groupEnd();
+        } else {
+            $query->where('status', 'approved');
+        }
+
+        $query->whereNotIn('status', ['rejected', 'cancelled', 'draft']);
 
         if ($excludeBookingId) {
             $query->where('id !=', $excludeBookingId);
@@ -492,17 +506,11 @@ class BookingModel extends Model
      */
     public function getBookableTimeSlotsForDate(string $date): array
     {
-        $slots = $this->getConfiguredTimeSlots();
-
-        if (! $this->isLastSaturdayOfMonth($date)) {
-            return $slots;
+        if ($this->isLastSaturdayOfMonth($date)) {
+            return ['12:00', '14:00'];
         }
 
-        // ponytail: filter only; if settings later add 12:00 it becomes the earliest last-Saturday option automatically
-        return array_values(array_filter(
-            $slots,
-            static fn (string $slot): bool => $slot >= '12:00'
-        ));
+        return $this->getConfiguredTimeSlots();
     }
 
     /**
@@ -567,12 +575,18 @@ class BookingModel extends Model
         // Check if time slot is already held/approved
         $query = $this->where('campus_id', $campusId)
                      ->where('wedding_date', $date)
-                     ->where('wedding_time', $time)
-                     ->groupStart()
-                        ->where('date_held', 1)
-                        ->orWhere('status', 'approved')
-                     ->groupEnd()
-                     ->whereNotIn('status', ['rejected', 'cancelled', 'draft']);
+                     ->where('wedding_time', $time);
+
+        if ($this->hasDateHeldColumn()) {
+            $query->groupStart()
+                ->where('date_held', 1)
+                ->orWhere('status', 'approved')
+            ->groupEnd();
+        } else {
+            $query->where('status', 'approved');
+        }
+
+        $query->whereNotIn('status', ['rejected', 'cancelled', 'draft']);
 
         if ($excludeBookingId) {
             $query->where('id !=', $excludeBookingId);
@@ -647,10 +661,12 @@ class BookingModel extends Model
             }
         }
 
-        $this->update($bookingId, [
-            'date_held' => 1,
-            'date_held_at' => date('Y-m-d H:i:s'),
-        ]);
+        if ($this->hasDateHeldColumn()) {
+            $this->update($bookingId, [
+                'date_held' => 1,
+                'date_held_at' => date('Y-m-d H:i:s'),
+            ]);
+        }
 
         return [
             'held' => true,

@@ -45,7 +45,6 @@ class API extends Controller
         }
 
         // Validate date according to guidelines
-        $dateValidation = $this->bookingModel->validateBookingDateTime($date, '09:00'); // Use any time for date validation
         $dateValidation = $this->bookingModel->validateBookingDateRules($date);
         if (!$dateValidation['valid']) {
             return $this->response->setJSON([
@@ -68,55 +67,45 @@ class API extends Controller
         }
 
         $isLastSaturday = $this->bookingModel->isLastSaturdayOfMonth($date);
+        $bookableSlots = $this->bookingModel->getBookableTimeSlotsForDate($date);
 
-        // Check existing bookings for each time slot (9 AM, 11 AM, 1 PM ceremony starts)
-        $availableTimeSlots = [
-            '09:00:00' => [
-                'time'      => '09:00',
-                'display'   => '9:00 AM',
+        $availableTimeSlots = [];
+        foreach ($bookableSlots as $slot) {
+            $key = strlen($slot) === 5 ? $slot . ':00' : $slot;
+            $timeH_i = substr($key, 0, 5);
+            $availableTimeSlots[$key] = [
+                'time'      => $timeH_i,
+                'display'   => $this->bookingModel->formatTimeSlotDisplay($timeH_i),
                 'available' => true,
-            ],
-            '11:00:00' => [
-                'time'      => '11:00',
-                'display'   => '11:00 AM',
-                'available' => true,
-            ],
-            '13:00:00' => [
-                'time'      => '13:00',
-                'display'   => '1:00 PM',
-                'available' => true,
-            ],
-        ];
-
-        if ($isLastSaturday) {
-            foreach ($availableTimeSlots as $slotKey => $slotData) {
-                if ($slotData['time'] < '12:00') {
-                    $availableTimeSlots[$slotKey]['available'] = false;
-                    $availableTimeSlots[$slotKey]['booking_status'] = 'cleaning_day';
-                    $availableTimeSlots[$slotKey]['reason'] = 'On the last Saturday of the month, ceremonies start from 12:00 PM due to National Cleaning Day.';
-                }
-            }
+            ];
         }
 
         // Get existing bookings that actually hold this campus date
-        $existingBookings = $this->bookingModel
+        $existingQuery = $this->bookingModel
             ->where('campus_id', $campusId)
-            ->where('wedding_date', $date)
-            ->groupStart()
+            ->where('wedding_date', $date);
+
+        if ($this->bookingModel->hasDateHeldColumn()) {
+            $existingQuery->groupStart()
                 ->where('date_held', 1)
                 ->orWhere('status', 'approved')
-            ->groupEnd()
+            ->groupEnd();
+        } else {
+            $existingQuery->where('status', 'approved');
+        }
+
+        $existingBookings = $existingQuery
             ->whereNotIn('status', ['rejected', 'cancelled', 'draft'])
             ->findAll();
 
-        // echo "<pre>"; print_r($existingBookings); echo "</pre>"; exit;
-
         // Mark time slots as unavailable if already booked
         foreach ($existingBookings as $booking) {
+            $bookedTime = $booking['wedding_time'] ?? '';
+            $timeKey = strlen($bookedTime) === 5 ? $bookedTime . ':00' : $bookedTime;
 
-            if (isset($availableTimeSlots[$booking['wedding_time']])) {
-                $availableTimeSlots[$booking['wedding_time']]['available'] = false;
-                $availableTimeSlots[$booking['wedding_time']]['booking_status'] = $booking['status'];
+            if (isset($availableTimeSlots[$timeKey])) {
+                $availableTimeSlots[$timeKey]['available'] = false;
+                $availableTimeSlots[$timeKey]['booking_status'] = $booking['status'];
             }
         }
 
@@ -247,8 +236,6 @@ class API extends Controller
                 ])->setStatusCode(404);
             }
 
-            // Validate date according to guidelines (advance booking, Fri/Sat only, time slots)
-            $dateValidation = $this->bookingModel->validateBookingDateTime($date, '09:00'); // Use any time for date validation
             // Validate date according to guidelines (advance booking, Fri/Sat only)
             $dateValidation = $this->bookingModel->validateBookingDateRules($date);
             if (!$dateValidation['valid']) {
@@ -277,44 +264,34 @@ class API extends Controller
             }
 
             $isLastSaturday = $this->bookingModel->isLastSaturdayOfMonth($date);
+            $bookableSlots = $this->bookingModel->getBookableTimeSlotsForDate($date);
 
-            // Check existing bookings for time slots (9 AM, 11 AM, 1 PM ceremony starts)
-            $availableTimeSlots = [
-                '09:00:00' => [
-                    'time'      => '09:00',
-                    'display'   => '9:00 AM',
+            $availableTimeSlots = [];
+            foreach ($bookableSlots as $slot) {
+                $key = strlen($slot) === 5 ? $slot . ':00' : $slot;
+                $timeH_i = substr($key, 0, 5);
+                $availableTimeSlots[$key] = [
+                    'time'      => $timeH_i,
+                    'display'   => $this->bookingModel->formatTimeSlotDisplay($timeH_i),
                     'available' => true,
-                ],
-                '11:00:00' => [
-                    'time'      => '11:00',
-                    'display'   => '11:00 AM',
-                    'available' => true,
-                ],
-                '13:00:00' => [
-                    'time'      => '13:00',
-                    'display'   => '1:00 PM',
-                    'available' => true,
-                ],
-            ];
-
-            if ($isLastSaturday) {
-                foreach ($availableTimeSlots as $slotKey => $slotData) {
-                    if ($slotData['time'] < '12:00') {
-                        $availableTimeSlots[$slotKey]['available'] = false;
-                        $availableTimeSlots[$slotKey]['booking_status'] = 'cleaning_day';
-                        $availableTimeSlots[$slotKey]['reason'] = 'On the last Saturday of the month, ceremonies start from 12:00 PM due to National Cleaning Day.';
-                    }
-                }
+                ];
             }
 
             // Get existing bookings that actually hold this campus date
-            $existingBookings = $this->bookingModel
+            $existingQuery = $this->bookingModel
                 ->where('campus_id', $campusId)
-                ->where('wedding_date', $date)
-                ->groupStart()
+                ->where('wedding_date', $date);
+
+            if ($this->bookingModel->hasDateHeldColumn()) {
+                $existingQuery->groupStart()
                     ->where('date_held', 1)
                     ->orWhere('status', 'approved')
-                ->groupEnd()
+                ->groupEnd();
+            } else {
+                $existingQuery->where('status', 'approved');
+            }
+
+            $existingBookings = $existingQuery
                 ->whereNotIn('status', ['rejected', 'cancelled', 'draft'])
                 ->findAll();
 
